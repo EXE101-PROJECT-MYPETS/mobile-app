@@ -1,0 +1,184 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:petpee_mobile/common/auth/api/auth_service.dart';
+import 'package:petpee_mobile/common/auth/model/auth_dto.dart';
+import 'package:petpee_mobile/common/user/model/user_model.dart';
+
+class AuthProvider extends ChangeNotifier {
+  final AuthService _authService = AuthService();
+
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
+  String? _token;
+  String? get token => _token;
+
+  String? _refreshToken;
+  String? get refreshToken => _refreshToken;
+
+  String? _role;
+  String? get role => _role;
+
+  int? _currentShopId;
+  int? get currentShopId => _currentShopId;
+
+  List<AuthShopDTO> _shops = [];
+  List<AuthShopDTO> get shops => List.unmodifiable(_shops);
+
+  UserModel? _currentUser;
+  UserModel? get currentUser => _currentUser;
+
+  AuthProvider() {
+    _loadToken();
+  }
+
+  Future<void> _loadToken() async {
+    final box = await Hive.openBox('auth_box');
+    _token = box.get('access_token');
+    _refreshToken = box.get('refresh_token');
+    _role = box.get('role');
+    _currentShopId = box.get('current_shop_id');
+    final userJson = box.get('user_data');
+    if (userJson != null) {
+      _currentUser = UserModel.fromJson(jsonDecode(userJson));
+    }
+    final shopsJson = box.get('shops');
+    if (shopsJson != null) {
+      final decodedShops = jsonDecode(shopsJson) as List<dynamic>;
+      _shops = decodedShops
+          .map((shop) => AuthShopDTO.fromJson(shop as Map<String, dynamic>))
+          .toList();
+    }
+    notifyListeners();
+  }
+
+  Future<void> _saveAuthentication(UserLoginResponse response) async {
+    final box = await Hive.openBox('auth_box');
+    await box.put('access_token', response.accessToken);
+    await box.put('refresh_token', response.refreshToken);
+    await box.put('role', response.role);
+    if (response.currentShopId != null) {
+      await box.put('current_shop_id', response.currentShopId);
+    } else {
+      await box.delete('current_shop_id');
+    }
+    await box.put('user_data', jsonEncode(response.user.toJson()));
+    await box.put(
+      'shops',
+      jsonEncode(response.shops.map((shop) => shop.toJson()).toList()),
+    );
+
+    _token = response.accessToken;
+    _refreshToken = response.refreshToken;
+    _role = response.role;
+    _currentShopId = response.currentShopId;
+    _currentUser = response.user;
+    _shops = response.shops;
+    notifyListeners();
+  }
+
+  Future<void> login(String email, String password) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      final response = await _authService.login(
+        AuthenticationRequest(email: email, password: password),
+      );
+      await _saveAuthentication(response);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<UserLoginResponse> register({
+    required String email,
+    required String password,
+    required String fullName,
+    required String phone,
+    required String address,
+    required String province,
+    required String district,
+    required String ward,
+    required String hamlet,
+    int? age,
+    XFile? avatar,
+  }) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      return await _authService.register(
+        RegisterRequest(
+          email: email,
+          password: password,
+          fullName: fullName,
+          phone: phone,
+          address: address,
+          province: province,
+          district: district,
+          ward: ward,
+          hamlet: hamlet,
+          age: age,
+          avatarUrlPreview: avatar,
+        ),
+      );
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<EmailVerificationResponse> sendRegisterVerificationCode(
+    String email,
+  ) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      return await _authService.sendRegisterVerificationCode(
+        RegisterEmailVerificationSendRequest(email: email),
+      );
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<EmailVerificationResponse> verifyRegisterVerificationCode({
+    required String email,
+    required String code,
+  }) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      return await _authService.verifyRegisterVerificationCode(
+        RegisterEmailVerificationVerifyRequest(email: email, code: code),
+      );
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> logout() async {
+    final box = await Hive.openBox('auth_box');
+    await box.delete('access_token');
+    await box.delete('refresh_token');
+    await box.delete('role');
+    await box.delete('current_shop_id');
+    await box.delete('user_data');
+    await box.delete('shops');
+    _token = null;
+    _refreshToken = null;
+    _role = null;
+    _currentShopId = null;
+    _currentUser = null;
+    _shops = [];
+    notifyListeners();
+  }
+}
