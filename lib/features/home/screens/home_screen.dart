@@ -6,6 +6,7 @@ import '../../../core/providers/app_state.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../shared/widgets/product_card.dart';
 import '../../profile/screens/profile_screen.dart';
+import '../../chat/screens/chat_list_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -76,18 +77,28 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildFloatingChatButton() {
-    return Container(
-      width: 60,
-      height: 60,
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFC1D6),
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(color: Colors.pink.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 5))
-        ],
-      ),
-      child: const Center(
-        child: Icon(LucideIcons.cat, color: Colors.white, size: 30),
+    return Builder(
+      builder: (context) => GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ChatListScreen()),
+          );
+        },
+        child: Container(
+          width: 60,
+          height: 60,
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFC1D6),
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(color: Colors.pink.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 5))
+            ],
+          ),
+          child: const Center(
+            child: Icon(LucideIcons.cat, color: Colors.white, size: 30),
+          ),
+        ),
       ),
     );
   }
@@ -474,7 +485,12 @@ class _BottomNavBar extends StatelessWidget {
       selectedItemColor: Colors.pink,
       unselectedItemColor: Colors.grey,
       onTap: (index) {
-        if (index == 4) {
+        if (index == 1) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ChatListScreen()),
+          );
+        } else if (index == 4) {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const ProfileScreen()),
@@ -485,7 +501,7 @@ class _BottomNavBar extends StatelessWidget {
       unselectedLabelStyle: const TextStyle(fontSize: 10),
       items: const [
         BottomNavigationBarItem(icon: Icon(LucideIcons.home), label: 'Trang chủ'),
-        BottomNavigationBarItem(icon: Icon(LucideIcons.utensils), label: 'Dịch vụ'),
+        BottomNavigationBarItem(icon: Icon(LucideIcons.messageCircle), label: 'Tin nhắn'),
         BottomNavigationBarItem(icon: Icon(LucideIcons.store), label: 'Cửa hàng'),
         BottomNavigationBarItem(icon: Icon(LucideIcons.ticket), label: 'Ưu đãi'),
         BottomNavigationBarItem(icon: Icon(LucideIcons.user), label: 'Tài khoản'),

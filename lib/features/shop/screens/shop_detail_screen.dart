@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../chat/screens/chat_detail_screen.dart';
 
 class ShopDetailScreen extends StatelessWidget {
   const ShopDetailScreen({super.key});
@@ -16,7 +17,7 @@ class ShopDetailScreen extends StatelessWidget {
             _buildHeader(context),
             
             // 2. Shop Info (Profile, Actions)
-            _buildShopInfo(),
+            _buildShopInfo(context),
             
             const Divider(color: Color(0xFFF1F5F9), thickness: 1, height: 32),
             
@@ -81,7 +82,7 @@ class ShopDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildShopInfo() {
+  Widget _buildShopInfo(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Stack(
@@ -128,7 +129,19 @@ class ShopDetailScreen extends StatelessWidget {
                       children: [
                         Expanded(
                           child: ElevatedButton.icon(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ChatDetailScreen(
+                                    conversationId: 'temp_1',
+                                    shopId: '1',
+                                    shopName: 'Golden Paws Spa',
+                                    shopAvatarUrl: 'https://picsum.photos/seed/shopprofile/200/200',
+                                  ),
+                                ),
+                              );
+                            },
                             icon: const Icon(LucideIcons.messageSquare, size: 16, color: Colors.white),
                             label: const Text('Chat ngay', style: TextStyle(fontSize: 13, color: Colors.white)),
                             style: ElevatedButton.styleFrom(

@@ -10,6 +10,8 @@ import 'package:petpee_mobile/features/cart/screens/cart_screen.dart';
 import 'package:petpee_mobile/features/home/screens/notifications_screen.dart';
 import 'package:petpee_mobile/features/home/screens/home_screen.dart';
 
+import 'package:petpee_mobile/features/chat/providers/chat_provider.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
@@ -19,6 +21,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => AppState()),
         ChangeNotifierProvider(create: (context) => AuthProvider()),
+        ChangeNotifierProvider(create: (context) => ChatProvider()),
       ],
       child: const MyApp(),
     ),
