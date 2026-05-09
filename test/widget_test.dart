@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:petpee_mobile/main.dart';
+import 'package:petpee_mobile/app.dart';
 
 void main() {
   testWidgets('Shows login screen', (WidgetTester tester) async {
