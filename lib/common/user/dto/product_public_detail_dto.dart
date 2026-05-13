@@ -1,3 +1,4 @@
+import 'package:petpee_mobile/common/utils/image_url_util.dart';
 import 'package:petpee_mobile/common/utils/price_formatter.dart';
 
 class ProductPublicDetailDTO {
@@ -8,6 +9,10 @@ class ProductPublicDetailDTO {
   final bool? shopVerified;
   final double? shopRating;
   final int? shopProductCount;
+  final String? shopAddress;
+  final String? shopContactName;
+  final String? shopContactPhone;
+  final String? shopContactEmail;
 
   final String? name;
   final String? sku;
@@ -40,6 +45,10 @@ class ProductPublicDetailDTO {
     this.shopVerified,
     this.shopRating,
     this.shopProductCount,
+    this.shopAddress,
+    this.shopContactName,
+    this.shopContactPhone,
+    this.shopContactEmail,
     this.name,
     this.sku,
     this.categoryName,
@@ -65,12 +74,12 @@ class ProductPublicDetailDTO {
   });
 
   factory ProductPublicDetailDTO.fromJson(Map<String, dynamic> json) {
-    String? _getString(dynamic value) {
+    String? getString(dynamic value) {
       if (value == null) return null;
       return value is String ? value : value.toString();
     }
 
-    List<String> _parseStringList(dynamic value) {
+    List<String> parseStringList(dynamic value) {
       if (value == null) return [];
       if (value is List) {
         return value.whereType<String>().toList();
@@ -82,45 +91,74 @@ class ProductPublicDetailDTO {
     }
 
     final shopData = json['shop'] as Map<String, dynamic>?;
+    final shopContact = shopData?['contact'] as Map<String, dynamic>?;
 
-    final dynamic images = json['imageUrls'] ?? json['images'] ?? json['imageUrl'];
+    final dynamic images =
+        json['imageUrls'] ?? json['images'] ?? json['imageUrl'];
 
     return ProductPublicDetailDTO(
       id: json['id'] as int?,
       shopId: json['shopId'] as int?,
-      shopName: _getString(json['shopName']) ?? _getString(shopData?['name']),
-      shopLogoUrl: _getString(json['shopLogoUrl']) ?? _getString(shopData?['logoUrl']) ?? _getString(shopData?['avatar']),
-      shopVerified: json['shopVerified'] as bool? ?? shopData?['verified'] as bool?,
-      shopRating: (json['shopRating'] as num?)?.toDouble() ?? (shopData?['rating'] as num?)?.toDouble(),
-      shopProductCount: json['shopProductCount'] as int? ?? shopData?['productCount'] as int?,
-      name: _getString(json['name']),
-      sku: _getString(json['sku']),
-      categoryName: _getString(json['categoryName']),
-      description: _getString(json['description']),
-      shortDescription: _getString(json['shortDescription']),
+      shopName: getString(json['shopName']) ?? getString(shopData?['name']),
+      shopLogoUrl: ImageUrlUtil.buildPublicUrl(
+        getString(json['shopLogoUrl']) ??
+            getString(shopData?['logoUrl']) ??
+            getString(shopData?['avatar']),
+      ),
+      shopVerified:
+          json['shopVerified'] as bool? ?? shopData?['verified'] as bool?,
+      shopRating:
+          (json['shopRating'] as num?)?.toDouble() ??
+          (shopData?['rating'] as num?)?.toDouble(),
+      shopProductCount:
+          json['shopProductCount'] as int? ?? shopData?['productCount'] as int?,
+      shopAddress:
+          getString(json['shopAddress']) ?? getString(shopData?['address']),
+      shopContactName:
+          getString(json['shopContactName']) ?? getString(shopContact?['name']),
+      shopContactPhone:
+          getString(json['shopContactPhone']) ??
+          getString(shopContact?['phone']),
+      shopContactEmail:
+          getString(json['shopContactEmail']) ??
+          getString(shopContact?['email']),
+      name: getString(json['name']),
+      sku: getString(json['sku']),
+      categoryName: getString(json['categoryName']),
+      description: getString(json['description']),
+      shortDescription: getString(json['shortDescription']),
       price: json['price'] as int?,
       originalPrice: json['originalPrice'] as int?,
       discountPercent: json['discountPercent'] as int?,
-      unit: _getString(json['unit']),
+      unit: getString(json['unit']),
       stockQty: json['stockQty'] as int?,
       soldCount: json['soldCount'] as int?,
       rating: (json['rating'] as num?)?.toDouble(),
       reviewCount: json['reviewCount'] as int?,
       totalReviews: json['totalReviews'] as int?,
       active: json['active'] as bool?,
-      imageUrls: _parseStringList(images),
-      badgeLabels: _parseStringList(json['badgeLabels'] ?? json['badges']),
-      highlightPoints: _parseStringList(json['highlightPoints'] ?? json['highlights'] ?? json['features']),
-      policyHighlights: _parseStringList(json['policyHighlights'] ?? json['policies'] ?? json['guarantees']),
-      availableVariants: _parseStringList(json['availableVariants'] ?? json['variants']),
-      deliveryNote: _getString(json['deliveryNote'] ?? json['delivery']),
-      returnPolicy: _getString(json['returnPolicy'] ?? json['returnPolicyText']),
+      imageUrls: ImageUrlUtil.buildPublicUrls(parseStringList(images)),
+      badgeLabels: parseStringList(json['badgeLabels'] ?? json['badges']),
+      highlightPoints: parseStringList(
+        json['highlightPoints'] ?? json['highlights'] ?? json['features'],
+      ),
+      policyHighlights: parseStringList(
+        json['policyHighlights'] ?? json['policies'] ?? json['guarantees'],
+      ),
+      availableVariants: parseStringList(
+        json['availableVariants'] ?? json['variants'],
+      ),
+      deliveryNote: getString(json['deliveryNote'] ?? json['delivery']),
+      returnPolicy: getString(json['returnPolicy'] ?? json['returnPolicyText']),
     );
   }
 
   String get priceText => PriceFormatter.formatVnd(price);
-  String get originalPriceText => originalPrice != null ? PriceFormatter.formatVnd(originalPrice, fallback: '') : '';
+  String get originalPriceText => originalPrice != null
+      ? PriceFormatter.formatVnd(originalPrice, fallback: '')
+      : '';
   String get soldText => soldCount != null ? 'Đã bán ${soldCount!}+' : 'Đã bán';
   String get stockText => stockQty != null ? 'Kho còn ${stockQty}' : 'Còn hàng';
-  String get reviewSummary => reviewCount != null ? '$reviewCount đánh giá' : 'Chưa có đánh giá';
+  String get reviewSummary =>
+      reviewCount != null ? '$reviewCount đánh giá' : 'Chưa có đánh giá';
 }

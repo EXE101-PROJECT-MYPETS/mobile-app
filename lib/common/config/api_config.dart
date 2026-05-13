@@ -16,8 +16,17 @@ class ApiConfig {
       '$registerEmailVerificationUrl/verify-code';
   static const String customerLoginUrl = '$authUrl/customer/login';
   static const String shopLoginUrl = '$authUrl/shop/login';
+  static const String currentUserAddressUrl = '$baseUrl/users/me/address';
 
   // Product endpoints (Public)
   static const String productPublicUrl = '$baseUrl/public/products';
   static const String productMobileUrl = '$productPublicUrl/mobile';
+  static const String shopPublicUrl = '$baseUrl/public/shops';
+
+  // Shipping endpoints
+  static const String ghtkOrdersFeeUrl = '$baseUrl/ghtk/orders/fee';
+
+  // Order endpoints
+  static const String ordersUrl = '$baseUrl/orders';
 }
+

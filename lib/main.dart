@@ -10,6 +10,7 @@ import 'package:petpee_mobile/features/chat/providers/chat_provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
+  await Hive.openBox('auth_box');
   
   runApp(
     MultiProvider(

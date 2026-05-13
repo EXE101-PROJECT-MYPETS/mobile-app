@@ -1,3 +1,5 @@
+import 'package:petpee_mobile/common/utils/image_url_util.dart';
+
 class ProductDTO {
   final int? id;
   final int? shopId;
@@ -15,6 +17,7 @@ class ProductDTO {
   final bool? active;
   final int? stockQty;
   final List<String>? imageUrls;
+  final String? shopProvince;
 
   ProductDTO({
     this.id,
@@ -33,6 +36,7 @@ class ProductDTO {
     this.active,
     this.stockQty,
     this.imageUrls,
+    this.shopProvince,
   });
 
   factory ProductDTO.fromJson(Map<String, dynamic> json) {
@@ -52,7 +56,10 @@ class ProductDTO {
       weightKg: (json['weightKg'] as num?)?.toDouble(),
       active: json['active'] as bool?,
       stockQty: json['stockQty'] as int?,
-      imageUrls: (json['imageUrls'] as List<dynamic>?)?.cast<String>(),
+      imageUrls: ImageUrlUtil.buildPublicUrls(
+        (json['imageUrls'] as List<dynamic>?)?.whereType<String>(),
+      ),
+      shopProvince: json['shopProvince'] as String?,
     );
   }
 
@@ -74,6 +81,7 @@ class ProductDTO {
       'active': active,
       'stockQty': stockQty,
       'imageUrls': imageUrls,
+      'shopProvince': shopProvince,
     };
   }
 }

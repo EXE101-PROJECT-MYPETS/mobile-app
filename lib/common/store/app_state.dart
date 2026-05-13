@@ -1,13 +1,18 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:petpee_mobile/apps/checkout/api/address_service.dart';
 import 'package:petpee_mobile/apps/product/model/product_model.dart';
 import 'package:petpee_mobile/apps/product/api/product_service.dart';
+import 'package:petpee_mobile/apps/service/api/service_service.dart';
+import 'package:petpee_mobile/common/user/dto/service_public_dto.dart';
 import 'package:petpee_mobile/apps/cart/model/cart_item_model.dart';
 import 'package:petpee_mobile/apps/profile/model/pet_model.dart';
 import 'package:petpee_mobile/apps/checkout/model/address_model.dart';
 
 class AppState extends ChangeNotifier {
   final ProductService _productService = ProductService();
+  final ServicePublicService _servicePublicService = ServicePublicService();
+  final AddressService _addressService = AddressService();
 
   // --- REAL PRODUCT DATA ---
   List<ProductModel> _allProducts = [];
@@ -15,6 +20,16 @@ class AppState extends ChangeNotifier {
   String? _productsError;
   int? _productCursor;
   bool _hasMoreProducts = true;
+
+  // --- REAL SERVICE DATA ---
+  List<ServicePublicDTO> _allServices = [];
+  bool _isLoadingServices = false;
+  String? _servicesError;
+  int? _serviceCursor;
+  bool _hasMoreServices = true;
+  double? _serviceUserLat;
+  double? _serviceUserLng;
+  double _serviceRadiusKm = 5;
 
   bool get hasMoreProducts => _hasMoreProducts;
 
@@ -71,27 +86,10 @@ class AppState extends ChangeNotifier {
     ),
   ];
 
-  // --- MOCK ADDRESS DATA ---
-  List<AddressModel> _addresses = [
-    AddressModel(
-      id: 'a1',
-      name: 'Lê Hồng Sơn',
-      phone: '(+84) 355 075 204',
-      location: 'Số 344, thôn 4',
-      region: 'Xã Thạch Hòa, Huyện Thạch Thất, Hà Nội',
-      isDefault: true,
-      type: 'Nhà Riêng',
-    ),
-    AddressModel(
-      id: 'a2',
-      name: 'Lê Trường',
-      phone: '(+84) 989 162 659',
-      location: 'Khu 4 Số Nhà 75',
-      region: 'Thị Trấn Cao Phong, Huyện Cao Phong, Hòa Bình',
-      isDefault: false,
-      type: 'Nhà Riêng',
-    ),
-  ];
+  // --- ADDRESS DATA ---
+  List<AddressModel> _addresses = [];
+  bool _isLoadingAddresses = false;
+  String? _addressesError;
 
   // Getters
   List<ProductModel> get allProducts => _allProducts;
@@ -102,6 +100,17 @@ class AppState extends ChangeNotifier {
   List<CartItemModel> get cartItems => _cartItems;
   List<PetModel> get myPets => _myPets;
   List<AddressModel> get addresses => _addresses;
+  bool get isLoadingAddresses => _isLoadingAddresses;
+  String? get addressesError => _addressesError;
+
+  // Service getters
+  List<ServicePublicDTO> get allServices => _allServices;
+  bool get isLoadingServices => _isLoadingServices;
+  String? get servicesError => _servicesError;
+  bool get hasMoreServices => _hasMoreServices;
+  double? get serviceUserLat => _serviceUserLat;
+  double? get serviceUserLng => _serviceUserLng;
+  double get serviceRadiusKm => _serviceRadiusKm;
   AddressModel? get defaultAddress {
     try {
       return _addresses.firstWhere((a) => a.isDefault);
@@ -119,8 +128,35 @@ class AppState extends ChangeNotifier {
     return _viewedProductIds.map((id) => getProductById(id)).whereType<ProductModel>().toList();
   }
 
+  Future<void> loadCurrentUserAddresses(String? accessToken) async {
+    if (_isLoadingAddresses) return;
+
+    if (accessToken == null || accessToken.isEmpty) {
+      _addresses = [];
+      _addressesError = null;
+      notifyListeners();
+      return;
+    }
+
+    _isLoadingAddresses = true;
+    _addressesError = null;
+    notifyListeners();
+
+    try {
+      _addresses = await _addressService.getCurrentUserAddresses(accessToken);
+    } catch (e) {
+      _addresses = [];
+      _addressesError = e.toString();
+    } finally {
+      _isLoadingAddresses = false;
+      notifyListeners();
+    }
+  }
+
   // --- INIT HIVE ---
   AppState() {
+    // Initialize with empty lists first
+    _allServices = [];
     _loadData();
     loadProducts(); // Load products from API on initialization
   }
@@ -149,7 +185,6 @@ class AppState extends ChangeNotifier {
 
   /// Load products from backend API
   Future<void> loadProducts({
-    int shopId = 1, // Default shop ID, should be configurable
     String? keyword,
     bool? active,
     int? cursor,
@@ -163,7 +198,6 @@ class AppState extends ChangeNotifier {
 
     try {
       final response = await _productService.getAllMobile(
-        shopId: shopId,
         keyword: keyword,
         active: active,
         cursor: cursor,
@@ -188,7 +222,6 @@ class AppState extends ChangeNotifier {
 
   /// Load more products (pagination)
   Future<void> loadMoreProducts({
-    int shopId = 1,
     String? keyword,
     bool? active,
     int? cursor,
@@ -201,7 +234,6 @@ class AppState extends ChangeNotifier {
 
     try {
       final response = await _productService.getAllMobile(
-        shopId: shopId,
         keyword: keyword,
         active: active,
         cursor: cursor ?? _productCursor,
@@ -334,6 +366,28 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void prepareBuyNow(ProductModel product, String shopName, [int quantity = 1]) {
+    for (final item in _cartItems) {
+      item.isSelected = false;
+    }
+
+    final index = _cartItems.indexWhere((i) => i.product.id == product.id && i.shopName == shopName);
+    if (index >= 0) {
+      _cartItems[index].quantity = quantity;
+      _cartItems[index].isSelected = true;
+    } else {
+      _cartItems.add(CartItemModel(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        product: product,
+        shopName: shopName,
+        quantity: quantity,
+        isSelected: true,
+      ));
+    }
+
+    notifyListeners();
+  }
+
   double get cartTotalPrice {
     return _cartItems.where((i) => i.isSelected).fold(0.0, (sum, item) => sum + (item.priceAsDouble * item.quantity));
   }
@@ -395,10 +449,126 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  // --- SERVICE API METHODS ---
+
+  /// Load services from backend API
+  Future<void> loadServices({
+    int? shopId,
+    String? search,
+    int? categoryId,
+    bool active = true,
+    double? minRating,
+    double? lat,
+    double? lng,
+    double? radiusKm,
+    int? cursor,
+    int size = 20,
+  }) async {
+    if (_isLoadingServices) return;
+
+    if (lat != null) {
+      _serviceUserLat = lat;
+    }
+    if (lng != null) {
+      _serviceUserLng = lng;
+    }
+    if (radiusKm != null && radiusKm > 0) {
+      _serviceRadiusKm = radiusKm;
+    }
+
+    final effectiveLat = lat ?? _serviceUserLat;
+    final effectiveLng = lng ?? _serviceUserLng;
+    final effectiveRadiusKm = effectiveLat != null && effectiveLng != null
+        ? (radiusKm ?? _serviceRadiusKm)
+        : null;
+
+    _isLoadingServices = true;
+    _servicesError = null;
+    notifyListeners();
+
+    try {
+      final response = await _servicePublicService.getAllForScroll(
+        shopId: shopId,
+        search: search,
+        categoryId: categoryId,
+        active: active,
+        minRating: minRating,
+        lat: effectiveLat,
+        lng: effectiveLng,
+        radiusKm: effectiveRadiusKm,
+        cursor: cursor,
+        size: size,
+      );
+
+      _allServices = response.content;
+      _serviceCursor = response.nextCursor;
+      _hasMoreServices = response.hasNext;
+      _servicesError = null;
+    } catch (e) {
+      _servicesError = 'Không thể tải dịch vụ: $e';
+      // Keep existing services if API fails
+    } finally {
+      _isLoadingServices = false;
+      notifyListeners();
+    }
+  }
+
+  /// Load more services (pagination)
+  Future<void> loadMoreServices({
+    int? shopId,
+    String? search,
+    int? categoryId,
+    bool active = true,
+    double? minRating,
+    double? lat,
+    double? lng,
+    double? radiusKm,
+    int? cursor,
+    int size = 20,
+  }) async {
+    if (_isLoadingServices || !_hasMoreServices) return;
+
+    final effectiveLat = lat ?? _serviceUserLat;
+    final effectiveLng = lng ?? _serviceUserLng;
+    final effectiveRadiusKm = radiusKm ?? _serviceRadiusKm;
+
+    _isLoadingServices = true;
+    notifyListeners();
+
+    try {
+      final response = await _servicePublicService.getAllForScroll(
+        shopId: shopId,
+        search: search,
+        categoryId: categoryId,
+        active: active,
+        minRating: minRating,
+        lat: effectiveLat,
+        lng: effectiveLng,
+        radiusKm: effectiveRadiusKm,
+        cursor: cursor ?? _serviceCursor,
+        size: size,
+      );
+
+      if (response.content.isNotEmpty) {
+        _allServices.addAll(response.content);
+      }
+      _serviceCursor = response.nextCursor;
+      _hasMoreServices = response.hasNext;
+
+      if (response.content.isEmpty && !response.hasNext) {
+        _hasMoreServices = false;
+      }
+    } catch (e) {
+      _servicesError = 'Không thể tải thêm dịch vụ: $e';
+    } finally {
+      _isLoadingServices = false;
+      notifyListeners();
+    }
+  }
+
   // --- CLEANUP ---
   @override
   void dispose() {
-    _productService.dispose();
     super.dispose();
   }
 }

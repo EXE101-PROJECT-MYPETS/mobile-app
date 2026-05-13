@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import '../../chat/screens/chat_detail_screen.dart';
+import 'package:petpee_mobile/features/chat/screens/chat_detail_screen.dart';
 
 class ShopDetailScreen extends StatelessWidget {
   const ShopDetailScreen({super.key});
