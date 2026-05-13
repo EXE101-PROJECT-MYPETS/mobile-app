@@ -7,6 +7,7 @@ import 'package:petpee_mobile/apps/product/page/product_list_screen.dart';
 import 'package:petpee_mobile/apps/profile/page/profile_screen.dart';
 import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
 import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
+import 'package:petpee_mobile/common/component/login_required_sheet.dart';
 import 'package:provider/provider.dart';
 import 'spa_booking_confirmation_screen.dart';
 
@@ -407,34 +408,7 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
   }
 
   void _showAuthDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Yêu cầu đăng nhập', style: TextStyle(fontWeight: FontWeight.bold)),
-          content: const Text('Bạn chưa đăng nhập để sử dụng. Hãy đăng nhập/đăng ký.'),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Hủy', style: TextStyle(color: Colors.grey)),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context); // close dialog
-                Navigator.pushNamed(context, '/login');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFB7185),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                elevation: 0,
-              ),
-              child: const Text('Đăng ký/Đăng nhập', style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        );
-      },
-    );
+    showLoginRequiredSheet(context);
   }
 
   Widget _buildShopLocation() {

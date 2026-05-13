@@ -1,17 +1,20 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:petpee_mobile/common/component/login_required_sheet.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:provider/provider.dart';
+import 'package:petpee_mobile/apps/checkout/page/checkout_screen.dart';
 import 'package:petpee_mobile/apps/product/model/product_model.dart';
 import 'package:petpee_mobile/common/component/product_card.dart';
-import 'package:petpee_mobile/common/store/app_state.dart';
 import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
+import 'package:petpee_mobile/common/store/app_state.dart';
 import 'package:petpee_mobile/apps/shop/page/shop_detail_screen.dart';
 import 'package:petpee_mobile/common/toast/app_toast.dart';
 import 'package:petpee_mobile/apps/product/api/product_service.dart';
 import 'package:petpee_mobile/common/user/dto/product_public_detail_dto.dart';
 import 'package:petpee_mobile/common/user/dto/product_public_review_dto.dart';
+import 'package:petpee_mobile/common/user/dto/shop_public_dto.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final String? productId;
@@ -27,8 +30,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   final PageController _pageController = PageController();
   late Future<ProductDetailPageData> _pageDataFuture;
   int _currentImageIndex = 0;
-  int _selectedVariantIndex = 0;
-  int _quantity = 1;
 
   @override
   void initState() {
@@ -39,7 +40,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   void dispose() {
     _pageController.dispose();
-    _productService.dispose();
     super.dispose();
   }
 
@@ -52,11 +52,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final detail = await _productService.getProductDetail(productId);
     final related = await _productService.getProductRelated(productId, size: 10);
     final reviews = await _productService.getProductReviews(productId, size: 4);
+    final shop = detail.shopId != null
+        ? await _productService.getShopDetail(detail.shopId!)
+        : null;
 
     final relatedProducts = related.map((dto) => ProductModel.fromDTO(dto)).toList();
 
     return ProductDetailPageData(
       detail: detail,
+      shop: shop,
       relatedProducts: relatedProducts,
       topReviews: reviews,
     );
@@ -87,7 +91,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           if (!snapshot.hasData) {
             return const SizedBox.shrink();
           }
-          return _buildBottomBar(snapshot.data!.detail);
+          return _buildBottomBar(snapshot.data!.detail, snapshot.data!.shop);
         },
       ),
     );
@@ -125,6 +129,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   Widget _buildContent(ProductDetailPageData data) {
     final detail = data.detail;
+    final shop = data.shop;
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -132,7 +137,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           _buildImageCarousel(detail),
           _buildMainInfoSection(detail),
           _buildSectionDivider(),
-          _buildShopSection(detail),
+          _buildShopSection(detail, shop),
           _buildSectionDivider(),
           _buildReviewSection(detail, data.topReviews),
           _buildSectionDivider(),
@@ -169,13 +174,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildShopSection(ProductPublicDetailDTO detail) {
+  Widget _buildShopSection(ProductPublicDetailDTO detail, ShopPublicDTO? shop) {
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
       child: Column(
         children: [
-          _buildShopCard(detail),
+          _buildShopCard(detail, shop),
         ],
       ),
     );
@@ -473,7 +478,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildShopCard(ProductPublicDetailDTO detail) {
+  Widget _buildShopCard(ProductPublicDetailDTO detail, ShopPublicDTO? shop) {
+    final shopName = shop?.name ?? detail.shopName ?? 'Cửa hàng';
+    final shopRating = shop?.rating ?? detail.shopRating;
+    final shopProductCount = shop?.productCount ?? detail.shopProductCount;
+    final isVerified = (shop?.badges.isNotEmpty ?? false) || detail.shopVerified == true;
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -504,7 +514,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         children: [
                           Expanded(
                             child: Text(
-                              detail.shopName ?? 'Cửa hàng',
+                              shopName,
                               style: GoogleFonts.inter(
                                 fontWeight: FontWeight.w700,
                                 fontSize: 16,
@@ -513,7 +523,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          if (detail.shopVerified == true) ...[
+                          if (isVerified) ...[
                             const SizedBox(width: 6),
                             const Icon(Icons.verified, size: 16, color: Colors.green),
                           ],
@@ -558,19 +568,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               children: [
                 Expanded(
                   child: _buildShopStat(
-                    value: detail.shopRating?.toStringAsFixed(1) ?? '0.0',
+                    value: shopRating?.toStringAsFixed(1) ?? '0.0',
                     label: 'Điểm shop',
                   ),
                 ),
                 Expanded(
                   child: _buildShopStat(
-                    value: '${detail.shopProductCount ?? 0}',
+                    value: '${shopProductCount ?? 0}',
                     label: 'Sản phẩm',
                   ),
                 ),
                 Expanded(
                   child: _buildShopStat(
-                    value: detail.shopVerified == true ? '100%' : '--',
+                    value: isVerified ? '100%' : '--',
                     label: 'Phản hồi chat',
                   ),
                 ),
@@ -823,24 +833,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     return Text(
       title,
       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
-    );
-  }
-
-  Widget _buildBulletText(String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('• ', style: TextStyle(fontSize: 20, height: 1.4)),
-          Expanded(
-            child: Text(
-              text,
-              style: const TextStyle(color: Color(0xFF475569), height: 1.5),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -1124,7 +1116,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     return '${parsed.day.toString().padLeft(2, '0')}/${parsed.month.toString().padLeft(2, '0')}/${parsed.year}';
   }
 
-  Widget _buildBottomBar(ProductPublicDetailDTO detail) {
+  Widget _buildBottomBar(ProductPublicDetailDTO detail, ShopPublicDTO? shop) {
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
@@ -1140,14 +1132,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     child: _buildBottomNavAction(
                       icon: LucideIcons.messageCircle,
                       label: 'Chat ngay',
-                      onTap: () => _onTapBottomAction('Chat ngay'),
+                      onTap: () => _onTapBottomAction('Chat ngay', detail, shop),
                     ),
                   ),
                   Expanded(
                     child: _buildBottomNavAction(
                       icon: LucideIcons.shoppingCart,
                       label: 'Thêm vào giỏ',
-                      onTap: () => _onTapBottomAction('Thêm vào giỏ'),
+                      onTap: () => _onTapBottomAction('Thêm vào giỏ', detail, shop),
                     ),
                   ),
                 ],
@@ -1159,7 +1151,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             child: SizedBox(
               height: 58,
               child: ElevatedButton(
-              onPressed: () => _onTapBottomAction('Mua ngay'),
+              onPressed: () => _onTapBottomAction('Mua ngay', detail, shop),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFA541C),
                 elevation: 0,
@@ -1215,57 +1207,63 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  void _onTapBottomAction(String action) {
+  void _onTapBottomAction(String action, ProductPublicDetailDTO detail, ShopPublicDTO? shop) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (authProvider.currentUser == null) {
       _showAuthDialog(context);
       return;
     }
+
+    if (action == 'Mua ngay') {
+      final appState = Provider.of<AppState>(context, listen: false);
+      appState.prepareBuyNow(_buildCheckoutProduct(detail), _resolveShopName(detail, shop));
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const CheckoutScreen()),
+      );
+      return;
+    }
+
+    if (action == 'Thêm vào giỏ') {
+      final appState = Provider.of<AppState>(context, listen: false);
+      appState.addToCart(_buildCheckoutProduct(detail), _resolveShopName(detail, shop));
+    }
+
     showAppToast(context, message: '$action thành công', type: AppToastType.success);
   }
 
-  void _showAuthDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text(
-            'Yêu cầu đăng nhập',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          content: const Text('Bạn chưa đăng nhập để sử dụng. Hãy đăng nhập/đăng ký.'),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Hủy', style: TextStyle(color: Colors.grey)),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/login');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFB7185),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                elevation: 0,
-              ),
-              child: const Text('Đăng ký/Đăng nhập', style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        );
-      },
+  ProductModel _buildCheckoutProduct(ProductPublicDetailDTO detail) {
+    return ProductModel(
+      id: detail.id?.toString() ?? '',
+      name: detail.name ?? 'Sản phẩm',
+      price: detail.priceText,
+      rating: detail.rating ?? detail.shopRating ?? 0,
+      reviews: detail.reviewCount ?? 0,
+      image: detail.imageUrls.isNotEmpty ? detail.imageUrls.first : '',
+      type: 'product',
+      category: detail.categoryName ?? 'Tất cả',
+      description: detail.description ?? 'Chưa có thông tin mô tả chi tiết.',
     );
+  }
+
+  String _resolveShopName(ProductPublicDetailDTO detail, [ShopPublicDTO? shop]) {
+    return shop?.name ?? detail.shopName ?? 'Cửa hàng';
+  }
+
+  void _showAuthDialog(BuildContext context) {
+    showLoginRequiredSheet(context);
   }
 }
 
 class ProductDetailPageData {
   final ProductPublicDetailDTO detail;
+  final ShopPublicDTO? shop;
   final List<ProductModel> relatedProducts;
   final List<ProductPublicReviewDTO> topReviews;
 
   ProductDetailPageData({
     required this.detail,
+    required this.shop,
     required this.relatedProducts,
     required this.topReviews,
   });

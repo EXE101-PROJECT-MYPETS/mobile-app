@@ -1,14 +1,22 @@
+import 'dart:ui' show PointerDeviceKind;
+
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:petpee_mobile/apps/home/page/notifications_screen.dart';
+import 'package:petpee_mobile/apps/home/page/map_screen.dart';
 import 'package:petpee_mobile/apps/product/page/product_list_screen.dart';
 import 'package:petpee_mobile/apps/product/page/spa_service_screen.dart';
 import 'package:petpee_mobile/apps/profile/page/profile_screen.dart';
 import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
 import 'package:petpee_mobile/common/component/product_card.dart';
+import 'package:petpee_mobile/common/component/service_card.dart';
 import 'package:petpee_mobile/common/store/app_state.dart';
 import 'package:provider/provider.dart';
+
+const Color _homeHeaderBackground = Color(0xFFD5F4FF);
+const Color _homeContentBackground = Color(0xFFD5F4FF);
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,12 +27,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late final ScrollController _scrollController;
+  bool _requestedServiceLocation = false;
 
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController()
-      ..addListener(_onScroll);
+    _scrollController = ScrollController()..addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadNearbyServices();
+    });
   }
 
   @override
@@ -46,10 +57,50 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _loadNearbyServices() async {
+    if (_requestedServiceLocation || !mounted) return;
+    _requestedServiceLocation = true;
+
+    final appState = context.read<AppState>();
+
+    try {
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        // On some platforms (especially web), isLocationServiceEnabled may be unreliable.
+        // Continue to request the current position instead of falling back immediately.
+      }
+
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        await appState.loadServices();
+        return;
+      }
+
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
+      );
+
+      await appState.loadServices(
+        lat: position.latitude,
+        lng: position.longitude,
+        radiusKm: appState.serviceRadiusKm,
+      );
+    } catch (_) {
+      await appState.loadServices();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6FBFF),
+      backgroundColor: _homeContentBackground,
       body: CustomScrollView(
         controller: _scrollController,
         slivers: [
@@ -59,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
             floating: false,
             snap: false,
             elevation: 0,
-            backgroundColor: Color(0xFFC9F0FF),
+            backgroundColor: _homeHeaderBackground,
             surfaceTintColor: Colors.transparent,
             toolbarHeight: 66,
             titleSpacing: 0,
@@ -68,44 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SliverToBoxAdapter(child: _BenefitSection()),
           const SliverToBoxAdapter(child: _PromoTicker()),
           const SliverToBoxAdapter(child: _QuickShortcutGrid()),
-          SliverToBoxAdapter(
-            child: Consumer<AppState>(
-              builder: (context, state, child) {
-                if (state.isLoadingProducts && state.allProducts.isEmpty) {
-                  return const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Center(child: CircularProgressIndicator()),
-                  );
-                }
-
-                if (state.productsError != null && state.allProducts.isEmpty) {
-                  return Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        Text(
-                          state.productsError!,
-                          style: const TextStyle(color: Colors.red),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 8),
-                        ElevatedButton(
-                          onPressed: () => state.loadProducts(),
-                          child: const Text('Thử lại'),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                final featured = state.similarProducts.isNotEmpty
-                    ? state.similarProducts
-                    : state.allProducts.take(1).toList();
-
-                return _FeatureTiles(products: featured);
-              },
-            ),
-          ),
+          const SliverToBoxAdapter(child: _ServiceSection()),
           const SliverToBoxAdapter(child: _FeedHeader()),
           Consumer<AppState>(
             builder: (context, state, child) {
@@ -135,9 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 return const SliverToBoxAdapter(
                   child: Padding(
                     padding: EdgeInsets.all(16.0),
-                    child: Center(
-                      child: Text('Không có sản phẩm nào'),
-                    ),
+                    child: Center(child: Text('Không có sản phẩm nào')),
                   ),
                 );
               }
@@ -146,7 +158,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.fromLTRB(12, 0, 12, 96),
                 sliver: SliverGrid(
                   delegate: SliverChildBuilderDelegate(
-                    (context, index) => ProductCard(product: state.allProducts[index]),
+                    (context, index) =>
+                        ProductCard(product: state.allProducts[index]),
                     childCount: state.allProducts.length,
                   ),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -181,25 +194,29 @@ class _HomeScreenState extends State<HomeScreen> {
           if (index == 1) {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const ProductListScreen()),
+              MaterialPageRoute(
+                builder: (context) => ProductListScreen(),
+              ),
               (route) => false,
             );
           } else if (index == 2) {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const SpaServiceScreen()),
+              MaterialPageRoute(builder: (context) => SpaServiceScreen()),
               (route) => false,
             );
           } else if (index == 3) {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const NotificationsScreen()),
+              MaterialPageRoute(
+                builder: (context) => NotificationsScreen(),
+              ),
               (route) => false,
             );
           } else if (index == 4) {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              MaterialPageRoute(builder: (context) => ProfileScreen()),
               (route) => false,
             );
           }
@@ -272,6 +289,18 @@ class _StickySearchHeader extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 10),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MapScreen(),
+                  ),
+                );
+              },
+              child: const _TopIcon(icon: LucideIcons.map, badge: null),
+            ),
+            const SizedBox(width: 8),
             const _TopIcon(icon: LucideIcons.bell, badge: '36'),
             const SizedBox(width: 8),
             const _TopIcon(icon: LucideIcons.messageCircle, badge: '27'),
@@ -288,13 +317,7 @@ class _BenefitSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFFC9F0FF), Color(0xFFEAFBFF)],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
+      color: _homeHeaderBackground,
       padding: const EdgeInsets.fromLTRB(12, 0, 12, 14),
       child: const _BenefitBar(),
     );
@@ -305,7 +328,7 @@ class _TopIcon extends StatelessWidget {
   const _TopIcon({required this.icon, required this.badge});
 
   final IconData icon;
-  final String badge;
+  final String? badge;
 
   @override
   Widget build(BuildContext context) {
@@ -321,26 +344,27 @@ class _TopIcon extends StatelessWidget {
           ),
           child: Icon(icon, color: const Color(0xFF8AA0AE), size: 18),
         ),
-        Positioned(
-          top: -5,
-          right: -6,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: const Color(0xFFFF9CB2)),
-            ),
-            child: Text(
-              badge,
-              style: GoogleFonts.inter(
-                color: const Color(0xFFFF586D),
-                fontSize: 9,
-                fontWeight: FontWeight.w700,
+        if (badge != null)
+          Positioned(
+            top: -5,
+            right: -6,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: const Color(0xFFFF9CB2)),
+              ),
+              child: Text(
+                badge!,
+                style: GoogleFonts.inter(
+                  color: const Color(0xFFFF586D),
+                  fontSize: 9,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ),
-        ),
       ],
     );
   }
@@ -378,7 +402,11 @@ class _BenefitBar extends StatelessWidget {
                           color: const Color(0xFFFFF1F2),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Icon(item.$1, color: const Color(0xFFFF5F57), size: 15),
+                        child: Icon(
+                          item.$1,
+                          color: const Color(0xFFFF5F57),
+                          size: 15,
+                        ),
                       ),
                       const SizedBox(width: 7),
                       Expanded(
@@ -426,7 +454,7 @@ class _PromoTicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFFD5F4FF),
+      color: _homeHeaderBackground,
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
       child: Column(
         children: [
@@ -554,7 +582,7 @@ class _QuickShortcutGrid extends StatelessWidget {
     ];
 
     return Container(
-      color: const Color(0xFFD5F4FF),
+      color: _homeHeaderBackground,
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 14),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -572,13 +600,19 @@ class _QuickShortcutGrid extends StatelessWidget {
                         borderRadius: BorderRadius.circular(14),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF76C6E8).withValues(alpha: 0.12),
+                            color: const Color(
+                              0xFF76C6E8,
+                            ).withValues(alpha: 0.12),
                             blurRadius: 10,
                             offset: const Offset(0, 5),
                           ),
                         ],
                       ),
-                      child: Icon(item.$1, color: const Color(0xFFFF5A4E), size: 21),
+                      child: Icon(
+                        item.$1,
+                        color: const Color(0xFFFF5A4E),
+                        size: 21,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -603,99 +637,13 @@ class _QuickShortcutGrid extends StatelessWidget {
   }
 }
 
-class _FeatureTiles extends StatelessWidget {
-  const _FeatureTiles({required this.products});
-
-  final List<dynamic> products;
-
-  @override
-  Widget build(BuildContext context) {
-    final firstProduct = products.isNotEmpty ? products.first : null;
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Container(
-              height: 210,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFFFF0F0), Color(0xFFFFD5E2)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: Text(
-                      'FREESHIP 0Đ',
-                      style: GoogleFonts.inter(
-                        color: const Color(0xFFFF5A3D),
-                        fontSize: 10,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ),
-                  const Spacer(),
-                  Text(
-                      'Combo hot cho boss',
-                    style: GoogleFonts.inter(
-                      color: const Color(0xFFEF4444),
-                      fontSize: 24,
-                      fontWeight: FontWeight.w900,
-                      height: 1,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                      'Gói chăm sóc, đồ chơi và phụ kiện đang được đặt nhiều nhất hôm nay.',
-                    style: GoogleFonts.inter(
-                      color: const Color(0xFF7C4A57),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: SizedBox(
-              height: 210,
-              child: firstProduct != null
-                  ? ProductCard(product: firstProduct)
-                  : Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _FeedHeader extends StatelessWidget {
   const _FeedHeader();
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
+      color: _homeContentBackground,
       padding: const EdgeInsets.fromLTRB(14, 18, 14, 12),
       child: Row(
         children: [
@@ -715,6 +663,102 @@ class _FeedHeader extends StatelessWidget {
               fontSize: 12,
               fontWeight: FontWeight.w800,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ServiceSection extends StatelessWidget {
+  const _ServiceSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: _homeContentBackground,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Row(
+              children: [
+                Text(
+                  'Dịch vụ nổi bật',
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFF1F2937),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  'Xem thêm',
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFFFF5A4E),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Consumer<AppState>(
+            builder: (context, state, child) {
+              if (state.isLoadingServices && state.allServices.isEmpty) {
+                return const SizedBox(
+                  height: 200,
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
+
+              if (state.servicesError != null && state.allServices.isEmpty) {
+                return SizedBox(
+                  height: 200,
+                  child: Center(
+                    child: Text(
+                      state.servicesError ?? 'Lỗi tải dịch vụ',
+                      style: const TextStyle(color: Colors.red),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+              }
+
+              if (state.allServices.isEmpty) {
+                return const SizedBox(
+                  height: 200,
+                  child: Center(child: Text('Chưa có dịch vụ nào')),
+                );
+              }
+
+              return SizedBox(
+                height: 360,
+                child: ScrollConfiguration(
+                  behavior: ScrollConfiguration.of(context).copyWith(
+                    dragDevices: {
+                      PointerDeviceKind.touch,
+                      PointerDeviceKind.mouse,
+                      PointerDeviceKind.trackpad,
+                      PointerDeviceKind.stylus,
+                    },
+                  ),
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    itemCount: state.allServices.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: 17),
+                    itemBuilder: (context, index) {
+                      return ServiceCard(service: state.allServices[index]);
+                    },
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -777,4 +821,3 @@ class _FloatingGiftButton extends StatelessWidget {
     );
   }
 }
-

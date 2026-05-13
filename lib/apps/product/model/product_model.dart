@@ -1,4 +1,5 @@
 import 'package:petpee_mobile/common/user/dto/product_dto.dart';
+import 'package:petpee_mobile/common/utils/image_url_util.dart';
 import 'package:petpee_mobile/common/utils/price_formatter.dart';
 
 class ProductModel {
@@ -9,8 +10,10 @@ class ProductModel {
   final int reviews;
   final String image;
   final String type; // 'spa', 'thu_y', 'product'
-  final String category; // 'Chó', 'Mèo', 'Spa', 'Thú y', 'Cát vệ sinh', 'Sữa tắm', v.v.
+  final String
+  category; // 'Chó', 'Mèo', 'Spa', 'Thú y', 'Cát vệ sinh', 'Sữa tắm', v.v.
   final String description;
+  final String shopProvince;
 
   ProductModel({
     required this.id,
@@ -22,6 +25,7 @@ class ProductModel {
     required this.type,
     required this.category,
     this.description = 'Chưa có thông tin mô tả chi tiết.',
+    this.shopProvince = 'Thành phố Hà Nội',
   });
 
   factory ProductModel.fromMap(Map<String, dynamic> map) {
@@ -31,10 +35,11 @@ class ProductModel {
       price: map['price'] ?? '',
       rating: map['rating']?.toDouble() ?? 0.0,
       reviews: map['reviews']?.toInt() ?? 0,
-      image: map['image'] ?? '',
+      image: ImageUrlUtil.buildPublicUrl(map['image'] as String?) ?? '',
       type: map['type'] ?? '',
       category: map['category'] ?? 'Tất cả',
       description: map['description'] ?? 'Chưa có thông tin mô tả chi tiết.',
+      shopProvince: map['shopProvince'] ?? 'Thành phố Hà Nội',
     );
   }
 
@@ -46,10 +51,15 @@ class ProductModel {
       price: PriceFormatter.formatVnd(dto.price),
       rating: dto.rating ?? 0.0,
       reviews: dto.reviewCount ?? 0,
-      image: dto.imageUrls?.isNotEmpty == true ? dto.imageUrls!.first : '',
+      image: dto.imageUrls?.isNotEmpty == true
+          ? ImageUrlUtil.buildPublicUrl(dto.imageUrls!.first) ?? ''
+          : '',
       type: _determineType(dto.categoryName),
       category: dto.categoryName ?? 'Tất cả',
       description: 'Sản phẩm chất lượng cao',
+      shopProvince: dto.shopProvince?.trim().isNotEmpty == true
+          ? dto.shopProvince!.trim()
+          : 'Thành phố Hà Nội',
     );
   }
 

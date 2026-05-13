@@ -1,18 +1,18 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:petpee_mobile/common/config/api_client.dart';
 import 'package:petpee_mobile/common/config/api_config.dart';
 import 'package:petpee_mobile/common/user/dto/product_dto.dart';
 import 'package:petpee_mobile/common/user/dto/product_public_detail_dto.dart';
 import 'package:petpee_mobile/common/user/dto/product_public_review_dto.dart';
+import 'package:petpee_mobile/common/user/dto/shop_public_dto.dart';
 import 'package:petpee_mobile/common/user/dto/scroll_response.dart';
 
 class ProductService {
-  final http.Client _client;
+  final ApiClient _client;
 
-  ProductService({http.Client? client}) : _client = client ?? http.Client();
+  ProductService({ApiClient? client}) : _client = client ?? ApiClient.instance;
 
   Future<ScrollResponse<ProductDTO>> getAllMobile({
-    required int shopId,
     String? keyword,
     bool? active,
     int? cursor,
@@ -34,13 +34,7 @@ class ProductService {
       queryParameters: queryParams,
     );
 
-    final response = await _client.get(
-      uri,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Shop-Id': shopId.toString(),
-      },
-    );
+    final response = await _client.get(uri);
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
@@ -55,12 +49,7 @@ class ProductService {
 
   Future<ProductPublicDetailDTO> getProductDetail(String productId) async {
     final uri = Uri.parse('${ApiConfig.productMobileUrl}/$productId');
-    final response = await _client.get(
-      uri,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    );
+    final response = await _client.get(uri);
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
@@ -70,16 +59,14 @@ class ProductService {
     throw Exception('Failed to load product detail: ${response.statusCode}');
   }
 
-  Future<List<ProductDTO>> getProductRelated(String productId, {int size = 10}) async {
-    final uri = Uri.parse('${ApiConfig.productPublicUrl}/$productId/related').replace(
-      queryParameters: {'size': size.toString()},
-    );
-    final response = await _client.get(
-      uri,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    );
+  Future<List<ProductDTO>> getProductRelated(
+    String productId, {
+    int size = 10,
+  }) async {
+    final uri = Uri.parse(
+      '${ApiConfig.productPublicUrl}/$productId/related',
+    ).replace(queryParameters: {'size': size.toString()});
+    final response = await _client.get(uri);
 
     if (response.statusCode == 200) {
       final dynamic jsonResponse = json.decode(response.body);
@@ -89,31 +76,44 @@ class ProductService {
     throw Exception('Failed to load related products: ${response.statusCode}');
   }
 
-  Future<List<ProductPublicReviewDTO>> getProductReviews(String productId, {int size = 20}) async {
-    final uri = Uri.parse('${ApiConfig.productPublicUrl}/$productId/reviews').replace(
-      queryParameters: {'size': size.toString()},
-    );
-    final response = await _client.get(
-      uri,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    );
+  Future<List<ProductPublicReviewDTO>> getProductReviews(
+    String productId, {
+    int size = 20,
+  }) async {
+    final uri = Uri.parse(
+      '${ApiConfig.productPublicUrl}/$productId/reviews',
+    ).replace(queryParameters: {'size': size.toString()});
+    final response = await _client.get(uri);
 
     if (response.statusCode == 200) {
       final dynamic jsonResponse = json.decode(response.body);
-      return _parseListResponse(jsonResponse, (item) => ProductPublicReviewDTO.fromJson(item));
+      return _parseListResponse(
+        jsonResponse,
+        (item) => ProductPublicReviewDTO.fromJson(item),
+      );
     }
 
     throw Exception('Failed to load product reviews: ${response.statusCode}');
   }
 
-  List<T> _parseListResponse<T>(dynamic body, T Function(Map<String, dynamic>) fromJson) {
+  Future<ShopPublicDTO> getShopDetail(int shopId) async {
+    final uri = Uri.parse('${ApiConfig.shopPublicUrl}/$shopId');
+    final response = await _client.get(uri);
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
+      return ShopPublicDTO.fromJson(jsonResponse);
+    }
+
+    throw Exception('Failed to load shop detail: ${response.statusCode}');
+  }
+
+  List<T> _parseListResponse<T>(
+    dynamic body,
+    T Function(Map<String, dynamic>) fromJson,
+  ) {
     if (body is List) {
-      return body
-          .whereType<Map<String, dynamic>>()
-          .map(fromJson)
-          .toList();
+      return body.whereType<Map<String, dynamic>>().map(fromJson).toList();
     }
 
     if (body is Map<String, dynamic> && body['content'] is List) {
@@ -124,9 +124,5 @@ class ProductService {
     }
 
     throw Exception('Unexpected response format: cannot parse list');
-  }
-
-  void dispose() {
-    _client.close();
   }
 }

@@ -1,5 +1,6 @@
 class AddressModel {
   final String id;
+  final String? userId;
   final String name;
   final String phone;
   final String location; // e.g. Tên đường, Số nhà
@@ -9,6 +10,7 @@ class AddressModel {
 
   AddressModel({
     required this.id,
+    this.userId,
     required this.name,
     required this.phone,
     required this.location,
@@ -16,4 +18,40 @@ class AddressModel {
     this.isDefault = false,
     this.type = 'Nhà Riêng',
   });
+
+  factory AddressModel.fromApi(Map<String, dynamic> json) {
+    final ward = _readString(json['ward']);
+    final district = _readString(json['district']);
+    final province = _readString(json['province']);
+    final hamlet = _readString(json['hamlet']);
+    final regionParts = [ward, district, province]
+        .where((part) => part.isNotEmpty)
+        .toList();
+
+    return AddressModel(
+      id: ((json['id'] as num?)?.toInt() ?? 0).toString(),
+      userId: ((json['userId'] as num?)?.toInt())?.toString(),
+      name: _readString(json['name']),
+      phone: _readString(json['tel']),
+      location: _readString(json['address']),
+      region: regionParts.join(', '),
+      isDefault: _readBool(json['isDefault']),
+      type: hamlet.isNotEmpty ? hamlet : 'Nha Rieng',
+    );
+  }
+
+  static String _readString(dynamic value) {
+    if (value == null) return '';
+    return value.toString().trim();
+  }
+
+  static bool _readBool(dynamic value) {
+    if (value is bool) return value;
+    if (value is num) return value != 0;
+    if (value is String) {
+      final normalized = value.trim().toLowerCase();
+      return normalized == 'true' || normalized == '1';
+    }
+    return false;
+  }
 }

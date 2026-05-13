@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:petpee_mobile/common/auth/api/auth_service.dart';
 import 'package:petpee_mobile/common/auth/model/auth_dto.dart';
+import 'package:petpee_mobile/common/config/api_client.dart';
 import 'package:petpee_mobile/common/user/model/user_model.dart';
 
 class AuthProvider extends ChangeNotifier {
@@ -34,8 +35,8 @@ class AuthProvider extends ChangeNotifier {
     _loadToken();
   }
 
-  Future<void> _loadToken() async {
-    final box = await Hive.openBox('auth_box');
+  void _loadToken() {
+    final box = Hive.box('auth_box');
     _token = box.get('access_token');
     _refreshToken = box.get('refresh_token');
     _role = box.get('role');
@@ -52,6 +53,8 @@ class AuthProvider extends ChangeNotifier {
           .toList();
     }
     notifyListeners();
+    // Sync ApiClient ngay lập tức (lúc này đã có currentShopId nếu đã login)
+    ApiClient.instance.configure(token: _token, shopId: _currentShopId);
   }
 
   Future<void> _saveAuthentication(UserLoginResponse response) async {
@@ -76,6 +79,8 @@ class AuthProvider extends ChangeNotifier {
     _currentShopId = response.currentShopId;
     _currentUser = response.user;
     _shops = response.shops;
+    // Sync ApiClient sau mỗi lần login / token thay đổi
+    ApiClient.instance.configure(token: _token, shopId: _currentShopId);
     notifyListeners();
   }
 
@@ -179,6 +184,8 @@ class AuthProvider extends ChangeNotifier {
     _currentShopId = null;
     _currentUser = null;
     _shops = [];
+    // Xoá token & shopId khỏi ApiClient
+    ApiClient.instance.clear();
     notifyListeners();
   }
 }
