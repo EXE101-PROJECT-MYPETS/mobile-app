@@ -194,9 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (index == 1) {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(
-                builder: (context) => ProductListScreen(),
-              ),
+              MaterialPageRoute(builder: (context) => ProductListScreen()),
               (route) => false,
             );
           } else if (index == 2) {
@@ -208,9 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
           } else if (index == 3) {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(
-                builder: (context) => NotificationsScreen(),
-              ),
+              MaterialPageRoute(builder: (context) => NotificationsScreen()),
               (route) => false,
             );
           } else if (index == 4) {
@@ -293,9 +289,7 @@ class _StickySearchHeader extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => MapScreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => MapScreen()),
                 );
               },
               child: const _TopIcon(icon: LucideIcons.map, badge: null),

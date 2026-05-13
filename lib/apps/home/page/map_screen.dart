@@ -34,7 +34,7 @@ class _MapScreenState extends State<MapScreen> {
   Future<void> _getCurrentLocation() async {
     try {
       debugPrint('[MapScreen] Getting current location...');
-      
+
       setState(() {
         isLoading = true;
         error = null;
@@ -43,7 +43,7 @@ class _MapScreenState extends State<MapScreen> {
       // Check location service enabled
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       debugPrint('[MapScreen] GPS service enabled: $serviceEnabled');
-      
+
       if (!serviceEnabled) {
         debugPrint('[MapScreen] ERROR: Location service is disabled');
         setState(() {
@@ -56,15 +56,19 @@ class _MapScreenState extends State<MapScreen> {
       // Check permission
       LocationPermission permission = await Geolocator.checkPermission();
       debugPrint('[MapScreen] Location permission before request: $permission');
-      
+
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
-        debugPrint('[MapScreen] Location permission after request: $permission');
+        debugPrint(
+          '[MapScreen] Location permission after request: $permission',
+        );
       }
 
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
-        debugPrint('[MapScreen] ERROR: Location permission denied or denied forever');
+        debugPrint(
+          '[MapScreen] ERROR: Location permission denied or denied forever',
+        );
         setState(() {
           error = 'Vui lòng cấp quyền truy cập vị trí';
           isLoading = false;
@@ -73,7 +77,7 @@ class _MapScreenState extends State<MapScreen> {
       }
 
       debugPrint('[MapScreen] Getting current position...');
-      
+
       // Get current position
       final position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
@@ -90,18 +94,32 @@ class _MapScreenState extends State<MapScreen> {
 
       final latLng = LatLng(position.latitude, position.longitude);
 
+      if (latLng.latitude.isNaN || latLng.longitude.isNaN) {
+        debugPrint('[MapScreen] ERROR: Coordinates are NaN');
+        if (mounted) {
+          setState(() {
+            error =
+                'Không thể xác định tọa độ hợp lệ. Vui lòng thiết lập vị trí trong máy ảo/thiết bị.';
+            isLoading = false;
+          });
+        }
+        return;
+      }
+
       if (mounted) {
         setState(() {
           currentLocation = latLng;
           isLoading = false;
         });
-        
-        debugPrint('[MapScreen] Map location updated: ${latLng.latitude}, ${latLng.longitude}');
+
+        debugPrint(
+          '[MapScreen] Map location updated: ${latLng.latitude}, ${latLng.longitude}',
+        );
       }
     } catch (e) {
       debugPrint('[MapScreen] ERROR: $e');
       debugPrint('[MapScreen] Exception type: ${e.runtimeType}');
-      
+
       if (mounted) {
         setState(() {
           error = 'Lỗi lấy vị trí: $e';
@@ -143,7 +161,8 @@ class _MapScreenState extends State<MapScreen> {
             FlutterMap(
               mapController: mapController,
               options: MapOptions(
-                initialCenter: currentLocation ?? const LatLng(20.9925, 105.7847),
+                initialCenter:
+                    currentLocation ?? const LatLng(20.9925, 105.7847),
                 initialZoom: 15.0,
                 minZoom: 1,
                 maxZoom: 19,
@@ -182,9 +201,7 @@ class _MapScreenState extends State<MapScreen> {
               ],
             )
           else if (isLoading)
-            const Center(
-              child: CircularProgressIndicator(),
-            )
+            const Center(child: CircularProgressIndicator())
           else if (error != null)
             Center(
               child: Column(
@@ -210,9 +227,7 @@ class _MapScreenState extends State<MapScreen> {
                     icon: const Icon(LucideIcons.rotateCw),
                     label: Text(
                       'Thử lại',
-                      style: GoogleFonts.inter(
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: GoogleFonts.inter(fontWeight: FontWeight.w600),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFF5A4E),
@@ -234,10 +249,7 @@ class _MapScreenState extends State<MapScreen> {
               child: FloatingActionButton(
                 onPressed: _getCurrentLocation,
                 backgroundColor: const Color(0xFFFF5A4E),
-                child: const Icon(
-                  LucideIcons.mapPin,
-                  color: Colors.white,
-                ),
+                child: const Icon(LucideIcons.mapPin, color: Colors.white),
               ),
             ),
         ],

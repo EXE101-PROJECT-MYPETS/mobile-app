@@ -54,7 +54,11 @@ class AuthProvider extends ChangeNotifier {
     }
     notifyListeners();
     // Sync ApiClient ngay lập tức (lúc này đã có currentShopId nếu đã login)
-    ApiClient.instance.configure(token: _token, shopId: _currentShopId);
+    ApiClient.instance.configure(
+      token: _token,
+      shopId: _currentShopId,
+      customerId: _currentUser?.id,
+    );
   }
 
   Future<void> _saveAuthentication(UserLoginResponse response) async {
@@ -80,7 +84,11 @@ class AuthProvider extends ChangeNotifier {
     _currentUser = response.user;
     _shops = response.shops;
     // Sync ApiClient sau mỗi lần login / token thay đổi
-    ApiClient.instance.configure(token: _token, shopId: _currentShopId);
+    ApiClient.instance.configure(
+      token: _token,
+      shopId: _currentShopId,
+      customerId: response.user.id,
+    );
     notifyListeners();
   }
 
@@ -170,6 +178,16 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> refreshSession() async {
+    final refreshToken = _refreshToken;
+    if (refreshToken == null || refreshToken.isEmpty) {
+      throw Exception('Không có refresh token để làm mới phiên đăng nhập');
+    }
+
+    final response = await _authService.refreshToken(refreshToken);
+    await _saveAuthentication(response);
+  }
+
   Future<void> logout() async {
     final box = await Hive.openBox('auth_box');
     await box.delete('access_token');
@@ -187,5 +205,39 @@ class AuthProvider extends ChangeNotifier {
     // Xoá token & shopId khỏi ApiClient
     ApiClient.instance.clear();
     notifyListeners();
+  }
+
+  /// Debug helper to inspect JWT token content.
+  void debugPrintTokenInfo() {
+    print('\n=== AUTH TOKEN DEBUG INFO ===');
+    print('Token exists: ${_token != null}');
+    print('Refresh token exists: ${_refreshToken != null}');
+    print('Current Shop ID: $_currentShopId');
+    print('Current User ID: ${_currentUser?.id}');
+    print('Role: $_role');
+
+    if (_token != null) {
+      try {
+        final parts = _token!.split('.');
+        if (parts.length == 3) {
+          final payload = parts[1];
+          final normalized = payload.padRight(
+            payload.length + (4 - payload.length % 4) % 4,
+            '=',
+          );
+          final decoded = utf8.decode(base64Url.decode(normalized));
+          final claims = jsonDecode(decoded) as Map<String, dynamic>;
+
+          print('JWT Claims:');
+          claims.forEach((key, value) {
+            print('  $key: $value');
+          });
+        }
+      } catch (e) {
+        print('Error decoding token: $e');
+      }
+    }
+
+    print('==============================\n');
   }
 }

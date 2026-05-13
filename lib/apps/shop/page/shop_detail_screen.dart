@@ -15,24 +15,27 @@ class ShopDetailScreen extends StatelessWidget {
           children: [
             // 1. Banner and App Bar Controls
             _buildHeader(context),
-            
+
             // 2. Shop Info (Profile, Actions)
             _buildShopInfo(context),
-            
+
             const Divider(color: Color(0xFFF1F5F9), thickness: 1, height: 32),
-            
+
             // 3. Stats Row
             _buildStatsRow(),
-            
+
             const Divider(color: Color(0xFFF1F5F9), thickness: 1, height: 32),
-            
+
             // 4. Address Section
             _buildAddressSection(),
-            
+
             const SizedBox(height: 16),
-            Container(height: 8, color: const Color(0xFFF8FAFC)), // Thick separator
+            Container(
+              height: 8,
+              color: const Color(0xFFF8FAFC),
+            ), // Thick separator
             const SizedBox(height: 16),
-            
+
             // 5. Products Section
             _buildProductsSection(),
           ],
@@ -58,7 +61,10 @@ class ShopDetailScreen extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildCircleButton(Icons.arrow_back, () => Navigator.pop(context)),
+                _buildCircleButton(
+                  Icons.arrow_back,
+                  () => Navigator.pop(context),
+                ),
                 _buildCircleButton(LucideIcons.share, () {}),
               ],
             ),
@@ -92,7 +98,9 @@ class ShopDetailScreen extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(width: 100), // Space for profile picture (80 width + 20 margin)
+              const SizedBox(
+                width: 100,
+              ), // Space for profile picture (80 width + 20 margin)
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,7 +118,11 @@ class ShopDetailScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 4),
-                        const Icon(Icons.verified, color: Colors.green, size: 18),
+                        const Icon(
+                          Icons.verified,
+                          color: Colors.green,
+                          size: 18,
+                        ),
                       ],
                     ),
                     const SizedBox(height: 4),
@@ -137,19 +149,32 @@ class ShopDetailScreen extends StatelessWidget {
                                     conversationId: 'temp_1',
                                     shopId: '1',
                                     shopName: 'Golden Paws Spa',
-                                    shopAvatarUrl: 'https://picsum.photos/seed/shopprofile/200/200',
+                                    shopAvatarUrl:
+                                        'https://picsum.photos/seed/shopprofile/200/200',
                                   ),
                                 ),
                               );
                             },
-                            icon: const Icon(LucideIcons.messageSquare, size: 16, color: Colors.white),
-                            label: const Text('Chat ngay', style: TextStyle(fontSize: 13, color: Colors.white)),
+                            icon: const Icon(
+                              LucideIcons.messageSquare,
+                              size: 16,
+                              color: Colors.white,
+                            ),
+                            label: const Text(
+                              'Chat ngay',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.white,
+                              ),
+                            ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF0F172A),
                               foregroundColor: Colors.white,
                               elevation: 0,
                               padding: const EdgeInsets.symmetric(vertical: 10),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
                             ),
                           ),
                         ),
@@ -162,9 +187,18 @@ class ShopDetailScreen extends StatelessWidget {
                               foregroundColor: Colors.white,
                               elevation: 0,
                               padding: const EdgeInsets.symmetric(vertical: 10),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
                             ),
-                            child: const Text('Theo dõi', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white)),
+                            child: const Text(
+                              'Theo dõi',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -228,21 +262,25 @@ class ShopDetailScreen extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            color: Color(0xFF64748B),
-            fontSize: 11,
-          ),
+          style: const TextStyle(color: Color(0xFF64748B), fontSize: 11),
         ),
         const SizedBox(height: 4),
         RichText(
           text: TextSpan(
-            style: const TextStyle(color: Color(0xFF1E293B), fontSize: 13, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              color: Color(0xFF1E293B),
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+            ),
             children: [
               TextSpan(text: value),
               if (subValue != null)
                 TextSpan(
                   text: subValue,
-                  style: const TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.normal),
+                  style: const TextStyle(
+                    color: Color(0xFF64748B),
+                    fontWeight: FontWeight.normal,
+                  ),
                 ),
             ],
           ),
@@ -262,7 +300,11 @@ class ShopDetailScreen extends StatelessWidget {
               color: const Color(0xFFF1F5F9),
               shape: BoxShape.circle,
             ),
-            child: const Icon(LucideIcons.mapPin, color: Color(0xFF94A3B8), size: 18),
+            child: const Icon(
+              LucideIcons.mapPin,
+              color: Color(0xFF94A3B8),
+              size: 18,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -271,16 +313,24 @@ class ShopDetailScreen extends StatelessWidget {
               children: const [
                 Text(
                   'ĐỊA CHỈ CHI TIẾT',
-                  style: TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: Color(0xFF94A3B8),
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 SizedBox(height: 4),
                 Text(
                   '45 Le Loi, District 1, Ho Chi Minh City',
-                  style: TextStyle(color: Color(0xFF1E293B), fontSize: 13, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: Color(0xFF1E293B),
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -294,7 +344,7 @@ class ShopDetailScreen extends StatelessWidget {
         'rating': 4.7,
         'reviews': 98,
         'image': 'https://picsum.photos/seed/spa_dog/400/300',
-        'badge': 'DỊCH VỤ'
+        'badge': 'DỊCH VỤ',
       },
       {
         'name': 'Lấy cao răng thú y',
@@ -302,7 +352,7 @@ class ShopDetailScreen extends StatelessWidget {
         'rating': 4.7,
         'reviews': 89,
         'image': 'https://picsum.photos/seed/spa_cat/400/300',
-        'badge': 'THÚ Y'
+        'badge': 'THÚ Y',
       },
     ];
 
@@ -360,7 +410,9 @@ class _ProductCard extends StatelessWidget {
           // Image Section
           Expanded(
             child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(12),
+              ),
               child: Image.network(
                 product['image'],
                 width: double.infinity,
@@ -391,12 +443,19 @@ class _ProductCard extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text(
                       product['rating'].toString(),
-                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFFD97706)),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFFD97706),
+                      ),
                     ),
                     const SizedBox(width: 2),
                     Text(
                       '(${product['reviews']} đánh giá)',
-                      style: const TextStyle(fontSize: 10, color: Color(0xFF64748B)),
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: Color(0xFF64748B),
+                      ),
                     ),
                   ],
                 ),
@@ -416,12 +475,17 @@ class _ProductCard extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: () {},
                     icon: const Icon(Icons.add, size: 14),
-                    label: const Text('Thêm giỏ hàng', style: TextStyle(fontSize: 11)),
+                    label: const Text(
+                      'Thêm giỏ hàng',
+                      style: TextStyle(fontSize: 11),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFB7185),
                       foregroundColor: Colors.white,
                       elevation: 0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
                     ),
                   ),
                 ),

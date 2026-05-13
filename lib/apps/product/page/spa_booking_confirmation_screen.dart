@@ -18,21 +18,23 @@ class SpaBookingConfirmationScreen extends StatefulWidget {
   });
 
   @override
-  State<SpaBookingConfirmationScreen> createState() => _SpaBookingConfirmationScreenState();
+  State<SpaBookingConfirmationScreen> createState() =>
+      _SpaBookingConfirmationScreenState();
 }
 
-class _SpaBookingConfirmationScreenState extends State<SpaBookingConfirmationScreen> {
+class _SpaBookingConfirmationScreenState
+    extends State<SpaBookingConfirmationScreen> {
   // 0: Đến tận nơi, 1: Shop đến đón
-  int _transportOption = 0; 
+  int _transportOption = 0;
   final int _pickupFee = 50000;
-  
+
   // Dữ liệu mock dựa trên index
   final _packages = [
     {'name': 'Cắt tỉa lông chuyên nghiệp', 'price': 450000, 'duration': '90m'},
     {'name': 'Tắm & Sấy tiêu chuẩn', 'price': 300000, 'duration': '45m'},
     {'name': 'Cắt móng & Vệ sinh tai', 'price': 200000, 'duration': '30m'},
   ];
-  
+
   final _times = ['10:00 AM', '11:30 AM', '1:00 PM', '3:30 PM'];
   final _pets = ['Buddy (Chó)', 'Lucy (Mèo)'];
 
@@ -41,7 +43,7 @@ class _SpaBookingConfirmationScreenState extends State<SpaBookingConfirmationScr
     final package = _packages[widget.selectedPackage];
     final time = _times[widget.selectedTime];
     final pet = _pets[widget.selectedPet];
-    
+
     // Tính tổng tiền
     int basePrice = package['price'] as int;
     int totalPrice = basePrice + (_transportOption == 1 ? _pickupFee : 0);
@@ -57,7 +59,11 @@ class _SpaBookingConfirmationScreenState extends State<SpaBookingConfirmationScr
         ),
         title: Text(
           'Xác nhận Đặt lịch',
-          style: GoogleFonts.inter(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
+          style: GoogleFonts.inter(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
         centerTitle: true,
       ),
@@ -71,7 +77,13 @@ class _SpaBookingConfirmationScreenState extends State<SpaBookingConfirmationScr
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))],
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.02),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,28 +92,54 @@ class _SpaBookingConfirmationScreenState extends State<SpaBookingConfirmationScr
                     children: [
                       Container(
                         padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(color: Colors.pink.shade50, borderRadius: BorderRadius.circular(12)),
-                        child: const Icon(LucideIcons.calendarCheck, color: Colors.pink),
+                        decoration: BoxDecoration(
+                          color: Colors.pink.shade50,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          LucideIcons.calendarCheck,
+                          color: Colors.pink,
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(package['name'] as String, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                            Text(
+                              package['name'] as String,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
                             const SizedBox(height: 4),
-                            Text('Sunny Spa - CS1', style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                            Text(
+                              'Sunny Spa - CS1',
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                                fontSize: 12,
+                              ),
+                            ),
                           ],
                         ),
-                      )
+                      ),
                     ],
                   ),
                   const Divider(height: 32),
-                  _buildSummaryRow(LucideIcons.clock, 'Thời gian:', '$time, ${widget.selectedDate.day}/${widget.selectedDate.month}/${widget.selectedDate.year}'),
+                  _buildSummaryRow(
+                    LucideIcons.clock,
+                    'Thời gian:',
+                    '$time, ${widget.selectedDate.day}/${widget.selectedDate.month}/${widget.selectedDate.year}',
+                  ),
                   const SizedBox(height: 12),
                   _buildSummaryRow(Icons.pets, 'Thú cưng:', pet),
                   const SizedBox(height: 12),
-                  _buildSummaryRow(LucideIcons.timer, 'Thời lượng:', package['duration'] as String),
+                  _buildSummaryRow(
+                    LucideIcons.timer,
+                    'Thời lượng:',
+                    package['duration'] as String,
+                  ),
                 ],
               ),
             ),
@@ -113,14 +151,23 @@ class _SpaBookingConfirmationScreenState extends State<SpaBookingConfirmationScr
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))],
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.02),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Bạn muốn sử dụng hình thức nào?', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  const Text(
+                    'Bạn muốn sử dụng hình thức nào?',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
                   const SizedBox(height: 16),
-                  
+
                   // Lựa chọn 0: Đến tận nơi
                   GestureDetector(
                     onTap: () => setState(() => _transportOption = 0),
@@ -144,27 +191,50 @@ class _SpaBookingConfirmationScreenState extends State<SpaBookingConfirmationScr
                       isSelected: _transportOption == 1,
                     ),
                   ),
-                  
+
                   // Nhập địa chỉ nếu Chọn Shop tới đón
                   if (_transportOption == 1) ...[
                     const SizedBox(height: 16),
                     Container(
                       padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade200)),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey.shade200),
+                      ),
                       child: Row(
                         children: [
-                          const Icon(LucideIcons.mapPin, color: Colors.grey, size: 16),
+                          const Icon(
+                            LucideIcons.mapPin,
+                            color: Colors.grey,
+                            size: 16,
+                          ),
                           const SizedBox(width: 8),
-                          const Expanded(child: Text('Tòa nhà Lotte, 54 Liễu Giai, Ba Đình, Hà Nội', style: TextStyle(fontSize: 12))),
+                          const Expanded(
+                            child: Text(
+                              'Tòa nhà Lotte, 54 Liễu Giai, Ba Đình, Hà Nội',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ),
                           TextButton(
-                            onPressed: () {}, 
-                            style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(0, 0), tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                            child: const Text('Thay đổi', style: TextStyle(color: Colors.pink, fontSize: 12))
-                          )
+                            onPressed: () {},
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                              minimumSize: const Size(0, 0),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            child: const Text(
+                              'Thay đổi',
+                              style: TextStyle(
+                                color: Colors.pink,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
                         ],
                       ),
-                    )
-                  ]
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -175,7 +245,13 @@ class _SpaBookingConfirmationScreenState extends State<SpaBookingConfirmationScr
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -5))]
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, -5),
+            ),
+          ],
         ),
         child: SafeArea(
           child: Row(
@@ -185,8 +261,18 @@ class _SpaBookingConfirmationScreenState extends State<SpaBookingConfirmationScr
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Tổng cộng', style: TextStyle(color: Colors.grey, fontSize: 12)),
-                    Text('${_formatCurrency(totalPrice)}đ', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.pink)),
+                    const Text(
+                      'Tổng cộng',
+                      style: TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
+                    Text(
+                      '${_formatCurrency(totalPrice)}đ',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: Colors.pink,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -195,15 +281,29 @@ class _SpaBookingConfirmationScreenState extends State<SpaBookingConfirmationScr
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFE91E63),
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     elevation: 0,
                   ),
                   onPressed: () {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const SpaBookingSuccessScreen()));
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SpaBookingSuccessScreen(),
+                      ),
+                    );
                   },
-                  child: const Text('Thanh Toán', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                  child: const Text(
+                    'Thanh Toán',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -211,17 +311,30 @@ class _SpaBookingConfirmationScreenState extends State<SpaBookingConfirmationScr
     );
   }
 
-  Widget _buildTransportOption({required IconData icon, required String title, required String subtitle, String? extraText, required bool isSelected}) {
+  Widget _buildTransportOption({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    String? extraText,
+    required bool isSelected,
+  }) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: isSelected ? Colors.pink.shade50 : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: isSelected ? Colors.pink : Colors.grey.shade300, width: isSelected ? 1.5 : 1)
+        border: Border.all(
+          color: isSelected ? Colors.pink : Colors.grey.shade300,
+          width: isSelected ? 1.5 : 1,
+        ),
       ),
       child: Row(
         children: [
-          Icon(icon, color: isSelected ? Colors.pink : Colors.grey.shade600, size: 24),
+          Icon(
+            icon,
+            color: isSelected ? Colors.pink : Colors.grey.shade600,
+            size: 24,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -230,17 +343,37 @@ class _SpaBookingConfirmationScreenState extends State<SpaBookingConfirmationScr
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: isSelected ? Colors.pink : Colors.black87)),
-                    if (extraText != null) Text(extraText, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange, fontSize: 12))
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: isSelected ? Colors.pink : Colors.black87,
+                      ),
+                    ),
+                    if (extraText != null)
+                      Text(
+                        extraText,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.orange,
+                          fontSize: 12,
+                        ),
+                      ),
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(subtitle, style: TextStyle(color: Colors.grey.shade600, fontSize: 11)),
+                Text(
+                  subtitle,
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 11),
+                ),
               ],
             ),
           ),
           const SizedBox(width: 8),
-          Icon(isSelected ? Icons.radio_button_checked : Icons.radio_button_off, color: isSelected ? Colors.pink : Colors.grey)
+          Icon(
+            isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
+            color: isSelected ? Colors.pink : Colors.grey,
+          ),
         ],
       ),
     );
@@ -252,9 +385,18 @@ class _SpaBookingConfirmationScreenState extends State<SpaBookingConfirmationScr
       children: [
         Icon(icon, size: 16, color: Colors.grey.shade600),
         const SizedBox(width: 8),
-        Text(label, style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
+        Text(
+          label,
+          style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+        ),
         const SizedBox(width: 8),
-        Expanded(child: Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), textAlign: TextAlign.right)),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            textAlign: TextAlign.right,
+          ),
+        ),
       ],
     );
   }

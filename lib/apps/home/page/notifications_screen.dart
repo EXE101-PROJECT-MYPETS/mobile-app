@@ -96,67 +96,105 @@ class NotificationsScreen extends StatelessWidget {
           final notif = notifications[index];
           final isRead = notif['isRead'] as bool;
 
-          return Container(
-            color: isRead ? Colors.white : Colors.pink.shade50.withOpacity(0.3),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: notif['bgColor'] as Color,
-                    shape: BoxShape.circle,
+          return GestureDetector(
+            onTap: () {
+              // Handle notification tap - navigate to relevant screen
+              final title = notif['title'] as String;
+              try {
+                if (title.contains('Spa') || title.contains('lịch')) {
+                  // TODO: Implement BookingsScreen
+                  showAppToast(
+                    context,
+                    message: 'Chức năng sắp ra mắt',
+                    type: AppToastType.info,
+                  );
+                } else if (title.contains('Đơn hàng') ||
+                    title.contains('giao')) {
+                  // TODO: Implement OrdersScreen
+                  showAppToast(
+                    context,
+                    message: 'Chức năng sắp ra mắt',
+                    type: AppToastType.info,
+                  );
+                } else if (title.contains('tiêm phòng') ||
+                    title.contains('Nhắc')) {
+                  // Navigate to pets screen
+                  Navigator.of(context).pushNamed('/pets');
+                }
+              } catch (e) {
+                showAppToast(
+                  context,
+                  message: 'Không thể mở màn hình',
+                  type: AppToastType.error,
+                );
+              }
+            },
+            child: Container(
+              color: isRead
+                  ? Colors.white
+                  : Colors.pink.shade50.withOpacity(0.3),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: notif['bgColor'] as Color,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      notif['icon'] as IconData,
+                      color: notif['color'] as Color,
+                      size: 22,
+                    ),
                   ),
-                  child: Icon(
-                    notif['icon'] as IconData,
-                    color: notif['color'] as Color,
-                    size: 22,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              notif['title'] as String,
-                              style: TextStyle(
-                                fontWeight: isRead
-                                    ? FontWeight.w600
-                                    : FontWeight.bold,
-                                fontSize: 15,
-                                color: isRead ? Colors.black87 : Colors.black,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                notif['title'] as String,
+                                style: TextStyle(
+                                  fontWeight: isRead
+                                      ? FontWeight.w600
+                                      : FontWeight.bold,
+                                  fontSize: 15,
+                                  color: isRead ? Colors.black87 : Colors.black,
+                                ),
                               ),
                             ),
-                          ),
-                          Text(
-                            notif['time'] as String,
-                            style: TextStyle(
-                              color: Colors.grey.shade500,
-                              fontSize: 12,
+                            Text(
+                              notif['time'] as String,
+                              style: TextStyle(
+                                color: Colors.grey.shade500,
+                                fontSize: 12,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        notif['body'] as String,
-                        style: TextStyle(
-                          color: isRead ? Colors.grey.shade600 : Colors.black87,
-                          fontSize: 13,
-                          height: 1.4,
+                          ],
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 6),
+                        Text(
+                          notif['body'] as String,
+                          style: TextStyle(
+                            color: isRead
+                                ? Colors.grey.shade600
+                                : Colors.black87,
+                            fontSize: 13,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },

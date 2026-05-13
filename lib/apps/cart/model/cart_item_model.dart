@@ -18,7 +18,10 @@ class CartItemModel {
   // Giả lập giá tiền từ string "150.000đ" sang double để tiện tính toán
   double get priceAsDouble {
     try {
-      String cleanPrice = product.price.replaceAll('đ', '').replaceAll('.', '').trim();
+      String cleanPrice = product.price
+          .replaceAll('đ', '')
+          .replaceAll('.', '')
+          .trim();
       return double.parse(cleanPrice);
     } catch (_) {
       return 0.0;

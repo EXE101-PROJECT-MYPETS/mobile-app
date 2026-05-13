@@ -25,6 +25,8 @@ class ShippingService {
       return GhtkFeeResponse.fromJson(json);
     }
 
-    throw Exception('Lấy phí vận chuyển thất bại (${response.statusCode}): $body');
+    throw Exception(
+      'Lấy phí vận chuyển thất bại (${response.statusCode}): $body',
+    );
   }
 }

@@ -37,24 +37,52 @@ class AppState extends ChangeNotifier {
   final Set<String> _likedProductIds = {};
   List<String> _viewedCategories = [];
   List<String> _viewedProductIds = [];
+  final Map<String, ProductModel> _viewedProductCache = {};
 
   // --- MOCK CART DATA ---
   final List<CartItemModel> _cartItems = [
     CartItemModel(
       id: 'c1',
-      product: ProductModel(id: 'c1_p', name: 'Gói spa cơ bản cho mèo', price: '199.000đ', rating: 4.8, reviews: 10, image: 'https://picsum.photos/seed/cart1/200', type: 'spa', category: 'Spa'),
+      product: ProductModel(
+        id: 'c1_p',
+        name: 'Gói spa cơ bản cho mèo',
+        price: '199.000đ',
+        rating: 4.8,
+        reviews: 10,
+        image: 'https://picsum.photos/seed/cart1/200',
+        type: 'spa',
+        category: 'Spa',
+      ),
       shopName: 'PETPEEs Mall',
       quantity: 1,
     ),
     CartItemModel(
       id: 'c2',
-      product: ProductModel(id: 'c2_p', name: 'Gói spa cao cấp cho chó', price: '349.000đ', rating: 4.9, reviews: 20, image: 'https://picsum.photos/seed/cart2/200', type: 'spa', category: 'Spa'),
+      product: ProductModel(
+        id: 'c2_p',
+        name: 'Gói spa cao cấp cho chó',
+        price: '349.000đ',
+        rating: 4.9,
+        reviews: 20,
+        image: 'https://picsum.photos/seed/cart2/200',
+        type: 'spa',
+        category: 'Spa',
+      ),
       shopName: 'Spa House Official',
       quantity: 2,
     ),
     CartItemModel(
       id: 'c3',
-      product: ProductModel(id: 'c3_p', name: 'Khám tổng quát cho chó', price: '259.000đ', rating: 4.7, reviews: 5, image: 'https://picsum.photos/seed/cart3/200', type: 'thu_y', category: 'Thú y'),
+      product: ProductModel(
+        id: 'c3_p',
+        name: 'Khám tổng quát cho chó',
+        price: '259.000đ',
+        rating: 4.7,
+        reviews: 5,
+        image: 'https://picsum.photos/seed/cart3/200',
+        type: 'thu_y',
+        category: 'Thú y',
+      ),
       shopName: 'Doggo Planet',
       quantity: 3,
     ),
@@ -63,26 +91,24 @@ class AppState extends ChangeNotifier {
   // --- MOCK PET DATA ---
   final List<PetModel> _myPets = [
     PetModel(
-      id: 'p1',
+      id: 1,
       name: 'Bông',
-      type: 'Chó',
-      breed: 'Golden Retriever',
-      shopName: 'Doggo Planet',
+      speciesId: 1,
+      breedText: 'Golden Retriever',
       gender: 'Đực',
-      age: '4 tuổi 10 tháng',
+      dob: DateTime(2019, 7, 15),
       note: 'Đã tiêm phòng đầy đủ',
-      image: 'https://picsum.photos/seed/pet1/200'
+      avatarUrl: 'https://picsum.photos/seed/pet1/200',
     ),
     PetModel(
-      id: 'p2',
+      id: 2,
       name: 'Nấm',
-      type: 'Mèo',
-      breed: 'Anh lông ngắn',
-      shopName: 'PETPEEs Mall',
+      speciesId: 2,
+      breedText: 'Anh lông ngắn',
       gender: 'Cái',
-      age: '2 tuổi 1 tháng',
+      dob: DateTime(2021, 4, 10),
       note: 'Ưa thích thức ăn hạt mềm',
-      image: 'https://picsum.photos/seed/pet2/200'
+      avatarUrl: 'https://picsum.photos/seed/pet2/200',
     ),
   ];
 
@@ -124,8 +150,34 @@ class AppState extends ChangeNotifier {
   }
 
   List<ProductModel> get recentlyViewedProducts {
-    // Return in order of recently viewed
-    return _viewedProductIds.map((id) => getProductById(id)).whereType<ProductModel>().toList();
+    return _viewedProductIds
+        .map((id) => _viewedProductCache[id] ?? getProductById(id))
+        .whereType<ProductModel>()
+        .toList();
+  }
+
+  /// Load recently viewed products from Hive persistence
+  Future<void> loadRecentlyViewedProducts() async {
+    try {
+      final box = await Hive.openBox('user_preferences');
+      final viewedIds = box.get('viewedProductIds') ?? [];
+      final viewedData = box.get('viewedProductsData') ?? {};
+
+      _viewedProductIds = List<String>.from(viewedIds);
+
+      _viewedProductCache.clear();
+      for (final id in _viewedProductIds) {
+        if (viewedData[id] != null) {
+          final data = Map<String, dynamic>.from(
+            viewedData[id] as Map<dynamic, dynamic>,
+          );
+          _viewedProductCache[id] = ProductModel.fromMap(data);
+        }
+      }
+      notifyListeners();
+    } catch (e) {
+      print('Error loading recently viewed products: $e');
+    }
   }
 
   Future<void> loadCurrentUserAddresses(String? accessToken) async {
@@ -174,6 +226,18 @@ class AppState extends ChangeNotifier {
     final savedProducts = box.get('viewedProductIds');
     if (savedProducts != null) {
       _viewedProductIds = List<String>.from(savedProducts);
+    }
+
+    final savedViewedData = box.get('viewedProductsData');
+    if (savedViewedData is Map) {
+      _viewedProductCache.clear();
+      for (final entry in savedViewedData.entries) {
+        if (entry.key is String && entry.value is Map) {
+          _viewedProductCache[entry.key as String] = ProductModel.fromMap(
+            Map<String, dynamic>.from(entry.value as Map),
+          );
+        }
+      }
     }
 
     // NOTE: In the future, load liked ids from BE here
@@ -278,13 +342,33 @@ class AppState extends ChangeNotifier {
     _viewedProductIds.remove(product.id);
     _viewedProductIds.insert(0, product.id);
     if (_viewedProductIds.length > 20) {
-      _viewedProductIds = _viewedProductIds.sublist(0, 20); // Lưu tối đa 20 sp gần nhất
+      _viewedProductIds = _viewedProductIds.sublist(0, 20);
     }
 
-    // 3. Save to local storage
+    // 3. Save to local storage (Hive) - save both IDs and full product data
     final box = await Hive.openBox('user_preferences');
     await box.put('viewedCategories', _viewedCategories);
     await box.put('viewedProductIds', _viewedProductIds);
+    _viewedProductCache[product.id] = product;
+
+    // Store full product as JSON for persistence
+    final viewedProductsJson = Map<String, dynamic>.from(
+      box.get('viewedProductsData') ?? <String, dynamic>{},
+    );
+    viewedProductsJson[product.id] = {
+      'id': product.id,
+      'name': product.name,
+      'price': product.price,
+      'rating': product.rating,
+      'reviews': product.reviews,
+      'image': product.image,
+      'type': product.type,
+      'category': product.category,
+      'description': product.description,
+      'shopProvince': product.shopProvince,
+      'timestamp': DateTime.now().toIso8601String(),
+    };
+    await box.put('viewedProductsData', viewedProductsJson);
 
     notifyListeners();
   }
@@ -309,7 +393,7 @@ class AppState extends ChangeNotifier {
   // Lấy các sản phẩm có danh mục nằm trong lịch sử xem
   List<ProductModel> get similarProducts {
     if (_viewedCategories.isEmpty) return [];
-    
+
     return _allProducts.where((p) {
       return _viewedCategories.contains(p.category);
     }).toList();
@@ -352,46 +436,60 @@ class AppState extends ChangeNotifier {
   }
 
   void addToCart(ProductModel product, String shopName, [int quantity = 1]) {
-    final index = _cartItems.indexWhere((i) => i.product.id == product.id && i.shopName == shopName);
+    final index = _cartItems.indexWhere(
+      (i) => i.product.id == product.id && i.shopName == shopName,
+    );
     if (index >= 0) {
       _cartItems[index].quantity += quantity;
     } else {
-      _cartItems.add(CartItemModel(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        product: product,
-        shopName: shopName,
-        quantity: quantity,
-      ));
+      _cartItems.add(
+        CartItemModel(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          product: product,
+          shopName: shopName,
+          quantity: quantity,
+        ),
+      );
     }
     notifyListeners();
   }
 
-  void prepareBuyNow(ProductModel product, String shopName, [int quantity = 1]) {
+  void prepareBuyNow(
+    ProductModel product,
+    String shopName, [
+    int quantity = 1,
+  ]) {
     for (final item in _cartItems) {
       item.isSelected = false;
     }
 
-    final index = _cartItems.indexWhere((i) => i.product.id == product.id && i.shopName == shopName);
+    final index = _cartItems.indexWhere(
+      (i) => i.product.id == product.id && i.shopName == shopName,
+    );
     if (index >= 0) {
       _cartItems[index].quantity = quantity;
       _cartItems[index].isSelected = true;
     } else {
-      _cartItems.add(CartItemModel(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        product: product,
-        shopName: shopName,
-        quantity: quantity,
-        isSelected: true,
-      ));
+      _cartItems.add(
+        CartItemModel(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          product: product,
+          shopName: shopName,
+          quantity: quantity,
+          isSelected: true,
+        ),
+      );
     }
 
     notifyListeners();
   }
 
   double get cartTotalPrice {
-    return _cartItems.where((i) => i.isSelected).fold(0.0, (sum, item) => sum + (item.priceAsDouble * item.quantity));
+    return _cartItems
+        .where((i) => i.isSelected)
+        .fold(0.0, (sum, item) => sum + (item.priceAsDouble * item.quantity));
   }
-  
+
   bool get isAllCartSelected {
     if (_cartItems.isEmpty) return false;
     return _cartItems.every((i) => i.isSelected);

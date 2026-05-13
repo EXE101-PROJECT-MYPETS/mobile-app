@@ -13,11 +13,11 @@ class GhtkFeeRequest {
   });
 
   Map<String, dynamic> toJson() => {
-        'userAddressId': userAddressId,
-        'weight': weight,
-        'value': value,
-        'transport': transport,
-      };
+    'userAddressId': userAddressId,
+    'weight': weight,
+    'value': value,
+    'transport': transport,
+  };
 }
 
 /// Response từ BE sau khi tính phí GHTK.

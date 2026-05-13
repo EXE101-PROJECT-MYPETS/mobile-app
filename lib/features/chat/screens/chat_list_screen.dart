@@ -24,30 +24,42 @@ class _ChatListScreenState extends State<ChatListScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Tin nhắn', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Tin nhắn',
+          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0.5,
       ),
       body: Consumer<ChatProvider>(
         builder: (context, chatProvider, child) {
           if (chatProvider.isLoading && chatProvider.conversations.isEmpty) {
-            return const Center(child: CircularProgressIndicator(color: Color(0xFFF9622E)));
+            return const Center(
+              child: CircularProgressIndicator(color: Color(0xFFF9622E)),
+            );
           }
 
           if (chatProvider.conversations.isEmpty) {
             return const Center(
-              child: Text('Bạn chưa có tin nhắn nào.', style: TextStyle(color: Colors.black54)),
+              child: Text(
+                'Bạn chưa có tin nhắn nào.',
+                style: TextStyle(color: Colors.black54),
+              ),
             );
           }
 
           return ListView.separated(
             itemCount: chatProvider.conversations.length,
-            separatorBuilder: (context, index) => const Divider(height: 1, indent: 70),
+            separatorBuilder: (context, index) =>
+                const Divider(height: 1, indent: 70),
             itemBuilder: (context, index) {
               final conversation = chatProvider.conversations[index];
               return ListTile(
                 tileColor: Colors.white,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 leading: CircleAvatar(
                   radius: 26,
                   backgroundImage: conversation.shopAvatarUrl != null
@@ -60,7 +72,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
                 ),
                 title: Text(
                   conversation.shopName,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
                 subtitle: Padding(
                   padding: const EdgeInsets.only(top: 4),
@@ -72,7 +87,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
                       color: conversation.lastMessage?.senderType == 'SHOP_USER'
                           ? Colors.black87
                           : Colors.black54,
-                      fontWeight: conversation.lastMessage?.senderType == 'SHOP_USER'
+                      fontWeight:
+                          conversation.lastMessage?.senderType == 'SHOP_USER'
                           ? FontWeight.w500
                           : FontWeight.normal,
                     ),
@@ -81,7 +97,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
                 trailing: conversation.lastMessage != null
                     ? Text(
                         _formatTime(conversation.lastMessage!.createdAt),
-                        style: const TextStyle(color: Colors.black54, fontSize: 12),
+                        style: const TextStyle(
+                          color: Colors.black54,
+                          fontSize: 12,
+                        ),
                       )
                     : null,
                 onTap: () {
@@ -108,7 +127,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
   String _formatTime(DateTime time) {
     final now = DateTime.now();
     final difference = now.difference(time);
-    
+
     if (difference.inDays == 0) {
       return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
     } else if (difference.inDays == 1) {

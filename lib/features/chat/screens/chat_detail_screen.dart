@@ -55,11 +55,11 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     if (text.trim().isEmpty) return;
 
     context.read<ChatProvider>().sendMessage(
-          widget.conversationId,
-          widget.shopId,
-          text,
-        );
-    
+      widget.conversationId,
+      widget.shopId,
+      text,
+    );
+
     _messageController.clear();
     _scrollToBottom();
   }
@@ -85,7 +85,11 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
             Expanded(
               child: Text(
                 widget.shopName,
-                style: const TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  color: Colors.black87,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -100,8 +104,11 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
           Expanded(
             child: Consumer<ChatProvider>(
               builder: (context, chatProvider, child) {
-                if (chatProvider.isLoading && chatProvider.currentMessages.isEmpty) {
-                  return const Center(child: CircularProgressIndicator(color: Color(0xFFF9622E)));
+                if (chatProvider.isLoading &&
+                    chatProvider.currentMessages.isEmpty) {
+                  return const Center(
+                    child: CircularProgressIndicator(color: Color(0xFFF9622E)),
+                  );
                 }
 
                 final messages = chatProvider.currentMessages.reversed.toList();
@@ -109,7 +116,10 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                 return ListView.builder(
                   controller: _scrollController,
                   reverse: true, // Start from bottom
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final message = messages[index];
@@ -130,15 +140,21 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
-        mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isMe
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isMe) ...[
             CircleAvatar(
               radius: 12,
-              backgroundImage: widget.shopAvatarUrl != null ? NetworkImage(widget.shopAvatarUrl!) : null,
+              backgroundImage: widget.shopAvatarUrl != null
+                  ? NetworkImage(widget.shopAvatarUrl!)
+                  : null,
               backgroundColor: Colors.grey[300],
-              child: widget.shopAvatarUrl == null ? const Icon(Icons.store, size: 12, color: Colors.grey) : null,
+              child: widget.shopAvatarUrl == null
+                  ? const Icon(Icons.store, size: 12, color: Colors.grey)
+                  : null,
             ),
             const SizedBox(width: 8),
           ],
@@ -177,9 +193,10 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
 
   Widget _buildMessageInput() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8).copyWith(
-        bottom: MediaQuery.of(context).padding.bottom + 8,
-      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 8,
+      ).copyWith(bottom: MediaQuery.of(context).padding.bottom + 8),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -204,7 +221,10 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                   hintText: 'Nhập tin nhắn...',
                   hintStyle: TextStyle(color: Colors.grey),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                 ),
                 maxLines: null,
                 textInputAction: TextInputAction.send,

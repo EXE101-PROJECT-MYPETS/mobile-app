@@ -3,11 +3,7 @@ class ShopPublicContactDTO {
   final String? phone;
   final String? email;
 
-  const ShopPublicContactDTO({
-    this.name,
-    this.phone,
-    this.email,
-  });
+  const ShopPublicContactDTO({this.name, this.phone, this.email});
 
   factory ShopPublicContactDTO.fromJson(Map<String, dynamic> json) {
     String? getString(dynamic value) {

@@ -54,6 +54,23 @@ class AuthService {
     throw Exception(_extractErrorMessage(body, 'Đăng nhập thất bại'));
   }
 
+  Future<UserLoginResponse> refreshToken(String refreshToken) async {
+    final response = await http.post(
+      Uri.parse('${ApiConfig.authUrl}/refreshToken'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'refreshToken': refreshToken}),
+    );
+
+    final body = _decodeResponse(response);
+    if (_isSuccess(response.statusCode)) {
+      return UserLoginResponse.fromJson(body);
+    }
+
+    throw Exception(
+      _extractErrorMessage(body, 'Làm mới phiên đăng nhập thất bại'),
+    );
+  }
+
   Future<UserLoginResponse> register(RegisterRequest registerRequest) async {
     final request = http.MultipartRequest(
       'POST',

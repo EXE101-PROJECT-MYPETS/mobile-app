@@ -26,11 +26,11 @@ class ConversationModel {
       customerId: json['customerId'].toString(),
       shopName: json['shopName'] ?? 'Shop ${json['shopId']}',
       shopAvatarUrl: json['shopAvatarUrl'],
-      createdAt: json['createdAt'] != null 
-          ? DateTime.parse(json['createdAt']) 
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
           : DateTime.now(),
-      lastMessage: json['lastMessage'] != null 
-          ? MessageModel.fromJson(json['lastMessage']) 
+      lastMessage: json['lastMessage'] != null
+          ? MessageModel.fromJson(json['lastMessage'])
           : null,
     );
   }

@@ -3,7 +3,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 class CommonBottomNavBar extends StatelessWidget {
-  const CommonBottomNavBar({super.key, required this.currentIndex, required this.onTap});
+  const CommonBottomNavBar({
+    super.key,
+    required this.currentIndex,
+    required this.onTap,
+  });
 
   final int currentIndex;
   final ValueChanged<int> onTap;
@@ -25,10 +29,19 @@ class CommonBottomNavBar extends StatelessWidget {
       ),
       onTap: onTap,
       items: const [
-        BottomNavigationBarItem(icon: Icon(LucideIcons.home), label: 'Trang chủ'),
+        BottomNavigationBarItem(
+          icon: Icon(LucideIcons.home),
+          label: 'Trang chủ',
+        ),
         BottomNavigationBarItem(icon: Icon(LucideIcons.store), label: 'Mall'),
-        BottomNavigationBarItem(icon: Icon(LucideIcons.clapperboard), label: 'Live'),
-        BottomNavigationBarItem(icon: Icon(LucideIcons.bell), label: 'Thông báo'),
+        BottomNavigationBarItem(
+          icon: Icon(LucideIcons.clapperboard),
+          label: 'Live',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(LucideIcons.bell),
+          label: 'Thông báo',
+        ),
         BottomNavigationBarItem(icon: Icon(LucideIcons.user), label: 'Tôi'),
       ],
     );

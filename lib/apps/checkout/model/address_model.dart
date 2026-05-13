@@ -24,9 +24,11 @@ class AddressModel {
     final district = _readString(json['district']);
     final province = _readString(json['province']);
     final hamlet = _readString(json['hamlet']);
-    final regionParts = [ward, district, province]
-        .where((part) => part.isNotEmpty)
-        .toList();
+    final regionParts = [
+      ward,
+      district,
+      province,
+    ].where((part) => part.isNotEmpty).toList();
 
     return AddressModel(
       id: ((json['id'] as num?)?.toInt() ?? 0).toString(),

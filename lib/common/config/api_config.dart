@@ -3,9 +3,9 @@ class ApiConfig {
   // Nếu dùng máy ảo Android (Emulator), dùng 10.0.2.2
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://192.168.1.26:8080/api',
+    defaultValue: 'http://192.168.16.107:8080/api',
   );
-  
+
   static const String authUrl = '$baseUrl/auth';
   static const String registerUrl = '$authUrl/register';
   static const String registerEmailVerificationUrl =
@@ -29,4 +29,3 @@ class ApiConfig {
   // Order endpoints
   static const String ordersUrl = '$baseUrl/orders';
 }
-

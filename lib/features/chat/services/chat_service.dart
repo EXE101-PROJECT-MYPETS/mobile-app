@@ -10,7 +10,8 @@ class ChatService {
       shopId: '1',
       senderType: 'CUSTOMER',
       senderCustomerId: '1',
-      body: 'Chào shop, cho mình hỏi dịch vụ spa cho chó poodle bao nhiêu tiền ạ?',
+      body:
+          'Chào shop, cho mình hỏi dịch vụ spa cho chó poodle bao nhiêu tiền ạ?',
       createdAt: DateTime.now().subtract(const Duration(minutes: 30)),
     ),
     MessageModel(
@@ -39,7 +40,8 @@ class ChatService {
       shopId: '1',
       customerId: '1',
       shopName: 'PetPee Spa & Hotel',
-      shopAvatarUrl: 'https://images.unsplash.com/photo-1517849845537-4d257902454a',
+      shopAvatarUrl:
+          'https://images.unsplash.com/photo-1517849845537-4d257902454a',
       createdAt: DateTime.now().subtract(const Duration(days: 1)),
       lastMessage: _mockMessages.last,
     ),
@@ -48,7 +50,8 @@ class ChatService {
       shopId: '2',
       customerId: '1',
       shopName: 'Thú Y Mèo Ngoan',
-      shopAvatarUrl: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba',
+      shopAvatarUrl:
+          'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba',
       createdAt: DateTime.now().subtract(const Duration(days: 2)),
       lastMessage: MessageModel(
         id: '4',
@@ -68,10 +71,16 @@ class ChatService {
 
   Future<List<MessageModel>> getMessages(String conversationId) async {
     await Future.delayed(const Duration(milliseconds: 500));
-    return _mockMessages.where((m) => m.conversationId == conversationId).toList();
+    return _mockMessages
+        .where((m) => m.conversationId == conversationId)
+        .toList();
   }
 
-  Future<MessageModel> sendMessage(String conversationId, String shopId, String body) async {
+  Future<MessageModel> sendMessage(
+    String conversationId,
+    String shopId,
+    String body,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 300));
     final newMessage = MessageModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -83,7 +92,7 @@ class ChatService {
       createdAt: DateTime.now(),
     );
     _mockMessages.add(newMessage);
-    
+
     // Update last message in conversation
     final index = _mockConversations.indexWhere((c) => c.id == conversationId);
     if (index != -1) {
@@ -98,7 +107,7 @@ class ChatService {
         lastMessage: newMessage,
       );
     }
-    
+
     return newMessage;
   }
 }

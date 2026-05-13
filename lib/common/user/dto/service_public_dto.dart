@@ -5,11 +5,7 @@ class ServicePublicDTO {
   final ShopInfoDTO? shop;
   final double? distanceKm;
 
-  ServicePublicDTO({
-    this.service,
-    this.shop,
-    this.distanceKm,
-  });
+  ServicePublicDTO({this.service, this.shop, this.distanceKm});
 
   int? get id => service?.id;
   int? get shopId => shop?.shopId;
@@ -124,7 +120,9 @@ class ShopInfoDTO {
     return ShopInfoDTO(
       shopId: json['shopId'] as int?,
       shopName: json['shopName'] as String?,
-      shopImageUrl: ImageUrlUtil.buildPublicUrl(json['shopImageUrl'] as String?),
+      shopImageUrl: ImageUrlUtil.buildPublicUrl(
+        json['shopImageUrl'] as String?,
+      ),
       shopAddress: json['shopAddress'] as String?,
       shopProvince: json['shopProvince'] as String?,
       shopLat: (json['shopLat'] as num?)?.toDouble(),

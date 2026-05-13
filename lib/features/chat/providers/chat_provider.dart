@@ -5,10 +5,10 @@ import '../services/chat_service.dart';
 
 class ChatProvider with ChangeNotifier {
   final ChatService _chatService = ChatService();
-  
+
   List<ConversationModel> _conversations = [];
   List<ConversationModel> get conversations => _conversations;
-  
+
   List<MessageModel> _currentMessages = [];
   List<MessageModel> get currentMessages => _currentMessages;
 
@@ -18,7 +18,7 @@ class ChatProvider with ChangeNotifier {
   Future<void> fetchConversations() async {
     _isLoading = true;
     notifyListeners();
-    
+
     try {
       _conversations = await _chatService.getConversations();
     } catch (e) {
@@ -33,7 +33,7 @@ class ChatProvider with ChangeNotifier {
     _isLoading = true;
     // Don't clear immediately to avoid flickering, or clear if needed
     notifyListeners();
-    
+
     try {
       _currentMessages = await _chatService.getMessages(conversationId);
     } catch (e) {
@@ -44,9 +44,13 @@ class ChatProvider with ChangeNotifier {
     }
   }
 
-  Future<void> sendMessage(String conversationId, String shopId, String body) async {
+  Future<void> sendMessage(
+    String conversationId,
+    String shopId,
+    String body,
+  ) async {
     if (body.trim().isEmpty) return;
-    
+
     // Optimistic UI update
     final tempMsg = MessageModel(
       id: 'temp_\${DateTime.now().millisecondsSinceEpoch}',
@@ -60,13 +64,17 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final realMsg = await _chatService.sendMessage(conversationId, shopId, body);
+      final realMsg = await _chatService.sendMessage(
+        conversationId,
+        shopId,
+        body,
+      );
       // Replace temp with real
       final index = _currentMessages.indexWhere((m) => m.id == tempMsg.id);
       if (index != -1) {
         _currentMessages[index] = realMsg;
       }
-      
+
       // Update conversations list so the last message is correct
       await fetchConversations();
     } catch (e) {
