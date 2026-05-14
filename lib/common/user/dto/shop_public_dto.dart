@@ -1,3 +1,5 @@
+import 'package:petpee_mobile/common/config/api_config.dart';
+
 class ShopPublicContactDTO {
   final String? name;
   final String? phone;
@@ -58,7 +60,7 @@ class ShopPublicDTO {
     return ShopPublicDTO(
       id: json['id'] as int?,
       name: getString(json['name']),
-      imageUrl: getString(json['imageUrl']),
+      imageUrl: ApiConfig.formatImageUrl(getString(json['imageUrl'])),
       rating: (json['rating'] as num?)?.toDouble(),
       productCount: json['productCount'] as int?,
       badges: parseStringList(json['badges']),

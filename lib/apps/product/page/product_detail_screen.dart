@@ -11,6 +11,7 @@ import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
 import 'package:petpee_mobile/common/store/app_state.dart';
 import 'package:petpee_mobile/apps/shop/page/shop_detail_screen.dart';
 import 'package:petpee_mobile/common/toast/app_toast.dart';
+import 'package:petpee_mobile/features/chat/screens/chat_detail_screen.dart';
 import 'package:petpee_mobile/apps/product/api/product_service.dart';
 import 'package:petpee_mobile/common/user/dto/product_public_detail_dto.dart';
 import 'package:petpee_mobile/common/user/dto/product_public_review_dto.dart';
@@ -674,7 +675,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   Widget _buildRelatedProductsPreview() {
     return SizedBox(
-      height: 252,
+      height: 265,
       child: FutureBuilder<ProductDetailPageData>(
         future: _pageDataFuture,
         builder: (context, snapshot) {
@@ -1303,6 +1304,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const CheckoutScreen()),
+      );
+      return;
+    }
+
+    if (action == 'Chat ngay') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ChatDetailScreen(
+            conversationId: 'temp_conv', // Temporary ID until integrated with actual logic
+            shopId: shop?.id?.toString() ?? detail.shopId?.toString() ?? '',
+            shopName: shop?.name ?? detail.shopName ?? 'Cửa hàng',
+            shopAvatarUrl: shop?.imageUrl ?? detail.shopLogoUrl,
+          ),
+        ),
       );
       return;
     }

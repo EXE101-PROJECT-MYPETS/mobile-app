@@ -28,4 +28,20 @@ class ApiConfig {
 
   // Order endpoints
   static const String ordersUrl = '$baseUrl/orders';
+
+  // Chat endpoints
+  static const String chatUrl = '$baseUrl/customer/conversations';
+  static const String chatConversationsUrl = chatUrl;
+
+  static String formatImageUrl(String? url) {
+    if (url == null || url.isEmpty) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    
+    // Remove /api from baseUrl since images are usually hosted at /uploads directly
+    final base = baseUrl.replaceAll('/api', '');
+    if (url.startsWith('/')) {
+      return '$base$url';
+    }
+    return '$base/$url';
+  }
 }

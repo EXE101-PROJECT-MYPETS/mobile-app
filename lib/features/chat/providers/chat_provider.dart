@@ -35,7 +35,11 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      _currentMessages = await _chatService.getMessages(conversationId);
+      if (conversationId == 'temp_conv') {
+        _currentMessages = [];
+      } else {
+        _currentMessages = await _chatService.getMessages(conversationId);
+      }
     } catch (e) {
       debugPrint('Error fetching messages: $e');
     } finally {
@@ -44,28 +48,35 @@ class ChatProvider with ChangeNotifier {
     }
   }
 
-  Future<void> sendMessage(
+  Future<String?> sendMessage(
     String conversationId,
     String shopId,
     String body,
   ) async {
-    if (body.trim().isEmpty) return;
+    if (body.trim().isEmpty) return null;
 
-    // Optimistic UI update
-    final tempMsg = MessageModel(
-      id: 'temp_\${DateTime.now().millisecondsSinceEpoch}',
-      conversationId: conversationId,
-      shopId: shopId,
-      senderType: 'CUSTOMER',
-      body: body,
-      createdAt: DateTime.now(),
-    );
-    _currentMessages.add(tempMsg);
-    notifyListeners();
+    String targetConvId = conversationId;
 
     try {
+      if (targetConvId == 'temp_conv') {
+        final newConv = await _chatService.createConversation(shopId);
+        targetConvId = newConv.id;
+      }
+
+      // Optimistic UI update
+      final tempMsg = MessageModel(
+        id: 'temp_\${DateTime.now().millisecondsSinceEpoch}',
+        conversationId: targetConvId,
+        shopId: shopId,
+        senderType: 'USER',
+        body: body,
+        createdAt: DateTime.now(),
+      );
+      _currentMessages.add(tempMsg);
+      notifyListeners();
+
       final realMsg = await _chatService.sendMessage(
-        conversationId,
+        targetConvId,
         shopId,
         body,
       );
@@ -77,11 +88,14 @@ class ChatProvider with ChangeNotifier {
 
       // Update conversations list so the last message is correct
       await fetchConversations();
+
+      return targetConvId;
     } catch (e) {
-      // Revert optimistic update
-      _currentMessages.removeWhere((m) => m.id == tempMsg.id);
+      // Revert optimistic update if there was one
+      _currentMessages.removeWhere((m) => m.id.startsWith('temp_'));
       debugPrint('Error sending message: $e');
       notifyListeners();
+      return null;
     }
   }
 }

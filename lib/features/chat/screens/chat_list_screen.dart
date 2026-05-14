@@ -11,6 +11,23 @@ class ChatListScreen extends StatefulWidget {
 }
 
 class _ChatListScreenState extends State<ChatListScreen> {
+  bool _isShopMessage(String? senderType) {
+    final normalized = senderType?.trim().toUpperCase();
+    return normalized == 'SHOP' || normalized == 'SHOP_USER';
+  }
+
+  String? _safeAvatarUrl(String? url) {
+    final normalized = url?.trim();
+    if (normalized == null || normalized.isEmpty) return null;
+    final lower = normalized.toLowerCase();
+    if (lower.startsWith('/uploads/') ||
+        lower.startsWith('uploads/') ||
+        lower.contains(':8080/uploads/')) {
+      return null;
+    }
+    return normalized;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -54,6 +71,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                 const Divider(height: 1, indent: 70),
             itemBuilder: (context, index) {
               final conversation = chatProvider.conversations[index];
+              final safeAvatarUrl = _safeAvatarUrl(conversation.shopAvatarUrl);
               return ListTile(
                 tileColor: Colors.white,
                 contentPadding: const EdgeInsets.symmetric(
@@ -62,13 +80,23 @@ class _ChatListScreenState extends State<ChatListScreen> {
                 ),
                 leading: CircleAvatar(
                   radius: 26,
-                  backgroundImage: conversation.shopAvatarUrl != null
-                      ? NetworkImage(conversation.shopAvatarUrl!)
-                      : null,
                   backgroundColor: Colors.grey[200],
-                  child: conversation.shopAvatarUrl == null
+                  child: safeAvatarUrl == null
                       ? const Icon(Icons.store, color: Colors.grey)
-                      : null,
+                      : ClipOval(
+                          child: Image.network(
+                            safeAvatarUrl,
+                            width: 52,
+                            height: 52,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) {
+                              return const Icon(
+                                Icons.store,
+                                color: Colors.grey,
+                              );
+                            },
+                          ),
+                        ),
                 ),
                 title: Text(
                   conversation.shopName,
@@ -84,11 +112,12 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: conversation.lastMessage?.senderType == 'SHOP_USER'
+                      color:
+                          _isShopMessage(conversation.lastMessage?.senderType)
                           ? Colors.black87
                           : Colors.black54,
                       fontWeight:
-                          conversation.lastMessage?.senderType == 'SHOP_USER'
+                          _isShopMessage(conversation.lastMessage?.senderType)
                           ? FontWeight.w500
                           : FontWeight.normal,
                     ),

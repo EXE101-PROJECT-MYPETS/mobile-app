@@ -52,34 +52,41 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const _SectionTitle(title: 'Thông Tin Spa'),
-            _buildShopLocation(),
-            const SizedBox(height: 12),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const _SectionTitle(title: 'Thông Tin Spa'),
+                  _buildShopLocation(),
+                  const SizedBox(height: 12),
 
-            const _SectionTitle(title: 'Chọn Gói Dịch Vụ'),
-            _buildServicePackages(),
-            const SizedBox(height: 20),
+                  const _SectionTitle(title: 'Chọn Gói Dịch Vụ'),
+                  _buildServicePackages(),
+                  const SizedBox(height: 20),
 
-            const _SectionTitle(title: 'Chọn Ngày'),
-            _buildCalendar(),
-            const SizedBox(height: 20),
+                  const _SectionTitle(title: 'Chọn Ngày'),
+                  _buildCalendar(),
+                  const SizedBox(height: 20),
 
-            const _SectionTitle(title: 'Chọn Khung Giờ'),
-            _buildTimeSlots(),
-            const SizedBox(height: 20),
+                  const _SectionTitle(title: 'Chọn Khung Giờ'),
+                  _buildTimeSlots(),
+                  const SizedBox(height: 20),
 
-            const _SectionTitle(title: 'Chọn Thú Cưng Của Bạn'),
-            _buildPetSelection(),
-            const SizedBox(height: 20),
-
-            _buildBottomBookButton(),
-            const SizedBox(height: 20),
-          ],
-        ),
+                  const _SectionTitle(title: 'Chọn Thú Cưng Của Bạn'),
+                  _buildPetSelection(),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: _buildBottomBookButton(),
+          ),
+        ],
       ),
       bottomNavigationBar: CommonBottomNavBar(
         currentIndex: 2,

@@ -24,12 +24,31 @@ class ChatDetailScreen extends StatefulWidget {
 class _ChatDetailScreenState extends State<ChatDetailScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  late String _currentConversationId;
+
+  String? get _safeShopAvatarUrl {
+    final raw = widget.shopAvatarUrl?.trim();
+    if (raw == null || raw.isEmpty) return null;
+    final lower = raw.toLowerCase();
+    if (lower.startsWith('/uploads/') ||
+        lower.startsWith('uploads/') ||
+        lower.contains(':8080/uploads/')) {
+      return null;
+    }
+    return raw;
+  }
+
+  bool _isCurrentUserMessage(String senderType) {
+    final normalized = senderType.trim().toUpperCase();
+    return normalized == 'USER' || normalized == 'CUSTOMER';
+  }
 
   @override
   void initState() {
     super.initState();
+    _currentConversationId = widget.conversationId;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ChatProvider>().fetchMessages(widget.conversationId);
+      context.read<ChatProvider>().fetchMessages(_currentConversationId);
     });
   }
 
@@ -54,11 +73,18 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     final text = _messageController.text;
     if (text.trim().isEmpty) return;
 
-    context.read<ChatProvider>().sendMessage(
-      widget.conversationId,
-      widget.shopId,
-      text,
-    );
+    context
+        .read<ChatProvider>()
+        .sendMessage(_currentConversationId, widget.shopId, text)
+        .then((newId) {
+          if (newId != null && newId != _currentConversationId) {
+            if (mounted) {
+              setState(() {
+                _currentConversationId = newId;
+              });
+            }
+          }
+        });
 
     _messageController.clear();
     _scrollToBottom();
@@ -73,13 +99,22 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
           children: [
             CircleAvatar(
               radius: 18,
-              backgroundImage: widget.shopAvatarUrl != null
-                  ? NetworkImage(widget.shopAvatarUrl!)
-                  : null,
               backgroundColor: Colors.grey[200],
-              child: widget.shopAvatarUrl == null
+              child: _safeShopAvatarUrl == null
                   ? const Icon(Icons.store, color: Colors.grey, size: 20)
-                  : null,
+                  : ClipOval(
+                      child: Image.network(
+                        _safeShopAvatarUrl!,
+                        width: 36,
+                        height: 36,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const Icon(
+                          Icons.store,
+                          color: Colors.grey,
+                          size: 20,
+                        ),
+                      ),
+                    ),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -123,7 +158,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final message = messages[index];
-                    final isMe = message.senderType == 'CUSTOMER';
+                    final isMe = _isCurrentUserMessage(message.senderType);
                     return _buildMessageBubble(message, isMe);
                   },
                 );
@@ -148,13 +183,22 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
           if (!isMe) ...[
             CircleAvatar(
               radius: 12,
-              backgroundImage: widget.shopAvatarUrl != null
-                  ? NetworkImage(widget.shopAvatarUrl!)
-                  : null,
               backgroundColor: Colors.grey[300],
-              child: widget.shopAvatarUrl == null
+              child: _safeShopAvatarUrl == null
                   ? const Icon(Icons.store, size: 12, color: Colors.grey)
-                  : null,
+                  : ClipOval(
+                      child: Image.network(
+                        _safeShopAvatarUrl!,
+                        width: 24,
+                        height: 24,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const Icon(
+                          Icons.store,
+                          size: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
             ),
             const SizedBox(width: 8),
           ],
