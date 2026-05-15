@@ -22,8 +22,8 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     // Load recently viewed products from local storage on app start
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final appState = context.read<AppState>();
-      appState.loadRecentlyViewedProducts();
+      final appState = Provider.maybeOf<AppState>(context, listen: false);
+      appState?.loadRecentlyViewedProducts();
     });
   }
 
