@@ -40,6 +40,18 @@ class ProductDTO {
   });
 
   factory ProductDTO.fromJson(Map<String, dynamic> json) {
+    String? readString(dynamic value) {
+      if (value == null) return null;
+      if (value is String) {
+        final trimmed = value.trim();
+        return trimmed.isEmpty ? null : trimmed;
+      }
+      final normalized = value.toString().trim();
+      return normalized.isEmpty ? null : normalized;
+    }
+
+    final shopData = json['shop'] as Map<String, dynamic>?;
+
     return ProductDTO(
       id: json['id'] as int?,
       shopId: json['shopId'] as int?,
@@ -59,7 +71,10 @@ class ProductDTO {
       imageUrls: ImageUrlUtil.buildPublicUrls(
         (json['imageUrls'] as List<dynamic>?)?.whereType<String>(),
       ),
-      shopProvince: json['shopProvince'] as String?,
+      shopProvince:
+          readString(shopData?['province']) ??
+          readString(json['province']) ??
+          readString(json['shopProvince']),
     );
   }
 

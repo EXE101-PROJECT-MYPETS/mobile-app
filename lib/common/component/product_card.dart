@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:petpee_mobile/apps/product/model/product_model.dart';
 import 'package:petpee_mobile/apps/product/page/product_detail_screen.dart';
 import 'package:petpee_mobile/apps/product/page/spa_service_screen.dart';
+import 'package:petpee_mobile/common/utils/category_badge_style.dart';
 import 'package:petpee_mobile/common/utils/price_formatter.dart';
 
 class ProductCard extends StatelessWidget {
@@ -13,6 +14,7 @@ class ProductCard extends StatelessWidget {
     final raw = product.price.trim();
     final normalized = raw
         .replaceAll('đ', '')
+        .replaceAll('Ä‘', '')
         .replaceAll('.', '')
         .replaceAll(',', '')
         .trim();
@@ -22,6 +24,12 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final trimmedCategory = product.category.trim();
+    final categoryLabel = trimmedCategory.isNotEmpty ? trimmedCategory : null;
+    final categoryBadgeStyle = categoryLabel != null
+        ? resolveCategoryBadgeStyle(categoryLabel)
+        : null;
+
     return GestureDetector(
       onTap: () {
         if (product.type == 'spa') {
@@ -53,7 +61,6 @@ class ProductCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Ảnh sản phẩm và Badge
             Expanded(
               child: Stack(
                 fit: StackFit.expand,
@@ -67,29 +74,28 @@ class ProductCard extends StatelessWidget {
                       child: Image.network(product.image, fit: BoxFit.cover),
                     ),
                   ),
-                  if (product.type == 'spa' || product.type == 'thu_y')
+                  if (categoryLabel != null)
                     Positioned(
                       top: 8,
-                      right: 8,
+                      left: 8,
                       child: Container(
+                        constraints: const BoxConstraints(maxWidth: 92),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: product.type == 'spa'
-                              ? Colors.pink.shade100
-                              : Colors.blue.shade100,
+                          color: categoryBadgeStyle!.backgroundColor,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          product.type == 'spa' ? 'Spa' : 'Thú y',
+                          categoryLabel,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            color: product.type == 'spa'
-                                ? Colors.pink.shade800
-                                : Colors.blue.shade800,
+                            color: categoryBadgeStyle.textColor,
                           ),
                         ),
                       ),
@@ -102,7 +108,6 @@ class ProductCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Tên sản phẩm
                   Text(
                     product.name,
                     style: const TextStyle(
@@ -114,7 +119,6 @@ class ProductCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 6),
-                  // Giá sản phẩm
                   Row(
                     children: [
                       Expanded(
@@ -155,9 +159,7 @@ class ProductCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 6),
-                  // Đánh giá
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 11),
                   Row(
                     children: [
                       const Icon(

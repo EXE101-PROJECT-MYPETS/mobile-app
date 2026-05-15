@@ -10,6 +10,7 @@ import 'package:petpee_mobile/apps/product/page/product_list_screen.dart';
 import 'package:petpee_mobile/apps/product/page/spa_service_screen.dart';
 import 'package:petpee_mobile/apps/profile/page/profile_screen.dart';
 import 'package:petpee_mobile/features/chat/screens/chat_list_screen.dart';
+import 'package:petpee_mobile/apps/search/page/search_screen.dart';
 import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
 import 'package:petpee_mobile/common/component/product_card.dart';
 import 'package:petpee_mobile/common/component/service_card.dart';
@@ -235,53 +236,66 @@ class _StickySearchHeader extends StatelessWidget {
         child: Row(
           children: [
             Expanded(
-              child: Container(
-                height: 42,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF76C6E8).withValues(alpha: 0.15),
-                      blurRadius: 12,
-                      offset: const Offset(0, 6),
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SearchScreen(),
                     ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    const SizedBox(width: 12),
-                    const Icon(
-                      LucideIcons.search,
-                      color: Color(0xFF9CA3AF),
-                      size: 18,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Khăn lau, pate, cát vệ sinh...',
-                        style: GoogleFonts.inter(
-                          color: const Color(0xFFFB6B77),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
+                  );
+                },
+                child: Container(
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF76C6E8).withValues(alpha: 0.15),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 12),
+                      const Icon(
+                        LucideIcons.search,
+                        color: Color(0xFF9CA3AF),
+                        size: 18,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Khăn lau, pate, cát vệ sinh...',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            color: const Color(0xFFFB6B77),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
-                    ),
-                    Container(
-                      width: 42,
-                      height: 42,
-                      decoration: const BoxDecoration(
-                        border: Border(
-                          left: BorderSide(color: Color(0xFFF0F3F6)),
+                      Container(
+                        width: 42,
+                        height: 42,
+                        decoration: const BoxDecoration(
+                          border: Border(
+                            left: BorderSide(color: Color(0xFFF0F3F6)),
+                          ),
+                        ),
+                        child: const Icon(
+                          LucideIcons.camera,
+                          color: Color(0xFF6B7280),
+                          size: 20,
                         ),
                       ),
-                      child: const Icon(
-                        LucideIcons.camera,
-                        color: Color(0xFF6B7280),
-                        size: 20,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -647,7 +661,7 @@ class _FeedHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: _homeContentBackground,
-      padding: const EdgeInsets.fromLTRB(14, 18, 14, 12),
+      padding: const EdgeInsets.fromLTRB(14, 8, 14, 12),
       child: Row(
         children: [
           Text(
@@ -656,15 +670,6 @@ class _FeedHeader extends StatelessWidget {
               color: const Color(0xFF1F2937),
               fontSize: 16,
               fontWeight: FontWeight.w900,
-            ),
-          ),
-          const Spacer(),
-          Text(
-            'Xem thêm',
-            style: GoogleFonts.inter(
-              color: const Color(0xFFFF5A4E),
-              fontSize: 12,
-              fontWeight: FontWeight.w800,
             ),
           ),
         ],
@@ -680,7 +685,7 @@ class _ServiceSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: _homeContentBackground,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+      padding: const EdgeInsets.fromLTRB(12, 16, 12, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -696,15 +701,6 @@ class _ServiceSection extends StatelessWidget {
                     fontWeight: FontWeight.w900,
                   ),
                 ),
-                const Spacer(),
-                Text(
-                  'Xem thêm',
-                  style: GoogleFonts.inter(
-                    color: const Color(0xFFFF5A4E),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
               ],
             ),
           ),
@@ -712,14 +708,14 @@ class _ServiceSection extends StatelessWidget {
             builder: (context, state, child) {
               if (state.isLoadingServices && state.allServices.isEmpty) {
                 return const SizedBox(
-                  height: 200,
+                  height: 188,
                   child: Center(child: CircularProgressIndicator()),
                 );
               }
 
               if (state.servicesError != null && state.allServices.isEmpty) {
                 return SizedBox(
-                  height: 200,
+                  height: 188,
                   child: Center(
                     child: Text(
                       state.servicesError ?? 'Lỗi tải dịch vụ',
@@ -732,34 +728,49 @@ class _ServiceSection extends StatelessWidget {
 
               if (state.allServices.isEmpty) {
                 return const SizedBox(
-                  height: 200,
+                  height: 188,
                   child: Center(child: Text('Chưa có dịch vụ nào')),
                 );
               }
 
-              return SizedBox(
-                height: 360,
-                child: ScrollConfiguration(
-                  behavior: ScrollConfiguration.of(context).copyWith(
-                    dragDevices: {
-                      PointerDeviceKind.touch,
-                      PointerDeviceKind.mouse,
-                      PointerDeviceKind.trackpad,
-                      PointerDeviceKind.stylus,
-                    },
-                  ),
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    itemCount: state.allServices.length,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(width: 17),
-                    itemBuilder: (context, index) {
-                      return ServiceCard(service: state.allServices[index]);
-                    },
-                  ),
-                ),
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  const horizontalPadding = 12.0;
+                  const itemGap = 12.0;
+                  final availableWidth =
+                      constraints.maxWidth - (horizontalPadding * 2) - itemGap;
+                  final itemWidth = (availableWidth / 2).clamp(194.0, 204.0);
+
+                  return SizedBox(
+                    height: 282,
+                    child: ScrollConfiguration(
+                      behavior: ScrollConfiguration.of(context).copyWith(
+                        dragDevices: {
+                          PointerDeviceKind.touch,
+                          PointerDeviceKind.mouse,
+                          PointerDeviceKind.trackpad,
+                          PointerDeviceKind.stylus,
+                        },
+                      ),
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: horizontalPadding,
+                        ),
+                        itemCount: state.allServices.length,
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(width: itemGap),
+                        itemBuilder: (context, index) {
+                          return ServiceCard(
+                            service: state.allServices[index],
+                            width: itemWidth,
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                },
               );
             },
           ),

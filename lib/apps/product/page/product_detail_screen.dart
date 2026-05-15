@@ -513,7 +513,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const ShopDetailScreen()),
+          MaterialPageRoute(
+            builder: (context) => ShopDetailScreen(
+              shopId: detail.shopId ?? shop?.id ?? 1,
+              shopName: shopName,
+              shopAvatarUrl: detail.shopLogoUrl ?? shop?.imageUrl ?? '',
+            ),
+          ),
         );
       },
       child: Container(
@@ -577,7 +583,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const ShopDetailScreen(),
+                        builder: (context) => ShopDetailScreen(
+                          shopId: detail.shopId ?? shop?.id ?? 1,
+                          shopName: shopName,
+                          shopAvatarUrl: detail.shopLogoUrl ?? shop?.imageUrl ?? '',
+                        ),
                       ),
                     );
                   },

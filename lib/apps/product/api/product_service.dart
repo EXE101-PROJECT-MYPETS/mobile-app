@@ -16,6 +16,7 @@ class ProductService {
 
   Future<ScrollResponse<ProductDTO>> getAllMobile({
     String? keyword,
+    int? shopId,
     bool? active,
     int? cursor,
     int? shopId,
