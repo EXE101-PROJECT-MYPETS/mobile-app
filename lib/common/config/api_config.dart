@@ -3,7 +3,7 @@ class ApiConfig {
   // Nếu dùng máy ảo Android (Emulator), dùng 10.0.2.2
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://192.168.1.16:8080/api',
+    defaultValue: 'https://evolutive-anneliese-distrustingly.ngrok-free.dev/api',
   );
 
   static const String authUrl = '$baseUrl/auth';
