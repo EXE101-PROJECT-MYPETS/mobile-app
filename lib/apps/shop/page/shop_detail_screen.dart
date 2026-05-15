@@ -9,6 +9,7 @@ import 'package:petpee_mobile/apps/service/api/service_service.dart';
 import 'package:petpee_mobile/common/component/service_card.dart';
 import 'package:petpee_mobile/common/user/dto/product_dto.dart';
 import 'package:petpee_mobile/common/user/dto/service_public_dto.dart';
+import 'package:petpee_mobile/common/utils/category_badge_style.dart';
 import 'package:petpee_mobile/common/utils/price_formatter.dart';
 import 'package:petpee_mobile/features/chat/screens/chat_detail_screen.dart';
 
@@ -212,7 +213,7 @@ class _ShopHeroHeader extends StatelessWidget {
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  'Tìm kiếm sản phẩm trong Shop',
+                                  'TÃƒÂ¬m kiÃ¡ÂºÂ¿m sÃ¡ÂºÂ£n phÃ¡ÂºÂ©m trong Shop',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: GoogleFonts.inter(
@@ -403,8 +404,8 @@ class _ShopTabBar extends StatelessWidget {
       child: Row(
         children: const [
           _TabItem(label: 'Shop', active: true),
-          _TabItem(label: 'Sản phẩm', badge: 'New'),
-          _TabItem(label: 'Danh mục hàng'),
+          _TabItem(label: 'SÃ¡ÂºÂ£n phÃ¡ÂºÂ©m', badge: 'New'),
+          _TabItem(label: 'Danh mÃ¡Â»Â¥c hÃƒÂ ng'),
         ],
       ),
     );
@@ -557,16 +558,16 @@ class _ServiceSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _SectionShell(
-      title: 'Dịch vụ',
-      actionLabel: 'Xem thêm',
+      title: 'DÃ¡Â»â€¹ch vÃ¡Â»Â¥',
+      actionLabel: 'Xem thÃƒÂªm',
       child: FutureBuilder<List<ServicePublicDTO>>(
         future: servicesFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const SizedBox(
-              height: 300,
-              child: Center(child: CircularProgressIndicator()),
-            );
+                return const SizedBox(
+                  height: 282,
+                  child: Center(child: CircularProgressIndicator()),
+                );
           }
 
           if (snapshot.hasError) {
@@ -574,7 +575,7 @@ class _ServiceSection extends StatelessWidget {
               height: 120,
               child: Center(
                 child: Text(
-                  'Không thể tải dịch vụ',
+                  'KhÃƒÂ´ng thÃ¡Â»Æ’ tÃ¡ÂºÂ£i dÃ¡Â»â€¹ch vÃ¡Â»Â¥',
                   style: GoogleFonts.inter(
                     color: const Color(0xFFEF4444),
                     fontSize: 13,
@@ -591,7 +592,7 @@ class _ServiceSection extends StatelessWidget {
               height: 120,
               child: Center(
                 child: Text(
-                  'Chưa có dịch vụ nào',
+                  'ChÃ†Â°a cÃƒÂ³ dÃ¡Â»â€¹ch vÃ¡Â»Â¥ nÃƒÂ o',
                   style: GoogleFonts.inter(
                     color: const Color(0xFF64748B),
                     fontSize: 13,
@@ -603,7 +604,7 @@ class _ServiceSection extends StatelessWidget {
           }
 
           return SizedBox(
-            height: 300,
+            height: 282,
             child: _HorizontalDragList(
               padding: const EdgeInsets.only(right: 8),
               itemCount: services.length,
@@ -630,8 +631,8 @@ class _ProductSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _SectionShell(
-      title: 'Sản phẩm',
-      actionLabel: 'Xem thêm',
+      title: 'SÃ¡ÂºÂ£n phÃ¡ÂºÂ©m',
+      actionLabel: 'Xem thÃƒÂªm',
       child: FutureBuilder<List<ProductDTO>>(
         future: productsFuture,
         builder: (context, snapshot) {
@@ -647,7 +648,7 @@ class _ProductSection extends StatelessWidget {
               height: 120,
               child: Center(
                 child: Text(
-                  'Không thể tải sản phẩm',
+                  'KhÃƒÂ´ng thÃ¡Â»Æ’ tÃ¡ÂºÂ£i sÃ¡ÂºÂ£n phÃ¡ÂºÂ©m',
                   style: GoogleFonts.inter(
                     color: const Color(0xFFEF4444),
                     fontSize: 13,
@@ -664,7 +665,7 @@ class _ProductSection extends StatelessWidget {
               height: 120,
               child: Center(
                 child: Text(
-                  'Chưa có sản phẩm nào',
+                  'ChÃ†Â°a cÃƒÂ³ sÃ¡ÂºÂ£n phÃ¡ÂºÂ©m nÃƒÂ o',
                   style: GoogleFonts.inter(
                     color: const Color(0xFF64748B),
                     fontSize: 13,
@@ -743,10 +744,10 @@ class _MarketplaceProductCard extends StatelessWidget {
         : null;
     final displayName = product.name?.trim().isNotEmpty == true
         ? product.name!.trim()
-        : 'Sản phẩm';
+        : 'SÃ¡ÂºÂ£n phÃ¡ÂºÂ©m';
     final categoryLabel = product.categoryName?.trim().isNotEmpty == true
         ? product.categoryName!.trim()
-        : 'Sản phẩm';
+        : null;
     final unitLabel = product.unit?.trim().isNotEmpty == true
         ? product.unit!.trim()
         : null;
@@ -791,28 +792,6 @@ class _MarketplaceProductCard extends StatelessWidget {
                       )
                     else
                       const _ProductImageFallback(),
-                    Positioned(
-                      left: 8,
-                      bottom: 8,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFE16A),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          'Pet',
-                          style: GoogleFonts.inter(
-                            color: const Color(0xFF0F172A),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -823,8 +802,10 @@ class _MarketplaceProductCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _ProductChip(label: categoryLabel),
-                    const SizedBox(height: 4),
+                    if (categoryLabel != null) ...[
+                      _ProductChip(label: categoryLabel),
+                      const SizedBox(height: 4),
+                    ],
                     Text(
                       displayName,
                       maxLines: 2,
@@ -862,25 +843,6 @@ class _MarketplaceProductCard extends StatelessWidget {
                             ),
                           ),
                       ],
-                    ),
-                    const SizedBox(height: 4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2.5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFE3E3),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        'Mua tại shop',
-                        style: GoogleFonts.inter(
-                          color: const Color(0xFFF45A45),
-                          fontSize: 9.5,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
                     ),
                     const SizedBox(height: 6),
                     Row(
@@ -932,10 +894,12 @@ class _ProductChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final badgeStyle = resolveCategoryBadgeStyle(label);
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
       decoration: BoxDecoration(
-        color: const Color(0xFFFF5A4E),
+        color: badgeStyle.backgroundColor,
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
@@ -943,7 +907,7 @@ class _ProductChip extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: GoogleFonts.inter(
-          color: Colors.white,
+          color: badgeStyle.textColor,
           fontSize: 9,
           fontWeight: FontWeight.w700,
         ),
