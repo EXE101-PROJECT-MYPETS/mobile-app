@@ -43,12 +43,12 @@ class ApiClient {
   Map<String, String> _buildHeaders([Map<String, String>? extra]) {
     final headers = <String, String>{
       'content-type': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
       if (_token != null) 'authorization': 'Bearer $_token',
       'X-Shop-Id': (_shopId ?? 1).toString(), // Default to 1 for guests
       if (_customerId != null) 'X-Customer-Id': _customerId.toString(),
     };
     if (extra != null) headers.addAll(extra);
-    print('🚀 [ApiClient] Sending Headers: $headers');
     return headers;
   }
 

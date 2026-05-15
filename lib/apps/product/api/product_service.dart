@@ -19,7 +19,6 @@ class ProductService {
     int? shopId,
     bool? active,
     int? cursor,
-    int? shopId,
     int size = 20,
   }) async {
     final queryParams = <String, String>{};

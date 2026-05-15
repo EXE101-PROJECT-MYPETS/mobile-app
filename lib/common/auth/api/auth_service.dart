@@ -5,12 +5,17 @@ import 'package:petpee_mobile/common/auth/model/auth_dto.dart';
 import 'package:petpee_mobile/common/config/api_config.dart';
 
 class AuthService {
+  static const Map<String, String> _jsonHeaders = {
+    'Content-Type': 'application/json',
+    'ngrok-skip-browser-warning': 'true',
+  };
+
   Future<EmailVerificationResponse> sendRegisterVerificationCode(
     RegisterEmailVerificationSendRequest request,
   ) async {
     final response = await http.post(
       Uri.parse(ApiConfig.registerEmailSendCodeUrl),
-      headers: {'Content-Type': 'application/json'},
+      headers: _jsonHeaders,
       body: jsonEncode(request.toJson()),
     );
 
@@ -27,7 +32,7 @@ class AuthService {
   ) async {
     final response = await http.post(
       Uri.parse(ApiConfig.registerEmailVerifyCodeUrl),
-      headers: {'Content-Type': 'application/json'},
+      headers: _jsonHeaders,
       body: jsonEncode(request.toJson()),
     );
 
@@ -42,7 +47,7 @@ class AuthService {
   Future<UserLoginResponse> login(AuthenticationRequest request) async {
     final response = await http.post(
       Uri.parse(ApiConfig.customerLoginUrl),
-      headers: {'Content-Type': 'application/json'},
+      headers: _jsonHeaders,
       body: jsonEncode(request.toJson()),
     );
 
@@ -57,7 +62,7 @@ class AuthService {
   Future<UserLoginResponse> refreshToken(String refreshToken) async {
     final response = await http.post(
       Uri.parse('${ApiConfig.authUrl}/refreshToken'),
-      headers: {'Content-Type': 'application/json'},
+      headers: _jsonHeaders,
       body: jsonEncode({'refreshToken': refreshToken}),
     );
 
@@ -76,6 +81,7 @@ class AuthService {
       'POST',
       Uri.parse(ApiConfig.registerUrl),
     );
+    request.headers['ngrok-skip-browser-warning'] = 'true';
 
     request.fields.addAll(registerRequest.toMultipartFields());
 

@@ -10,7 +10,10 @@ class PublicApiClient {
   final http.Client _client = http.Client();
 
   Map<String, String> _buildHeaders([Map<String, String>? extra]) {
-    final headers = <String, String>{'content-type': 'application/json'};
+    final headers = <String, String>{
+      'content-type': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
+    };
     if (extra != null) headers.addAll(extra);
     return headers;
   }

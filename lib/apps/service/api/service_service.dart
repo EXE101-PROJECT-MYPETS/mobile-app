@@ -57,7 +57,10 @@ class ServicePublicService {
     ).replace(queryParameters: queryParams);
 
     try {
-      final response = await _client.get(uri);
+      final response = await _client.get(
+        uri,
+        headers: const {'ngrok-skip-browser-warning': 'true'},
+      );
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body) as Map<String, dynamic>;
