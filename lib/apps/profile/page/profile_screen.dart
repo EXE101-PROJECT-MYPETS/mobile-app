@@ -29,7 +29,11 @@ class ProfileScreen extends StatelessWidget {
         elevation: 0,
         title: Text(
           'Tài khoản',
-          style: GoogleFonts.inter(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 18),
+          style: GoogleFonts.inter(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
         actions: [
           IconButton(
@@ -55,11 +59,13 @@ class ProfileScreen extends StatelessWidget {
               builder: (context, authProvider, child) {
                 final user = authProvider.currentUser;
                 String avatarUrl = 'https://picsum.photos/seed/user/200';
-                if (user?.avatarUrlPreview != null && user!.avatarUrlPreview!.isNotEmpty) {
+                if (user?.avatarUrlPreview != null &&
+                    user!.avatarUrlPreview!.isNotEmpty) {
                   if (user.avatarUrlPreview!.startsWith('http')) {
                     avatarUrl = user.avatarUrlPreview!;
                   } else {
-                    avatarUrl = '${ApiConfig.baseUrl.replaceAll('/api', '')}/${user.avatarUrlPreview!}';
+                    avatarUrl =
+                        '${ApiConfig.baseUrl.replaceAll('/api', '')}/${user.avatarUrlPreview!}';
                   }
                 }
 
@@ -67,7 +73,9 @@ class ProfileScreen extends StatelessWidget {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const EditProfileScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => const EditProfileScreen(),
+                      ),
                     );
                   },
                   child: Container(
@@ -78,8 +86,16 @@ class ProfileScreen extends StatelessWidget {
                         CircleAvatar(
                           radius: 30,
                           backgroundColor: Colors.grey.shade200,
-                          backgroundImage: user?.avatarUrlPreview != null ? NetworkImage(avatarUrl) : null,
-                          child: user?.avatarUrlPreview == null ? const Icon(LucideIcons.user, size: 30, color: Colors.grey) : null,
+                          backgroundImage: user?.avatarUrlPreview != null
+                              ? NetworkImage(avatarUrl)
+                              : null,
+                          child: user?.avatarUrlPreview == null
+                              ? const Icon(
+                                  LucideIcons.user,
+                                  size: 30,
+                                  color: Colors.grey,
+                                )
+                              : null,
                         ),
                         const SizedBox(width: 16),
                         Expanded(
@@ -88,21 +104,38 @@ class ProfileScreen extends StatelessWidget {
                             children: [
                               Text(
                                 user?.fullName ?? 'Khách',
-                                style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold),
+                                style: GoogleFonts.inter(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                               const SizedBox(height: 4),
                               Row(
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 2,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: Colors.grey.shade200,
                                       borderRadius: BorderRadius.circular(12),
                                     ),
-                                    child: Text(user?.role == 'SHOP' ? 'Chủ Shop' : 'Thành viên Bạc', style: const TextStyle(fontSize: 10)),
+                                    child: Text(
+                                      user?.role == 'SHOP'
+                                          ? 'Chủ Shop'
+                                          : 'Thành viên Bạc',
+                                      style: const TextStyle(fontSize: 10),
+                                    ),
                                   ),
                                   const SizedBox(width: 8),
-                                  const Text('Người theo dõi: 12', style: TextStyle(fontSize: 12, color: Colors.black54)),
+                                  const Text(
+                                    'Người theo dõi: 12',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.black54,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ],
@@ -123,19 +156,37 @@ class ProfileScreen extends StatelessWidget {
               child: Column(
                 children: [
                   ListTile(
-                    leading: const Icon(LucideIcons.fileText, color: Colors.blue),
-                    title: const Text('Đơn mua', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    leading: const Icon(
+                      LucideIcons.fileText,
+                      color: Colors.blue,
+                    ),
+                    title: const Text(
+                      'Đơn mua',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
                     trailing: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('Xem lịch sử mua hàng', style: TextStyle(fontSize: 12, color: Colors.black54)),
-                        Icon(Icons.chevron_right, size: 16, color: Colors.black54),
+                        Text(
+                          'Xem lịch sử mua hàng',
+                          style: TextStyle(fontSize: 12, color: Colors.black54),
+                        ),
+                        Icon(
+                          Icons.chevron_right,
+                          size: 16,
+                          color: Colors.black54,
+                        ),
                       ],
                     ),
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const OrdersScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => const OrdersScreen(),
+                        ),
                       );
                     },
                   ),
@@ -146,7 +197,10 @@ class ProfileScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         _buildOrderStatus(LucideIcons.wallet, 'Chờ xác nhận'),
-                        _buildOrderStatus(LucideIcons.packageSearch, 'Đang xử lý'),
+                        _buildOrderStatus(
+                          LucideIcons.packageSearch,
+                          'Đang xử lý',
+                        ),
                         _buildOrderStatus(LucideIcons.truck, 'Đang giao'),
                         _buildOrderStatus(LucideIcons.star, 'Đánh giá'),
                       ],
@@ -162,35 +216,67 @@ class ProfileScreen extends StatelessWidget {
               color: Colors.white,
               child: Column(
                 children: [
-                  _buildListTileItem(LucideIcons.shoppingCart, 'Giỏ hàng', Colors.orange, onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const CartScreen()),
-                    );
-                  }),
+                  _buildListTileItem(
+                    LucideIcons.shoppingCart,
+                    'Giỏ hàng',
+                    Colors.orange,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CartScreen(),
+                        ),
+                      );
+                    },
+                  ),
                   const Divider(height: 1, indent: 48),
-                  _buildListTileItem(LucideIcons.heart, 'Đã thích', Colors.red, onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const FavoriteProductsScreen()),
-                    );
-                  }),
+                  _buildListTileItem(
+                    LucideIcons.heart,
+                    'Đã thích',
+                    Colors.red,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const FavoriteProductsScreen(),
+                        ),
+                      );
+                    },
+                  ),
                   const Divider(height: 1, indent: 48),
-                  _buildListTileItem(LucideIcons.clock, 'Đã xem gần đây', Colors.blue, onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const RecentlyViewedScreen()),
-                    );
-                  }),
+                  _buildListTileItem(
+                    LucideIcons.clock,
+                    'Đã xem gần đây',
+                    Colors.blue,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const RecentlyViewedScreen(),
+                        ),
+                      );
+                    },
+                  ),
                   const Divider(height: 1, indent: 48),
-                  _buildListTileItem(Icons.pets, 'Thú cưng của tôi', Colors.pink, onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const MyPetsScreen()),
-                    );
-                  }),
+                  _buildListTileItem(
+                    Icons.pets,
+                    'Thú cưng của tôi',
+                    Colors.pink,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MyPetsScreen(),
+                        ),
+                      );
+                    },
+                  ),
                   const Divider(height: 1, indent: 48),
-                  _buildListTileItem(LucideIcons.star, 'Đánh giá của tôi', Colors.amber),
+                  _buildListTileItem(
+                    LucideIcons.star,
+                    'Đánh giá của tôi',
+                    Colors.amber,
+                  ),
                 ],
               ),
             ),
@@ -210,7 +296,9 @@ class ProfileScreen extends StatelessWidget {
           } else if (index == 1) {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const ProductListScreen()),
+              MaterialPageRoute(
+                builder: (context) => const ProductListScreen(),
+              ),
               (route) => false,
             );
           } else if (index == 2) {
@@ -222,7 +310,9 @@ class ProfileScreen extends StatelessWidget {
           } else if (index == 3) {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const NotificationsScreen()),
+              MaterialPageRoute(
+                builder: (context) => const NotificationsScreen(),
+              ),
               (route) => false,
             );
           }
@@ -236,19 +326,30 @@ class ProfileScreen extends StatelessWidget {
       children: [
         Icon(icon, color: Colors.black87, size: 28),
         const SizedBox(height: 8),
-        Text(label, style: const TextStyle(fontSize: 11, color: Colors.black87)),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 11, color: Colors.black87),
+        ),
       ],
     );
   }
 
   // Hỗ trợ nhận IconData linh hoạt (Material Icon hoặc LucideIcon)
-  Widget _buildListTileItem(IconData icon, String title, Color color, {VoidCallback? onTap}) {
+  Widget _buildListTileItem(
+    IconData icon,
+    String title,
+    Color color, {
+    VoidCallback? onTap,
+  }) {
     return ListTile(
       leading: Icon(icon, color: color),
       title: Text(title, style: const TextStyle(fontSize: 14)),
-      trailing: const Icon(Icons.chevron_right, size: 16, color: Colors.black54),
+      trailing: const Icon(
+        Icons.chevron_right,
+        size: 16,
+        color: Colors.black54,
+      ),
       onTap: onTap ?? () {},
     );
   }
 }
-

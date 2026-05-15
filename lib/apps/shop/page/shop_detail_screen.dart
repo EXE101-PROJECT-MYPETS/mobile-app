@@ -43,7 +43,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
     if (value != null && value.isNotEmpty) {
       return value;
     }
-    return 'wjbbb01.vn';
+    return 'Cửa hàng';
   }
 
   String get _effectiveShopAvatarUrl {
@@ -154,7 +154,11 @@ class _ShopHeroHeader extends StatelessWidget {
           const DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF4A4B97), Color(0xFF7251D6), Color(0xFFF09BB3)],
+                colors: [
+                  Color(0xFF4A4B97),
+                  Color(0xFF7251D6),
+                  Color(0xFFF09BB3),
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -213,7 +217,7 @@ class _ShopHeroHeader extends StatelessWidget {
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  'TÃƒÂ¬m kiÃ¡ÂºÂ¿m sÃ¡ÂºÂ£n phÃ¡ÂºÂ©m trong Shop',
+                                  'Tìm kiếm sản phẩm trong Shop',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: GoogleFonts.inter(
@@ -401,11 +405,11 @@ class _ShopTabBar extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        children: const [
+      child: const Row(
+        children: [
           _TabItem(label: 'Shop', active: true),
-          _TabItem(label: 'SÃ¡ÂºÂ£n phÃ¡ÂºÂ©m', badge: 'New'),
-          _TabItem(label: 'Danh mÃ¡Â»Â¥c hÃƒÂ ng'),
+          _TabItem(label: 'Sản phẩm', badge: 'New'),
+          _TabItem(label: 'Danh mục hàng'),
         ],
       ),
     );
@@ -558,16 +562,16 @@ class _ServiceSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _SectionShell(
-      title: 'DÃ¡Â»â€¹ch vÃ¡Â»Â¥',
-      actionLabel: 'Xem thÃƒÂªm',
+      title: 'Dịch vụ',
+      actionLabel: 'Xem thêm',
       child: FutureBuilder<List<ServicePublicDTO>>(
         future: servicesFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-                return const SizedBox(
-                  height: 282,
-                  child: Center(child: CircularProgressIndicator()),
-                );
+            return const SizedBox(
+              height: 282,
+              child: Center(child: CircularProgressIndicator()),
+            );
           }
 
           if (snapshot.hasError) {
@@ -575,7 +579,7 @@ class _ServiceSection extends StatelessWidget {
               height: 120,
               child: Center(
                 child: Text(
-                  'KhÃƒÂ´ng thÃ¡Â»Æ’ tÃ¡ÂºÂ£i dÃ¡Â»â€¹ch vÃ¡Â»Â¥',
+                  'Không thể tải dịch vụ',
                   style: GoogleFonts.inter(
                     color: const Color(0xFFEF4444),
                     fontSize: 13,
@@ -592,7 +596,7 @@ class _ServiceSection extends StatelessWidget {
               height: 120,
               child: Center(
                 child: Text(
-                  'ChÃ†Â°a cÃƒÂ³ dÃ¡Â»â€¹ch vÃ¡Â»Â¥ nÃƒÂ o',
+                  'Chưa có dịch vụ nào',
                   style: GoogleFonts.inter(
                     color: const Color(0xFF64748B),
                     fontSize: 13,
@@ -631,8 +635,8 @@ class _ProductSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _SectionShell(
-      title: 'SÃ¡ÂºÂ£n phÃ¡ÂºÂ©m',
-      actionLabel: 'Xem thÃƒÂªm',
+      title: 'Sản phẩm',
+      actionLabel: 'Xem thêm',
       child: FutureBuilder<List<ProductDTO>>(
         future: productsFuture,
         builder: (context, snapshot) {
@@ -648,7 +652,7 @@ class _ProductSection extends StatelessWidget {
               height: 120,
               child: Center(
                 child: Text(
-                  'KhÃƒÂ´ng thÃ¡Â»Æ’ tÃ¡ÂºÂ£i sÃ¡ÂºÂ£n phÃ¡ÂºÂ©m',
+                  'Không thể tải sản phẩm',
                   style: GoogleFonts.inter(
                     color: const Color(0xFFEF4444),
                     fontSize: 13,
@@ -665,7 +669,7 @@ class _ProductSection extends StatelessWidget {
               height: 120,
               child: Center(
                 child: Text(
-                  'ChÃ†Â°a cÃƒÂ³ sÃ¡ÂºÂ£n phÃ¡ÂºÂ©m nÃƒÂ o',
+                  'Chưa có sản phẩm nào',
                   style: GoogleFonts.inter(
                     color: const Color(0xFF64748B),
                     fontSize: 13,
@@ -742,17 +746,22 @@ class _MarketplaceProductCard extends StatelessWidget {
     final imageUrl = product.imageUrls?.isNotEmpty == true
         ? product.imageUrls!.first
         : null;
+
     final displayName = product.name?.trim().isNotEmpty == true
         ? product.name!.trim()
-        : 'SÃ¡ÂºÂ£n phÃ¡ÂºÂ©m';
+        : 'Sản phẩm';
+
     final categoryLabel = product.categoryName?.trim().isNotEmpty == true
         ? product.categoryName!.trim()
         : null;
+
     final unitLabel = product.unit?.trim().isNotEmpty == true
         ? product.unit!.trim()
         : null;
+
     final ratingValue = product.rating ?? product.reviewAvg ?? 0;
-    final reviewLabel = '${product.totalReviews ?? product.reviewCount ?? 0} đánh giá';
+    final reviewLabel =
+        '${product.totalReviews ?? product.reviewCount ?? 0} đánh giá';
 
     return GestureDetector(
       onTap: () {
@@ -760,10 +769,13 @@ class _MarketplaceProductCard extends StatelessWidget {
         if (productId == null) {
           return;
         }
+
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProductDetailScreen(productId: productId.toString()),
+            builder: (context) => ProductDetailScreen(
+              productId: productId.toString(),
+            ),
           ),
         );
       },
@@ -777,7 +789,9 @@ class _MarketplaceProductCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(12),
+              ),
               child: AspectRatio(
                 aspectRatio: 1,
                 child: Stack(
@@ -921,13 +935,13 @@ class _ProductImageFallback extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(color: Color(0xFFF1F5F9)),
+    return const DecoratedBox(
+      decoration: BoxDecoration(color: Color(0xFFF1F5F9)),
       child: Center(
         child: Icon(
           LucideIcons.image,
           size: 36,
-          color: const Color(0xFF94A3B8),
+          color: Color(0xFF94A3B8),
         ),
       ),
     );

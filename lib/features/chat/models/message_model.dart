@@ -28,8 +28,8 @@ class MessageModel {
       senderCustomerId: json['senderCustomerId']?.toString(),
       senderUserId: json['senderUserId']?.toString(),
       body: json['body'] ?? '',
-      createdAt: json['createdAt'] != null 
-          ? DateTime.parse(json['createdAt']) 
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
           : DateTime.now(),
     );
   }

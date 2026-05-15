@@ -122,7 +122,11 @@ class _LoginRequiredSheet extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(LucideIcons.logIn, size: 18, color: Colors.white),
+                    const Icon(
+                      LucideIcons.logIn,
+                      size: 18,
+                      color: Colors.white,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       'Đăng nhập / Đăng ký',

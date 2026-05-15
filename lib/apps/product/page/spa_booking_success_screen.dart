@@ -31,29 +31,41 @@ class SpaBookingSuccessScreen extends StatelessWidget {
                         color: Colors.green.shade50,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(LucideIcons.checkCircle2, color: Colors.green, size: 60),
+                      child: const Icon(
+                        LucideIcons.checkCircle2,
+                        color: Colors.green,
+                        size: 60,
+                      ),
                     ),
                   );
                 },
               ),
               const SizedBox(height: 32),
-              
+
               // Tiêu đề
               Text(
                 'Đặt lịch Spa thành công!',
-                style: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87),
+                style: GoogleFonts.inter(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              
+
               // Mô tả
               Text(
                 'Cảm ơn bạn đã sử dụng dịch vụ của PetPee.\nChúng tôi đã gửi thông tin chi tiết vào thông báo của bạn.',
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 14, height: 1.5),
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontSize: 14,
+                  height: 1.5,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 48),
-              
+
               // Nút về trang chủ
               SizedBox(
                 width: double.infinity,
@@ -61,17 +73,28 @@ class SpaBookingSuccessScreen extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFE91E63),
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     elevation: 0,
                   ),
                   onPressed: () {
                     Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (context) => const HomeScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => const HomeScreen(),
+                      ),
                       (route) => false,
                     );
                   },
-                  child: const Text('Trở Về Trang Chủ', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                  child: const Text(
+                    'Trở Về Trang Chủ',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -80,13 +103,22 @@ class SpaBookingSuccessScreen extends StatelessWidget {
                 child: OutlinedButton(
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     side: const BorderSide(color: Color(0xFFE91E63)),
                   ),
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: const Text('Xem Chi Tiết Lịch', style: TextStyle(color: Color(0xFFE91E63), fontSize: 16, fontWeight: FontWeight.bold)),
+                  child: const Text(
+                    'Xem Chi Tiết Lịch',
+                    style: TextStyle(
+                      color: Color(0xFFE91E63),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
             ],

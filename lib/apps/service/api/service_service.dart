@@ -7,7 +7,8 @@ import 'package:petpee_mobile/common/user/dto/scroll_response.dart';
 class ServicePublicService {
   final http.Client _client;
 
-  ServicePublicService({http.Client? client}) : _client = client ?? http.Client();
+  ServicePublicService({http.Client? client})
+    : _client = client ?? http.Client();
 
   Future<ScrollResponse<ServicePublicDTO>> getAllForScroll({
     int? shopId,
@@ -33,7 +34,7 @@ class ServicePublicService {
       queryParams['categoryId'] = categoryId.toString();
     }
     queryParams['active'] = active.toString();
-    
+
     if (minRating != null) {
       queryParams['minRating'] = minRating.toString();
     }

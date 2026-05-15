@@ -20,19 +20,22 @@ class ApiClient {
 
   String? _token;
   int? _shopId;
+  int? _customerId;
 
   final http.Client _client = http.Client();
 
-  /// Cập nhật token và shopId (gọi sau login / load từ Hive).
-  void configure({String? token, int? shopId}) {
+  /// Cập nhật token, shopId, và customerId (gọi sau login / load từ Hive).
+  void configure({String? token, int? shopId, int? customerId}) {
     _token = token;
     _shopId = shopId;
+    _customerId = customerId;
   }
 
   /// Xoá thông tin xác thực (gọi khi logout).
   void clear() {
     _token = null;
     _shopId = null;
+    _customerId = null;
   }
 
   // ─── Headers builder ──────────────────────────────────────────────────────
@@ -42,6 +45,7 @@ class ApiClient {
       'content-type': 'application/json',
       if (_token != null) 'authorization': 'Bearer $_token',
       'X-Shop-Id': (_shopId ?? 1).toString(), // Default to 1 for guests
+      if (_customerId != null) 'X-Customer-Id': _customerId.toString(),
     };
     if (extra != null) headers.addAll(extra);
     print('🚀 [ApiClient] Sending Headers: $headers');
@@ -50,10 +54,7 @@ class ApiClient {
 
   // ─── HTTP methods ─────────────────────────────────────────────────────────
 
-  Future<http.Response> get(
-    Uri url, {
-    Map<String, String>? headers,
-  }) {
+  Future<http.Response> get(Uri url, {Map<String, String>? headers}) {
     return _client.get(url, headers: _buildHeaders(headers));
   }
 

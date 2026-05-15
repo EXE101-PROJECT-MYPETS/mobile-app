@@ -18,12 +18,23 @@ class SettingsScreen extends StatelessWidget {
         leadingWidth: 80,
         leading: TextButton.icon(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFFFB7185), size: 16),
-          label: const Text('', style: TextStyle(color: Color(0xFFFB7185), fontSize: 14)),
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: Color(0xFFFB7185),
+            size: 16,
+          ),
+          label: const Text(
+            '',
+            style: TextStyle(color: Color(0xFFFB7185), fontSize: 14),
+          ),
         ),
         title: Text(
           'Thiết lập tài khoản',
-          style: GoogleFonts.inter(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.bold),
+          style: GoogleFonts.inter(
+            color: Colors.black87,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
         actions: [
@@ -31,7 +42,10 @@ class SettingsScreen extends StatelessWidget {
             alignment: Alignment.center,
             children: [
               IconButton(
-                icon: const Icon(LucideIcons.messageCircle, color: Color(0xFFFB7185)),
+                icon: const Icon(
+                  LucideIcons.messageCircle,
+                  color: Color(0xFFFB7185),
+                ),
                 onPressed: () {},
               ),
               Positioned(
@@ -45,12 +59,16 @@ class SettingsScreen extends StatelessWidget {
                   ),
                   child: const Text(
                     '1',
-                    style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 8,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
             ],
-          )
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -60,14 +78,17 @@ class SettingsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
-              
+
               _buildSectionHeader('Tài khoản của tôi'),
               _buildMenuCard([
                 _buildMenuItem('Tài khoản & Bảo mật', LucideIcons.shieldCheck),
                 const Divider(height: 1, indent: 48),
                 _buildMenuItem('Địa chỉ', LucideIcons.mapPin),
                 const Divider(height: 1, indent: 48),
-                _buildMenuItem('Tài khoản / Thẻ ngân hàng', LucideIcons.creditCard),
+                _buildMenuItem(
+                  'Tài khoản / Thẻ ngân hàng',
+                  LucideIcons.creditCard,
+                ),
               ]),
 
               const SizedBox(height: 16),
@@ -81,7 +102,11 @@ class SettingsScreen extends StatelessWidget {
                 const Divider(height: 1, indent: 48),
                 _buildMenuItem('Người dùng đã bị chặn', LucideIcons.userX),
                 const Divider(height: 1, indent: 48),
-                _buildMenuItem('Ngôn ngữ / Language', LucideIcons.globe, subtitle: 'Tiếng Việt'),
+                _buildMenuItem(
+                  'Ngôn ngữ / Language',
+                  LucideIcons.globe,
+                  subtitle: 'Tiếng Việt',
+                ),
               ]),
 
               const SizedBox(height: 16),
@@ -95,9 +120,13 @@ class SettingsScreen extends StatelessWidget {
                 const Divider(height: 1, indent: 48),
                 _buildMenuItem('Giới thiệu', LucideIcons.info),
                 const Divider(height: 1, indent: 48),
-                _buildMenuItem('Yêu cầu hủy tài khoản', LucideIcons.trash2, isDestructive: true),
+                _buildMenuItem(
+                  'Yêu cầu hủy tài khoản',
+                  LucideIcons.trash2,
+                  isDestructive: true,
+                ),
               ]),
-              
+
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
@@ -113,16 +142,24 @@ class SettingsScreen extends StatelessWidget {
                     ),
                   ),
                   onPressed: () async {
-                    await Provider.of<AuthProvider>(context, listen: false).logout();
+                    await Provider.of<AuthProvider>(
+                      context,
+                      listen: false,
+                    ).logout();
                     if (context.mounted) {
                       Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(builder: (context) => const LoginScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => const LoginScreen(),
+                        ),
                         (route) => false,
                       );
                     }
                   },
-                  child: const Text('Đăng xuất', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                  child: const Text(
+                    'Đăng xuất',
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
               const SizedBox(height: 40),
@@ -160,13 +197,16 @@ class SettingsScreen extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        children: children,
-      ),
+      child: Column(children: children),
     );
   }
 
-  Widget _buildMenuItem(String title, IconData icon, {String? subtitle, bool isDestructive = false}) {
+  Widget _buildMenuItem(
+    String title,
+    IconData icon, {
+    String? subtitle,
+    bool isDestructive = false,
+  }) {
     return ListTile(
       leading: Icon(
         icon,
@@ -187,7 +227,11 @@ class SettingsScreen extends StatelessWidget {
               style: const TextStyle(fontSize: 12, color: Colors.blueGrey),
             )
           : null,
-      trailing: const Icon(Icons.chevron_right, color: Colors.black26, size: 20),
+      trailing: const Icon(
+        Icons.chevron_right,
+        color: Colors.black26,
+        size: 20,
+      ),
       onTap: () {},
     );
   }

@@ -1,0 +1,66 @@
+Resolving dependencies...
+Downloading packages...
+  characters 1.4.0 (1.4.1 available)
+  cli_util 0.4.2 (0.5.1 available)
+  flutter_launcher_icons 0.13.1 (0.14.4 available)
+  google_fonts 6.3.3 (8.1.0 available)
+  hooks 1.0.2 (1.0.3 available)
+  latlong2 0.9.1 (0.10.1 available)
+  matcher 0.12.17 (0.12.20 available)
+  material_color_utilities 0.11.1 (0.13.0 available)
+  meta 1.17.0 (1.18.2 available)
+  native_toolchain_c 0.17.6 (0.18.0 available)
+  package_info_plus 9.0.1 (10.1.0 available)
+  package_info_plus_platform_interface 3.2.1 (4.1.0 available)
+  path_provider_android 2.3.0 (2.3.1 available)
+  test_api 0.7.7 (0.7.12 available)
+  vector_math 2.2.0 (2.3.0 available)
+  vm_service 15.0.2 (15.2.0 available)
+  win32 5.15.0 (6.2.0 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+18 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Analyzing petpee_mobile...                                      
+
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\apps\cart\page\cart_screen.dart:122:41 - deprecated_member_use
+   info - 'activeColor' is deprecated and shouldn't be used. Use activeThumbColor instead. This feature was deprecated after v3.31.0-2.0.pre - lib\apps\checkout\page\add_address_screen.dart:204:33 - deprecated_member_use
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\apps\checkout\page\address_selection_screen.dart:47:21 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\apps\checkout\page\address_selection_screen.dart:48:21 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\apps\checkout\page\checkout_screen.dart:270:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\apps\checkout\page\checkout_screen.dart:320:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\apps\checkout\page\checkout_screen.dart:505:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\apps\checkout\page\order_success_screen.dart:100:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\apps\checkout\page\order_success_screen.dart:291:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\apps\home\page\map_screen.dart:186:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\apps\home\page\notifications_screen.dart:125:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\apps\product\page\product_detail_screen.dart:312:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\apps\product\page\product_detail_screen.dart:360:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\apps\product\page\product_detail_screen.dart:383:27 - deprecated_member_use
+   info - Use a 'SizedBox' to add whitespace to a layout - lib\apps\product\page\product_detail_screen.dart:516:14 - sized_box_for_whitespace
+   info - Unnecessary use of multiple underscores - lib\apps\product\page\product_detail_screen.dart:697:37 - unnecessary_underscores
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\apps\product\page\product_detail_screen.dart:732:33 - deprecated_member_use
+   info - Unnecessary use of multiple underscores - lib\apps\product\page\product_detail_screen.dart:757:47 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\apps\product\page\product_detail_screen.dart:757:51 - unnecessary_underscores
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\apps\product\page\product_detail_screen.dart:772:43 - deprecated_member_use
+   info - Unnecessary use of multiple underscores - lib\apps\product\page\product_detail_screen.dart:1077:39 - unnecessary_underscores
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\apps\product\page\spa_service_screen.dart:220:33 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\apps\profile\page\add_pet_screen.dart:354:11 - deprecated_member_use
+warning - Unused import: 'package:provider/provider.dart' - lib\apps\profile\page\my_pets_screen.dart:4:8 - unused_import
+warning - Unused import: 'package:petpee_mobile/common/store/app_state.dart' - lib\apps\profile\page\my_pets_screen.dart:5:8 - unused_import
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\apps\profile\page\my_pets_screen.dart:266:27 - use_build_context_synchronously
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\apps\profile\page\my_pets_screen.dart:390:26 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\apps\profile\page\orders_screen.dart:119:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\apps\profile\page\settings_screen.dart:194:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\apps\shop\page\shop_detail_screen.dart:83:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\apps\shop\page\shop_detail_screen.dart:223:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\common\component\login_required_sheet.dart:104:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\common\component\service_card.dart:76:51 - deprecated_member_use
+   info - Don't invoke 'print' in production code - lib\common\config\api_client.dart:51:5 - avoid_print
+   info - The type of the right operand ('String') isn't a subtype or a supertype of the left operand ('int?') - lib\common\store\app_state.dart:453:37 - unrelated_type_equality_checks
+   info - Unnecessary override - lib\common\store\app_state.dart:616:8 - unnecessary_overrides
+   info - Unnecessary braces in a string interpolation - lib\common\user\dto\product_public_detail_dto.dart:161:55 - unnecessary_brace_in_string_interps
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\chat\screens\chat_detail_screen.dart:174:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\chat\screens\chat_detail_screen.dart:204:33 - deprecated_member_use
+
+39 issues found. (ran in 2.1s)

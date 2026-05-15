@@ -19,7 +19,19 @@ class ProductListScreen extends StatefulWidget {
 
 class _ProductListScreenState extends State<ProductListScreen> {
   int _selectedCategoryIndex = 0;
-  final List<String> _categories = ['Tất cả', 'Chó', 'Mèo', 'Spa', 'Thú y', 'Cát vệ sinh', 'Sữa tắm','Đồ chơi', 'Thức ăn','Nhà cho mèo', 'Nhà cho chó'];
+  final List<String> _categories = [
+    'Tất cả',
+    'Chó',
+    'Mèo',
+    'Spa',
+    'Thú y',
+    'Cát vệ sinh',
+    'Sữa tắm',
+    'Đồ chơi',
+    'Thức ăn',
+    'Nhà cho mèo',
+    'Nhà cho chó',
+  ];
   late final ScrollController _scrollController;
 
   @override
@@ -50,11 +62,20 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
     var allProducts = appState.allProducts;
-    
+
     // Filter products based on selected category
-    var products = _selectedCategoryIndex == 0 
-        ? allProducts 
-        : allProducts.where((p) => p.category == _categories[_selectedCategoryIndex] || (p.type == 'spa' && _categories[_selectedCategoryIndex] == 'Spa') || (p.type == 'thu_y' && _categories[_selectedCategoryIndex] == 'Thú y')).toList();
+    var products = _selectedCategoryIndex == 0
+        ? allProducts
+        : allProducts
+              .where(
+                (p) =>
+                    p.category == _categories[_selectedCategoryIndex] ||
+                    (p.type == 'spa' &&
+                        _categories[_selectedCategoryIndex] == 'Spa') ||
+                    (p.type == 'thu_y' &&
+                        _categories[_selectedCategoryIndex] == 'Thú y'),
+              )
+              .toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF5F7), // Nền hồng nhạt rất nhẹ
@@ -63,7 +84,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
         children: [
           // 1. Bộ lọc danh mục (Tất cả, Chó, Mèo...)
           _buildCategoryFilter(),
-          
+
           // 2. Lưới sản phẩm (2 cột)
           Expanded(
             child: GridView.builder(
@@ -107,7 +128,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
           } else if (index == 3) {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const NotificationsScreen()),
+              MaterialPageRoute(
+                builder: (context) => const NotificationsScreen(),
+              ),
               (route) => false,
             );
           } else if (index == 4) {
@@ -139,7 +162,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
               margin: const EdgeInsets.only(right: 12),
               padding: const EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFFFB7185) : const Color(0xFFFFE4E9),
+                color: isSelected
+                    ? const Color(0xFFFB7185)
+                    : const Color(0xFFFFE4E9),
                 borderRadius: BorderRadius.circular(20),
               ),
               alignment: Alignment.center,
@@ -160,7 +185,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
 }
 
 // Header chứa Logo, Thanh tìm kiếm và Giỏ hàng
-class _ProductListHeader extends StatelessWidget implements PreferredSizeWidget {
+class _ProductListHeader extends StatelessWidget
+    implements PreferredSizeWidget {
   const _ProductListHeader();
 
   @override
@@ -227,14 +253,24 @@ class _ProductListHeader extends StatelessWidget implements PreferredSizeWidget 
           Stack(
             clipBehavior: Clip.none,
             children: [
-              const Icon(LucideIcons.shoppingCart, color: Colors.grey, size: 24),
+              const Icon(
+                LucideIcons.shoppingCart,
+                color: Colors.grey,
+                size: 24,
+              ),
               Positioned(
                 top: -4,
                 right: -4,
                 child: Container(
                   padding: const EdgeInsets.all(2),
-                  decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-                  constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
+                  decoration: const BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                  constraints: const BoxConstraints(
+                    minWidth: 14,
+                    minHeight: 14,
+                  ),
                   child: const Text(
                     '2',
                     style: TextStyle(color: Colors.white, fontSize: 8),
@@ -252,4 +288,3 @@ class _ProductListHeader extends StatelessWidget implements PreferredSizeWidget 
   @override
   Size get preferredSize => const Size.fromHeight(80);
 }
-

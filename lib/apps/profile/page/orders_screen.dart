@@ -16,12 +16,23 @@ class OrdersScreen extends StatelessWidget {
           leadingWidth: 80,
           leading: TextButton.icon(
             onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.arrow_back_ios, color: Color(0xFFFB7185), size: 16),
-            label: const Text('Back', style: TextStyle(color: Color(0xFFFB7185), fontSize: 14)),
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: Color(0xFFFB7185),
+              size: 16,
+            ),
+            label: const Text(
+              'Back',
+              style: TextStyle(color: Color(0xFFFB7185), fontSize: 14),
+            ),
           ),
           title: Text(
             'Đơn mua',
-            style: GoogleFonts.inter(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 16),
+            style: GoogleFonts.inter(
+              color: Colors.black87,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
           ),
           centerTitle: true,
           bottom: const TabBar(
@@ -30,7 +41,10 @@ class OrdersScreen extends StatelessWidget {
             unselectedLabelColor: Colors.black54,
             indicatorColor: Color(0xFFE91E63),
             labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-            unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+            unselectedLabelStyle: TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 13,
+            ),
             tabs: [
               Tab(text: 'Tất cả'),
               Tab(text: 'Chờ xác nhận'),
@@ -123,12 +137,19 @@ class _OrdersList extends StatelessWidget {
                           color: const Color(0xFFFFF0F3),
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: const Icon(Icons.store, size: 14, color: Color(0xFFFB7185)),
+                        child: const Icon(
+                          Icons.store,
+                          size: 14,
+                          color: Color(0xFFFB7185),
+                        ),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         order['shop'] as String,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
                       ),
                     ],
                   ),
@@ -144,12 +165,21 @@ class _OrdersList extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               // Body card
-              Text('Mã đơn: ${order['orderId']}', style: const TextStyle(fontSize: 12, color: Colors.black87)),
+              Text(
+                'Mã đơn: ${order['orderId']}',
+                style: const TextStyle(fontSize: 12, color: Colors.black87),
+              ),
               const SizedBox(height: 4),
-              Text('Sản phẩm: ${order['product']}', style: const TextStyle(fontSize: 12, color: Colors.black87)),
+              Text(
+                'Sản phẩm: ${order['product']}',
+                style: const TextStyle(fontSize: 12, color: Colors.black87),
+              ),
               const SizedBox(height: 4),
-              Text('Ngày tạo: ${order['date']}', style: const TextStyle(fontSize: 12, color: Colors.black87)),
-              
+              Text(
+                'Ngày tạo: ${order['date']}',
+                style: const TextStyle(fontSize: 12, color: Colors.black87),
+              ),
+
               const SizedBox(height: 12),
               // Footer card
               Align(

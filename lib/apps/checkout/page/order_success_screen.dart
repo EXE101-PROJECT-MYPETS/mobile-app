@@ -67,7 +67,10 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                       child: Row(
                         children: [
                           IconButton(
-                            icon: const Icon(LucideIcons.arrowLeft, color: Color(0xFF111827)),
+                            icon: const Icon(
+                              LucideIcons.arrowLeft,
+                              color: Color(0xFF111827),
+                            ),
                             onPressed: () => Navigator.pop(context),
                           ),
                           const SizedBox(width: 8),
@@ -109,7 +112,11 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                                   color: const Color(0xFFE9F7EE),
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(Icons.check, color: Color(0xFF16A34A), size: 38),
+                                child: const Icon(
+                                  Icons.check,
+                                  color: Color(0xFF16A34A),
+                                  size: 38,
+                                ),
                               ),
                               const SizedBox(height: 16),
                               Text(
@@ -138,14 +145,25 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                                       onPressed: () {
                                         Navigator.pushAndRemoveUntil(
                                           context,
-                                          MaterialPageRoute(builder: (context) => const HomeScreen()),
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const HomeScreen(),
+                                          ),
                                           (route) => false,
                                         );
                                       },
                                       style: OutlinedButton.styleFrom(
-                                        side: const BorderSide(color: Color(0xFF111827)),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                        padding: const EdgeInsets.symmetric(vertical: 14),
+                                        side: const BorderSide(
+                                          color: Color(0xFF111827),
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 14,
+                                        ),
                                       ),
                                       child: Text(
                                         'Trang chủ',
@@ -163,13 +181,24 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                                       onPressed: () {
                                         Navigator.push(
                                           context,
-                                          MaterialPageRoute(builder: (context) => const OrdersScreen()),
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const OrdersScreen(),
+                                          ),
                                         );
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(0xFF111827),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                        padding: const EdgeInsets.symmetric(vertical: 14),
+                                        backgroundColor: const Color(
+                                          0xFF111827,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 14,
+                                        ),
                                       ),
                                       child: Text(
                                         'Đơn mua',
@@ -212,7 +241,10 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
               delegate: _StickyHeaderDelegate(
                 child: Container(
                   color: const Color(0xFFF8FAFC),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Có thể bạn cũng thích',
@@ -230,84 +262,85 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               sliver: SliverGrid(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final product = _products[index];
-                    final imageUrl = (product.imageUrls != null && product.imageUrls!.isNotEmpty)
-                        ? product.imageUrls!.first
-                        : 'https://via.placeholder.com/150';
-                    return GestureDetector(
-                      onTap: product.id != null
-                          ? () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ProductDetailScreen(
-                                    productId: product.id!.toString(),
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final product = _products[index];
+                  final imageUrl =
+                      (product.imageUrls != null &&
+                          product.imageUrls!.isNotEmpty)
+                      ? product.imageUrls!.first
+                      : 'https://via.placeholder.com/150';
+                  return GestureDetector(
+                    onTap: product.id != null
+                        ? () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ProductDetailScreen(
+                                  productId: product.id!.toString(),
+                                ),
+                              ),
+                            );
+                          }
+                        : null,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.04),
+                            blurRadius: 10,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(16),
+                            ),
+                            child: Image.network(
+                              imageUrl,
+                              width: double.infinity,
+                              height: 140,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  product.name ?? '',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFF111827),
                                   ),
                                 ),
-                              );
-                            }
-                          : null,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.04),
-                              blurRadius: 10,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ClipRRect(
-                              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                              child: Image.network(
-                                imageUrl,
-                                width: double.infinity,
-                                height: 140,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
+                                const SizedBox(height: 6),
+                                if (product.price != null)
                                   Text(
-                                    product.name ?? '',
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
+                                    currencyFormat.format(product.price),
                                     style: GoogleFonts.inter(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                      color: const Color(0xFF111827),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFFEA580C),
                                     ),
                                   ),
-                                  const SizedBox(height: 6),
-                                  if (product.price != null)
-                                    Text(
-                                      currencyFormat.format(product.price),
-                                      style: GoogleFonts.inter(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: const Color(0xFFEA580C),
-                                      ),
-                                    ),
-                                ],
-                              ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    );
-                  },
-                  childCount: _products.length,
-                ),
+                    ),
+                  );
+                }, childCount: _products.length),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   childAspectRatio: 0.65,
@@ -335,7 +368,11 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
   });
 
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
     return Material(
       color: const Color(0xFFF8FAFC),
       elevation: overlapsContent ? 2 : 0,
@@ -350,5 +387,6 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
   double get minExtent => minExtentValue;
 
   @override
-  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) => false;
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) =>
+      false;
 }

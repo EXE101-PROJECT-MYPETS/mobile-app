@@ -11,6 +11,8 @@ import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
 import 'package:petpee_mobile/common/store/app_state.dart';
 import 'package:petpee_mobile/apps/shop/page/shop_detail_screen.dart';
 import 'package:petpee_mobile/common/toast/app_toast.dart';
+import 'package:petpee_mobile/features/chat/providers/chat_provider.dart';
+import 'package:petpee_mobile/features/chat/screens/chat_detail_screen.dart';
 import 'package:petpee_mobile/apps/product/api/product_service.dart';
 import 'package:petpee_mobile/common/user/dto/product_public_detail_dto.dart';
 import 'package:petpee_mobile/common/user/dto/product_public_review_dto.dart';
@@ -50,13 +52,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
 
     final detail = await _productService.getProductDetail(productId);
-    final related = await _productService.getProductRelated(productId, size: 10);
+    final related = await _productService.getProductRelated(
+      productId,
+      size: 10,
+    );
     final reviews = await _productService.getProductReviews(productId, size: 4);
     final shop = detail.shopId != null
         ? await _productService.getShopDetail(detail.shopId!)
         : null;
 
-    final relatedProducts = related.map((dto) => ProductModel.fromDTO(dto)).toList();
+    final relatedProducts = related
+        .map((dto) => ProductModel.fromDTO(dto))
+        .toList();
 
     return ProductDetailPageData(
       detail: detail,
@@ -82,6 +89,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   return _buildError(snapshot.error.toString());
                 }
                 final data = snapshot.requireData;
+                // Log product viewed to recently viewed after frame is built
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _logProductViewed(data.detail);
+                });
                 return _buildContent(data);
               },
             ),
@@ -98,9 +109,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Widget _buildEmptyState() {
-    return const Center(
-      child: Text('Không có sản phẩm để hiển thị.'),
-    );
+    return const Center(child: Text('Không có sản phẩm để hiển thị.'));
   }
 
   Widget _buildError(String error) {
@@ -112,13 +121,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           children: [
             Text(
               'Lỗi khi tải sản phẩm',
-              style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold),
+              style: GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 12),
             Text(error, textAlign: TextAlign.center),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () => setState(() => _pageDataFuture = _loadPageData()),
+              onPressed: () =>
+                  setState(() => _pageDataFuture = _loadPageData()),
               child: const Text('Tải lại'),
             ),
           ],
@@ -178,15 +191,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-      child: Column(
-        children: [
-          _buildShopCard(detail, shop),
-        ],
-      ),
+      child: Column(children: [_buildShopCard(detail, shop)]),
     );
   }
 
-  Widget _buildReviewSection(ProductPublicDetailDTO detail, List<ProductPublicReviewDTO> reviews) {
+  Widget _buildReviewSection(
+    ProductPublicDetailDTO detail,
+    List<ProductPublicReviewDTO> reviews,
+  ) {
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
@@ -223,7 +235,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             padding: const EdgeInsets.only(right: 16),
             child: Row(
               children: [
-                Expanded(child: Container(height: 1, color: const Color(0xFFE5E7EB))),
+                Expanded(
+                  child: Container(height: 1, color: const Color(0xFFE5E7EB)),
+                ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Text(
@@ -235,7 +249,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ),
                   ),
                 ),
-                Expanded(child: Container(height: 1, color: const Color(0xFFE5E7EB))),
+                Expanded(
+                  child: Container(height: 1, color: const Color(0xFFE5E7EB)),
+                ),
               ],
             ),
           ),
@@ -251,7 +267,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               mainAxisSpacing: 10,
               childAspectRatio: 0.66,
             ),
-            itemBuilder: (context, index) => ProductCard(product: products[index]),
+            itemBuilder: (context, index) =>
+                ProductCard(product: products[index]),
           ),
         ],
       ),
@@ -259,10 +276,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Widget _buildSectionDivider() {
-    return Container(
-      height: 10,
-      color: const Color(0xFFF3F4F6),
-    );
+    return Container(height: 10, color: const Color(0xFFF3F4F6));
   }
 
   Widget _buildImageCarousel(ProductPublicDetailDTO detail) {
@@ -278,7 +292,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           PageView.builder(
             controller: _pageController,
             itemCount: images.length,
-            onPageChanged: (index) => setState(() => _currentImageIndex = index),
+            onPageChanged: (index) =>
+                setState(() => _currentImageIndex = index),
             itemBuilder: (context, index) {
               return Image.network(
                 images[index],
@@ -297,10 +312,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.black.withOpacity(0.32),
-                    Colors.transparent,
-                  ],
+                  colors: [Colors.black.withOpacity(0.32), Colors.transparent],
                 ),
               ),
             ),
@@ -366,7 +378,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildOverlayIcon({required IconData icon, required VoidCallback onTap}) {
+  Widget _buildOverlayIcon({
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
     return Material(
       color: Colors.black.withOpacity(0.28),
       shape: const CircleBorder(),
@@ -397,7 +412,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
               child: Text(
                 badge,
-                style: const TextStyle(color: Color(0xFF4338CA), fontSize: 12, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  color: Color(0xFF4338CA),
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           )
@@ -406,7 +425,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Widget _buildPriceSection(ProductPublicDetailDTO detail) {
-    final hasDiscount = detail.originalPrice != null && (detail.originalPrice ?? 0) > (detail.price ?? 0);
+    final hasDiscount =
+        detail.originalPrice != null &&
+        (detail.originalPrice ?? 0) > (detail.price ?? 0);
     return Row(
       children: [
         Text(
@@ -436,7 +457,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ),
             child: Text(
               '-${detail.discountPercent ?? 0}%',
-              style: const TextStyle(color: Color(0xFFB45309), fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: Color(0xFFB45309),
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
@@ -482,7 +506,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final shopName = shop?.name ?? detail.shopName ?? 'Cửa hàng';
     final shopRating = shop?.rating ?? detail.shopRating;
     final shopProductCount = shop?.productCount ?? detail.shopProductCount;
-    final isVerified = (shop?.badges.isNotEmpty ?? false) || detail.shopVerified == true;
+    final isVerified =
+        (shop?.badges.isNotEmpty ?? false) || detail.shopVerified == true;
 
     return GestureDetector(
       onTap: () {
@@ -509,7 +534,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   backgroundImage: detail.shopLogoUrl != null
                       ? NetworkImage(detail.shopLogoUrl!) as ImageProvider
                       : null,
-                  child: detail.shopLogoUrl == null ? const Icon(Icons.store, color: Color(0xFF94A3B8)) : null,
+                  child: detail.shopLogoUrl == null
+                      ? const Icon(Icons.store, color: Color(0xFF94A3B8))
+                      : null,
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -531,7 +558,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           ),
                           if (isVerified) ...[
                             const SizedBox(width: 6),
-                            const Icon(Icons.verified, size: 16, color: Colors.green),
+                            const Icon(
+                              Icons.verified,
+                              size: 16,
+                              color: Colors.green,
+                            ),
                           ],
                         ],
                       ),
@@ -563,12 +594,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: Color(0xFFFB5533)),
                     foregroundColor: const Color(0xFFFB5533),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
                   ),
                   child: Text(
                     'Xem Shop',
-                    style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600),
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -647,7 +686,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   Widget _buildRelatedProductsPreview() {
     return SizedBox(
-      height: 252,
+      height: 265,
       child: FutureBuilder<ProductDetailPageData>(
         future: _pageDataFuture,
         builder: (context, snapshot) {
@@ -676,7 +715,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ProductDetailScreen(productId: product.id),
+                        builder: (context) =>
+                            ProductDetailScreen(productId: product.id),
                       ),
                     );
                   },
@@ -727,7 +767,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ? Image.network(
                             product.image,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => _buildShopProductImageFallback(),
+                            errorBuilder: (_, __, ___) =>
+                                _buildShopProductImageFallback(),
                           )
                         : _buildShopProductImageFallback(),
                   ),
@@ -736,7 +777,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   left: 8,
                   top: 8,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.96),
                       borderRadius: BorderRadius.circular(999),
@@ -779,7 +823,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    const Icon(Icons.star_rounded, size: 15, color: Color(0xFFF59E0B)),
+                    const Icon(
+                      Icons.star_rounded,
+                      size: 15,
+                      color: Color(0xFFF59E0B),
+                    ),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Wrap(
@@ -844,13 +892,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
-      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+      style: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+        color: Color(0xFF1E293B),
+      ),
     );
   }
 
-  Widget _buildReviewSummary(ProductPublicDetailDTO detail, List<ProductPublicReviewDTO> reviews) {
+  Widget _buildReviewSummary(
+    ProductPublicDetailDTO detail,
+    List<ProductPublicReviewDTO> reviews,
+  ) {
     if (reviews.isEmpty) {
-      return const Text('Chưa có đánh giá nào.', style: TextStyle(color: Color(0xFF64748B)));
+      return const Text(
+        'Chưa có đánh giá nào.',
+        style: TextStyle(color: Color(0xFF64748B)),
+      );
     }
 
     final previewReviews = reviews.take(_reviewPreviewLimit).toList();
@@ -897,7 +955,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ),
                   ),
                   const SizedBox(width: 2),
-                  const Icon(Icons.chevron_right, size: 18, color: Color(0xFF9CA3AF)),
+                  const Icon(
+                    Icons.chevron_right,
+                    size: 18,
+                    color: Color(0xFF9CA3AF),
+                  ),
                 ],
               ),
             ),
@@ -905,7 +967,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ),
         const SizedBox(height: 12),
         const SizedBox(height: 4),
-        ...previewReviews.map((review) => _buildReviewCard(review, showImages: false)),
+        ...previewReviews.map(
+          (review) => _buildReviewCard(review, showImages: false),
+        ),
         const SizedBox(height: 4),
         TextButton(
           onPressed: _showAllReviews,
@@ -915,15 +979,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildReviewCard(ProductPublicReviewDTO review, {bool showImages = true}) {
+  Widget _buildReviewCard(
+    ProductPublicReviewDTO review, {
+    bool showImages = true,
+  }) {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 12),
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: Colors.grey.shade200),
-        ),
+        border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -966,7 +1031,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       children: List.generate(
                         5,
                         (index) => Icon(
-                          index < (review.rating ?? 0).round().clamp(0, 5) ? Icons.star : Icons.star_border,
+                          index < (review.rating ?? 0).round().clamp(0, 5)
+                              ? Icons.star
+                              : Icons.star_border,
                           size: 14,
                           color: const Color(0xFFFBBF24),
                         ),
@@ -1065,7 +1132,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       padding: const EdgeInsets.all(24),
                       child: Text(
                         'Không tải được tất cả đánh giá.',
-                        style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF475569)),
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          color: const Color(0xFF475569),
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -1082,7 +1152,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           Expanded(
                             child: Text(
                               'Tất cả đánh giá (${allReviews.length})',
-                              style: GoogleFonts.inter(fontSize: 17, fontWeight: FontWeight.w700),
+                              style: GoogleFonts.inter(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
                           IconButton(
@@ -1097,7 +1170,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       child: ListView.builder(
                         padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
                         itemCount: allReviews.length,
-                        itemBuilder: (context, index) => _buildReviewCard(allReviews[index]),
+                        itemBuilder: (context, index) =>
+                            _buildReviewCard(allReviews[index]),
                       ),
                     ),
                   ],
@@ -1144,14 +1218,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     child: _buildBottomNavAction(
                       icon: LucideIcons.messageCircle,
                       label: 'Chat ngay',
-                      onTap: () => _onTapBottomAction('Chat ngay', detail, shop),
+                      onTap: () =>
+                          _onTapBottomAction('Chat ngay', detail, shop),
                     ),
                   ),
                   Expanded(
                     child: _buildBottomNavAction(
                       icon: LucideIcons.shoppingCart,
                       label: 'Thêm vào giỏ',
-                      onTap: () => _onTapBottomAction('Thêm vào giỏ', detail, shop),
+                      onTap: () =>
+                          _onTapBottomAction('Thêm vào giỏ', detail, shop),
                     ),
                   ),
                 ],
@@ -1163,22 +1239,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             child: SizedBox(
               height: 58,
               child: ElevatedButton(
-              onPressed: () => _onTapBottomAction('Mua ngay', detail, shop),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFA541C),
-                elevation: 0,
-                shape: const RoundedRectangleBorder(),
-                padding: EdgeInsets.zero,
-              ),
-              child: Text(
-                'Mua ngay',
-                style: GoogleFonts.inter(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
+                onPressed: () => _onTapBottomAction('Mua ngay', detail, shop),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFA541C),
+                  elevation: 0,
+                  shape: const RoundedRectangleBorder(),
+                  padding: EdgeInsets.zero,
+                ),
+                child: Text(
+                  'Mua ngay',
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
-            ),
             ),
           ),
         ],
@@ -1219,7 +1295,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  void _onTapBottomAction(String action, ProductPublicDetailDTO detail, ShopPublicDTO? shop) {
+  Future<void> _onTapBottomAction(
+    String action,
+    ProductPublicDetailDTO detail,
+    ShopPublicDTO? shop,
+  ) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (authProvider.currentUser == null) {
       _showAuthDialog(context);
@@ -1228,7 +1308,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
     if (action == 'Mua ngay') {
       final appState = Provider.of<AppState>(context, listen: false);
-      appState.prepareBuyNow(_buildCheckoutProduct(detail), _resolveShopName(detail, shop));
+      appState.prepareBuyNow(
+        _buildCheckoutProduct(detail),
+        _resolveShopName(detail, shop),
+      );
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const CheckoutScreen()),
@@ -1236,12 +1319,61 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       return;
     }
 
-    if (action == 'Thêm vào giỏ') {
-      final appState = Provider.of<AppState>(context, listen: false);
-      appState.addToCart(_buildCheckoutProduct(detail), _resolveShopName(detail, shop));
+    if (action == 'Chat ngay') {
+      final shopId = shop?.id?.toString() ?? detail.shopId?.toString() ?? '';
+      if (shopId.isEmpty) {
+        showAppToast(
+          context,
+          message: 'Không xác định được shop để mở chat',
+          type: AppToastType.error,
+        );
+        return;
+      }
+
+      final chatProvider = context.read<ChatProvider>();
+      try {
+        final conversation = await chatProvider.openConversationForShop(shopId);
+        if (!mounted) {
+          return;
+        }
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatDetailScreen(
+              conversationId: conversation.id,
+              shopId: conversation.shopId,
+              shopName: shop?.name ?? detail.shopName ?? 'Cửa hàng',
+              shopAvatarUrl: shop?.imageUrl ?? detail.shopLogoUrl,
+            ),
+          ),
+        );
+      } catch (e) {
+        if (!mounted) {
+          return;
+        }
+        showAppToast(
+          context,
+          message: 'Không thể mở chat: $e',
+          type: AppToastType.error,
+        );
+      }
+      return;
     }
 
-    showAppToast(context, message: '$action thành công', type: AppToastType.success);
+    if (action == 'Thêm vào giỏ') {
+      final appState = Provider.of<AppState>(context, listen: false);
+      appState.addToCart(
+        _buildCheckoutProduct(detail),
+        _resolveShopName(detail, shop),
+      );
+    }
+
+    showAppToast(
+      context,
+      message: '$action thành công',
+      type: AppToastType.success,
+    );
   }
 
   ProductModel _buildCheckoutProduct(ProductPublicDetailDTO detail) {
@@ -1258,12 +1390,33 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  String _resolveShopName(ProductPublicDetailDTO detail, [ShopPublicDTO? shop]) {
+  String _resolveShopName(
+    ProductPublicDetailDTO detail, [
+    ShopPublicDTO? shop,
+  ]) {
     return shop?.name ?? detail.shopName ?? 'Cửa hàng';
   }
 
   void _showAuthDialog(BuildContext context) {
     showLoginRequiredSheet(context);
+  }
+
+  void _logProductViewed(ProductPublicDetailDTO detail) {
+    // Log product to recently viewed (Hive storage)
+    final appState = Provider.of<AppState>(context, listen: false);
+    if (detail.id != null) {
+      final product = ProductModel(
+        id: detail.id.toString(),
+        name: detail.name ?? 'Sản phẩm',
+        price: detail.price?.toString() ?? '0',
+        rating: detail.rating ?? 0.0,
+        reviews: detail.reviewCount ?? 0,
+        image: detail.imageUrls.isNotEmpty ? detail.imageUrls[0] : '',
+        type: 'product',
+        category: detail.categoryName ?? 'Khác',
+      );
+      appState.logProductViewed(product);
+    }
   }
 }
 

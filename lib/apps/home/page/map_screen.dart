@@ -73,17 +73,27 @@ class _MapScreenState extends State<MapScreen> {
   Future<LatLng?> _tryGetCurrentLocation() async {
     try {
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      debugPrint('[MapScreen] GPS service enabled: $serviceEnabled');
+
       if (!serviceEnabled) return null;
 
       var permission = await Geolocator.checkPermission();
+      debugPrint('[MapScreen] Location permission before request: $permission');
+
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
+        debugPrint(
+          '[MapScreen] Location permission after request: $permission',
+        );
       }
 
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
+        debugPrint('[MapScreen] Location permission denied');
         return null;
       }
+
+      debugPrint('[MapScreen] Getting current position...');
 
       final position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
@@ -92,7 +102,20 @@ class _MapScreenState extends State<MapScreen> {
         ),
       );
 
-      return LatLng(position.latitude, position.longitude);
+      debugPrint('[MapScreen] CURRENT POSITION:');
+      debugPrint('[MapScreen] lat = ${position.latitude}');
+      debugPrint('[MapScreen] lng = ${position.longitude}');
+      debugPrint('[MapScreen] accuracy = ${position.accuracy}');
+      debugPrint('[MapScreen] timestamp = ${position.timestamp}');
+
+      final latLng = LatLng(position.latitude, position.longitude);
+
+      if (latLng.latitude.isNaN || latLng.longitude.isNaN) {
+        debugPrint('[MapScreen] Invalid coordinates');
+        return null;
+      }
+
+      return latLng;
     } catch (e) {
       debugPrint('[MapScreen] Failed to get current location: $e');
       return null;
@@ -101,9 +124,11 @@ class _MapScreenState extends State<MapScreen> {
 
   LatLng get _initialCenter {
     if (currentLocation != null) return currentLocation!;
+
     if (shopMarkers.isNotEmpty) {
       return LatLng(shopMarkers.first.lat!, shopMarkers.first.lng!);
     }
+
     return _defaultCenter;
   }
 
@@ -386,6 +411,7 @@ class _MapScreenState extends State<MapScreen> {
                   if ((zoom - _currentZoom).abs() < 0.05) {
                     return;
                   }
+
                   setState(() {
                     _currentZoom = zoom;
                   });
@@ -711,6 +737,7 @@ class _RatingStars extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: List.generate(5, (index) {
         final fill = (normalizedRating - index).clamp(0, 1).toDouble();
+
         return Padding(
           padding: EdgeInsets.only(right: index == 4 ? 0 : 1),
           child: _StarFill(fill: fill),

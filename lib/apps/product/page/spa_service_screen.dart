@@ -22,9 +22,13 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
   int _selectedPackage = 0;
   int _selectedTime = 1;
   int _selectedPet = 0;
-  
+
   // Lịch thực tế
-  DateTime _currentMonth = DateTime(DateTime.now().year, DateTime.now().month, 1);
+  DateTime _currentMonth = DateTime(
+    DateTime.now().year,
+    DateTime.now().month,
+    1,
+  );
   DateTime _selectedDate = DateTime.now();
 
   @override
@@ -48,34 +52,41 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const _SectionTitle(title: 'Thông Tin Spa'),
-            _buildShopLocation(),
-            const SizedBox(height: 12),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const _SectionTitle(title: 'Thông Tin Spa'),
+                  _buildShopLocation(),
+                  const SizedBox(height: 12),
 
-            const _SectionTitle(title: 'Chọn Gói Dịch Vụ'),
-            _buildServicePackages(),
-            const SizedBox(height: 20),
+                  const _SectionTitle(title: 'Chọn Gói Dịch Vụ'),
+                  _buildServicePackages(),
+                  const SizedBox(height: 20),
 
-            const _SectionTitle(title: 'Chọn Ngày'),
-            _buildCalendar(),
-            const SizedBox(height: 20),
+                  const _SectionTitle(title: 'Chọn Ngày'),
+                  _buildCalendar(),
+                  const SizedBox(height: 20),
 
-            const _SectionTitle(title: 'Chọn Khung Giờ'),
-            _buildTimeSlots(),
-            const SizedBox(height: 20),
+                  const _SectionTitle(title: 'Chọn Khung Giờ'),
+                  _buildTimeSlots(),
+                  const SizedBox(height: 20),
 
-            const _SectionTitle(title: 'Chọn Thú Cưng Của Bạn'),
-            _buildPetSelection(),
-            const SizedBox(height: 20),
-            
-            _buildBottomBookButton(),
-            const SizedBox(height: 20),
-          ],
-        ),
+                  const _SectionTitle(title: 'Chọn Thú Cưng Của Bạn'),
+                  _buildPetSelection(),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: _buildBottomBookButton(),
+          ),
+        ],
       ),
       bottomNavigationBar: CommonBottomNavBar(
         currentIndex: 2,
@@ -89,13 +100,17 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
           } else if (index == 1) {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const ProductListScreen()),
+              MaterialPageRoute(
+                builder: (context) => const ProductListScreen(),
+              ),
               (route) => false,
             );
           } else if (index == 3) {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const NotificationsScreen()),
+              MaterialPageRoute(
+                builder: (context) => const NotificationsScreen(),
+              ),
               (route) => false,
             );
           } else if (index == 4) {
@@ -112,9 +127,17 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
 
   Widget _buildServicePackages() {
     final packages = [
-      {'icon': LucideIcons.scissors, 'name': 'Cắt tỉa lông', 'price': '\$45 | 90m'},
+      {
+        'icon': LucideIcons.scissors,
+        'name': 'Cắt tỉa lông',
+        'price': '\$45 | 90m',
+      },
       {'icon': LucideIcons.bath, 'name': 'Tắm & Sấy', 'price': '\$30 | 45m'},
-      {'icon': LucideIcons.mousePointer2, 'name': 'Cắt móng', 'price': '\$20 | 30m'},
+      {
+        'icon': LucideIcons.mousePointer2,
+        'name': 'Cắt móng',
+        'price': '\$20 | 30m',
+      },
     ];
 
     return SingleChildScrollView(
@@ -133,19 +156,26 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
                 color: isSelected ? const Color(0xFFFFF0F3) : Colors.white,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: isSelected ? const Color(0xFFFB7185) : Colors.grey.shade300,
+                  color: isSelected
+                      ? const Color(0xFFFB7185)
+                      : Colors.grey.shade300,
                   width: 1,
                 ),
               ),
               child: Column(
                 children: [
-                  Icon(packages[index]['icon'] as IconData, 
-                       color: Colors.black87, 
-                       size: 32),
+                  Icon(
+                    packages[index]['icon'] as IconData,
+                    color: Colors.black87,
+                    size: 32,
+                  ),
                   const SizedBox(height: 8),
                   Text(
                     packages[index]['name'] as String,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 4),
@@ -168,10 +198,18 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
 
   Widget _buildCalendar() {
     final daysOfWeek = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-    
+
     // Tính toán số ngày trong tháng và ngày bắt đầu
-    int daysInMonth = DateTime(_currentMonth.year, _currentMonth.month + 1, 0).day;
-    int firstWeekday = DateTime(_currentMonth.year, _currentMonth.month, 1).weekday;
+    int daysInMonth = DateTime(
+      _currentMonth.year,
+      _currentMonth.month + 1,
+      0,
+    ).day;
+    int firstWeekday = DateTime(
+      _currentMonth.year,
+      _currentMonth.month,
+      1,
+    ).weekday;
     // Dart's weekday: 1 = Monday, 7 = Sunday. We want Sunday = 0, Monday = 1,...
     int emptySlots = firstWeekday == 7 ? 0 : firstWeekday;
 
@@ -201,7 +239,11 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
                 icon: const Icon(Icons.chevron_left, color: Colors.black54),
                 onPressed: () {
                   setState(() {
-                    _currentMonth = DateTime(_currentMonth.year, _currentMonth.month - 1, 1);
+                    _currentMonth = DateTime(
+                      _currentMonth.year,
+                      _currentMonth.month - 1,
+                      1,
+                    );
                   });
                 },
                 padding: EdgeInsets.zero,
@@ -209,13 +251,20 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
               ),
               Text(
                 monthName,
-                style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 14),
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
               ),
               IconButton(
                 icon: const Icon(Icons.chevron_right, color: Colors.black54),
                 onPressed: () {
                   setState(() {
-                    _currentMonth = DateTime(_currentMonth.year, _currentMonth.month + 1, 1);
+                    _currentMonth = DateTime(
+                      _currentMonth.year,
+                      _currentMonth.month + 1,
+                      1,
+                    );
                   });
                 },
                 padding: EdgeInsets.zero,
@@ -226,9 +275,21 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: daysOfWeek.map((day) => Expanded(
-              child: Text(day, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, color: Colors.black54, fontWeight: FontWeight.bold)),
-            )).toList(),
+            children: daysOfWeek
+                .map(
+                  (day) => Expanded(
+                    child: Text(
+                      day,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.black54,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
           ),
           const SizedBox(height: 8),
           GridView.builder(
@@ -244,15 +305,21 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
                 return const SizedBox.shrink(); // Ô trống
               }
               int dayNumber = index - emptySlots + 1;
-              DateTime date = DateTime(_currentMonth.year, _currentMonth.month, dayNumber);
-              
-              bool isSelected = _selectedDate.year == date.year &&
-                                _selectedDate.month == date.month &&
-                                _selectedDate.day == date.day;
-                                
-              bool isToday = DateTime.now().year == date.year &&
-                             DateTime.now().month == date.month &&
-                             DateTime.now().day == date.day;
+              DateTime date = DateTime(
+                _currentMonth.year,
+                _currentMonth.month,
+                dayNumber,
+              );
+
+              bool isSelected =
+                  _selectedDate.year == date.year &&
+                  _selectedDate.month == date.month &&
+                  _selectedDate.day == date.day;
+
+              bool isToday =
+                  DateTime.now().year == date.year &&
+                  DateTime.now().month == date.month &&
+                  DateTime.now().day == date.day;
 
               return Center(
                 child: GestureDetector(
@@ -265,9 +332,11 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFFE91E63) : Colors.transparent,
+                      color: isSelected
+                          ? const Color(0xFFE91E63)
+                          : Colors.transparent,
                       borderRadius: BorderRadius.circular(8),
-                      border: isToday && !isSelected 
+                      border: isToday && !isSelected
                           ? Border.all(color: const Color(0xFFE91E63), width: 1)
                           : null,
                     ),
@@ -276,7 +345,9 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
                       dayNumber.toString(),
                       style: TextStyle(
                         color: isSelected ? Colors.white : Colors.black87,
-                        fontWeight: isSelected || isToday ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: isSelected || isToday
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                       ),
                     ),
                   ),
@@ -306,7 +377,9 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
                 color: isSelected ? const Color(0xFFE91E63) : Colors.white,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: isSelected ? const Color(0xFFE91E63) : Colors.grey.shade300,
+                  color: isSelected
+                      ? const Color(0xFFE91E63)
+                      : Colors.grey.shade300,
                 ),
               ),
               child: Text(
@@ -337,8 +410,8 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
           return GestureDetector(
             onTap: () => setState(() => _selectedPet = index),
             child: Padding(
-               padding: const EdgeInsets.only(right: 16),
-               child: Column(
+              padding: const EdgeInsets.only(right: 16),
+              child: Column(
                 children: [
                   Container(
                     width: 60,
@@ -346,7 +419,9 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isSelected ? const Color(0xFFE91E63) : Colors.transparent,
+                        color: isSelected
+                            ? const Color(0xFFE91E63)
+                            : Colors.transparent,
                         width: 2,
                       ),
                       image: DecorationImage(
@@ -359,8 +434,12 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
                   Text(
                     pets[index]['name'] as String,
                     style: TextStyle(
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                      color: isSelected ? const Color(0xFFE91E63) : Colors.black87,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      color: isSelected
+                          ? const Color(0xFFE91E63)
+                          : Colors.black87,
                       fontSize: 12,
                     ),
                   ),
@@ -381,11 +460,16 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFFE91E63),
           padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           elevation: 0,
         ),
         onPressed: () {
-          final authProvider = Provider.of<AuthProvider>(context, listen: false);
+          final authProvider = Provider.of<AuthProvider>(
+            context,
+            listen: false,
+          );
           if (authProvider.currentUser == null) {
             _showAuthDialog(context);
           } else {
@@ -402,7 +486,14 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
             );
           }
         },
-        child: const Text('Đặt Lịch Ngay', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+        child: const Text(
+          'Đặt Lịch Ngay',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
     );
   }
@@ -431,7 +522,7 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
               image: const DecorationImage(
                 image: NetworkImage('https://picsum.photos/seed/shop1/100'),
                 fit: BoxFit.cover,
-              )
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -439,25 +530,48 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Sunny Spa - CS1', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                const Text(
+                  'Sunny Spa - CS1',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(LucideIcons.mapPin, size: 12, color: Colors.grey),
+                    const Icon(
+                      LucideIcons.mapPin,
+                      size: 12,
+                      color: Colors.grey,
+                    ),
                     const SizedBox(width: 4),
                     const Expanded(
-                      child: Text('123 Đường Cầu Giấy, Q. Cầu Giấy, Hà Nội', style: TextStyle(color: Colors.grey, fontSize: 11), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      child: Text(
+                        '123 Đường Cầu Giấy, Q. Cầu Giấy, Hà Nội',
+                        style: TextStyle(color: Colors.grey, fontSize: 11),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(LucideIcons.navigation, size: 12, color: Colors.pink),
+                    const Icon(
+                      LucideIcons.navigation,
+                      size: 12,
+                      color: Colors.pink,
+                    ),
                     const SizedBox(width: 4),
-                    const Text('Cách bạn 1.2 km', style: TextStyle(color: Colors.pink, fontSize: 11, fontWeight: FontWeight.w600)),
+                    const Text(
+                      'Cách bạn 1.2 km',
+                      style: TextStyle(
+                        color: Colors.pink,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ],
-                )
+                ),
               ],
             ),
           ),
@@ -468,7 +582,7 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
               shape: BoxShape.circle,
             ),
             child: const Icon(LucideIcons.map, color: Colors.pink, size: 20),
-          )
+          ),
         ],
       ),
     );
@@ -485,9 +599,12 @@ class _SectionTitle extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
       child: Text(
         title,
-        style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+        style: GoogleFonts.inter(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),
       ),
     );
   }
 }
-

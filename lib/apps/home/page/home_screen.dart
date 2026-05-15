@@ -9,6 +9,7 @@ import 'package:petpee_mobile/apps/home/page/map_screen.dart';
 import 'package:petpee_mobile/apps/product/page/product_list_screen.dart';
 import 'package:petpee_mobile/apps/product/page/spa_service_screen.dart';
 import 'package:petpee_mobile/apps/profile/page/profile_screen.dart';
+import 'package:petpee_mobile/features/chat/screens/chat_list_screen.dart';
 import 'package:petpee_mobile/apps/search/page/search_screen.dart';
 import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
 import 'package:petpee_mobile/common/component/product_card.dart';
@@ -311,7 +312,15 @@ class _StickySearchHeader extends StatelessWidget {
             const SizedBox(width: 8),
             const _TopIcon(icon: LucideIcons.bell, badge: '36'),
             const SizedBox(width: 8),
-            const _TopIcon(icon: LucideIcons.messageCircle, badge: '27'),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ChatListScreen()),
+                );
+              },
+              child: const _TopIcon(icon: LucideIcons.messageCircle, badge: '27'),
+            ),
           ],
         ),
       ),
@@ -685,7 +694,7 @@ class _ServiceSection extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  'Dịch vụ nổi bật',
+                  'Dịch vụ nổi bật gần bạn',
                   style: GoogleFonts.inter(
                     color: const Color(0xFF1F2937),
                     fontSize: 16,
