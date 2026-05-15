@@ -108,3 +108,25 @@ dart run flutter_launcher_icons
   co ghi local storage.
 - Truoc khi ket thuc mot thay doi code, chay toi thieu `dart format lib test`
   va `flutter analyze`; chay `flutter test` khi thay doi logic/UI co the test.
+## UI Layout Safety Rules
+
+- Khi làm giao diện, bắt buộc kiểm tra nguy cơ vỡ layout, overflow, text tràn, nút bị che hoặc nội dung bị cắt.
+- Không đặt chiều cao cố định quá chặt cho card, modal, bottom sheet, form hoặc list item nếu bên trong có text/dữ liệu động.
+- Ưu tiên layout co giãn theo nội dung bằng `Flexible`, `Expanded`, `Wrap`, `SingleChildScrollView`, `ListView`, `mainAxisSize`, `min/max constraints` thay vì hard-code height.
+- Với text dài, phải xử lý bằng `maxLines`, `overflow: TextOverflow.ellipsis`, hoặc cho phép xuống dòng hợp lý.
+- Với giá tiền, tên dịch vụ, tên shop, địa chỉ, mô tả và badge khoảng cách, phải giả định dữ liệu có thể dài hơn mẫu thiết kế.
+- Khi sửa UI card/list item, phải test với dữ liệu dài và dữ liệu ngắn để tránh lỗi overflow.
+- Không để các thành phần trong `Column` bị ép quá sát nhau. Cần dùng spacing hợp lý và tránh tổng chiều cao con vượt quá chiều cao cha.
+- Nếu dùng Flutter, không để `Column` trong container/card có height cố định mà không có xử lý overflow.
+- Nếu dùng Flutter, khi có ảnh + nội dung + giá + badge trong cùng card, card phải đủ cao hoặc nội dung bên dưới phải được co giãn an toàn.
+- Nếu gặp lỗi `BOTTOM OVERFLOWED`, phải ưu tiên sửa layout thật, không chỉ che lỗi bằng cách tăng height tùy tiện.
+
+## Vietnamese UI Text Rule
+
+- Tất cả chữ hiển thị trên giao diện người dùng phải dùng tiếng Việt có dấu.
+- Áp dụng cho: tiêu đề trang, nhãn form, placeholder, tooltip, nút bấm, tab, menu, breadcrumb, thông báo lỗi, thông báo thành công, confirm dialog, empty state, table header, filter label và mọi text mà người dùng nhìn thấy.
+- Không dùng tiếng Việt không dấu trong UI, ví dụ dùng `Cấu hình GHTK`, không dùng `Cau hinh GHTK`.
+- Không hard-code text tiếng Anh trên UI nếu màn hình dành cho người dùng Việt, ví dụ dùng `Lưu`, `Hủy`, `Tìm kiếm`, `Đang tải...`, `Không có dữ liệu`.
+- Chỉ giữ tiếng Anh cho tên biến, tên hàm, tên class, tên file, API path, enum, package, keyword kỹ thuật và giá trị kỹ thuật không hiển thị trực tiếp cho người dùng.
+- Nếu backend trả về enum hoặc mã trạng thái tiếng Anh, frontend phải map sang nhãn tiếng Việt có dấu trước khi hiển thị, ví dụ `PENDING` → `Đang chờ`, `CONFIRMED` → `Đã xác nhận`.
+- Khi thêm hoặc sửa component, phải rà soát các text hiển thị trong phần component đó và chuyển sang tiếng Việt có dấu nếu còn thiếu.
