@@ -14,6 +14,7 @@ class ProductService {
 
   Future<ScrollResponse<ProductDTO>> getAllMobile({
     String? keyword,
+    int? shopId,
     bool? active,
     int? cursor,
     int size = 20,
@@ -24,6 +25,9 @@ class ProductService {
     }
     if (active != null) {
       queryParams['active'] = active.toString();
+    }
+    if (shopId != null) {
+      queryParams['shopId'] = shopId.toString();
     }
     if (cursor != null) {
       queryParams['cursor'] = cursor.toString();

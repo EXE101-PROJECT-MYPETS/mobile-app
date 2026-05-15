@@ -6,13 +6,19 @@ import 'package:petpee_mobile/common/utils/price_formatter.dart';
 
 class ServiceCard extends StatelessWidget {
   final ServicePublicDTO service;
+  final bool showLocation;
 
-  const ServiceCard({super.key, required this.service});
+  const ServiceCard({
+    super.key,
+    required this.service,
+    this.showLocation = true,
+  });
 
   @override
   Widget build(BuildContext context) {
     final formattedPrice = PriceFormatter.formatVnd(service.basePrice ?? 0);
     final duration = service.durationMin ?? 0;
+    final shopName = service.shopName?.trim();
     final durationText = duration >= 60
         ? '${(duration / 60).toStringAsFixed(1)}h'
         : '${duration}p';
@@ -21,17 +27,11 @@ class ServiceCard extends StatelessWidget {
     final distanceText = _formatDistance(service.distanceKm);
 
     return Container(
-      width: 252,
+      width: 200,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        border: Border.all(color: const Color(0xFFE8EDF7)),
       ),
       child: GestureDetector(
         onTap: () {
@@ -40,7 +40,6 @@ class ServiceCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header với icon service và badge khoảng cách
             ClipRRect(
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(18),
@@ -48,7 +47,7 @@ class ServiceCard extends StatelessWidget {
               child: Stack(
                 children: [
                   SizedBox(
-                    height: 175,
+                    height: 136,
                     width: double.infinity,
                     child: imageUrl != null && imageUrl.isNotEmpty
                         ? Image.network(
@@ -73,7 +72,7 @@ class ServiceCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.12),
+                              color: Colors.black.withValues(alpha: 0.12),
                               blurRadius: 8,
                               offset: const Offset(0, 3),
                             ),
@@ -103,26 +102,24 @@ class ServiceCard extends StatelessWidget {
                 ],
               ),
             ),
-            // Content
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(17),
+                padding: const EdgeInsets.fromLTRB(15, 14, 15, 14),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Service name
                     Text(
                       service.name ?? 'Dịch vụ',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.inter(
-                        fontSize: 18,
+                        fontSize: 17,
                         fontWeight: FontWeight.w600,
                         color: const Color(0xFF1F2937),
                         height: 1.3,
                       ),
                     ),
-                    const SizedBox(height: 7),
+                    const SizedBox(height: 6),
                     Text(
                       'Diễn ra trong $durationText',
                       style: GoogleFonts.inter(
@@ -131,12 +128,24 @@ class ServiceCard extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const Spacer(),
+                    if (shopName != null && shopName.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        shopName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: const Color(0xFF64748B),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                     _ServiceRating(
                       rating: service.rating,
                       ratingCount: service.ratingCount,
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 5),
                     Row(
                       children: [
                         Expanded(
@@ -153,29 +162,32 @@ class ServiceCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 7),
-                    Row(
-                      children: [
-                        const Icon(
-                          LucideIcons.mapPin,
-                          size: 13,
-                          color: Color(0xFF94A3B8),
-                        ),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            _buildLocationText(shopProvince, distanceText),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              color: const Color(0xFF94A3B8),
-                              fontWeight: FontWeight.w500,
+                    if (showLocation) ...[
+                      const SizedBox(height: 5),
+                      Row(
+                        children: [
+                          const Icon(
+                            LucideIcons.mapPin,
+                            size: 13,
+                            color: Color(0xFF94A3B8),
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              _buildLocationText(shopProvince, distanceText),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: const Color(0xFF94A3B8),
+                                fontWeight: FontWeight.w500,
+                                height: 1.25,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -264,7 +276,11 @@ class _ServiceImageFallback extends StatelessWidget {
         ),
       ),
       child: const Center(
-        child: Icon(LucideIcons.sparkles, size: 62, color: Color(0xFFFF5A4E)),
+        child: Icon(
+          LucideIcons.sparkles,
+          size: 62,
+          color: Color(0xFFFF5A4E),
+        ),
       ),
     );
   }

@@ -22,6 +22,7 @@ class ApiConfig {
   static const String productPublicUrl = '$baseUrl/public/products';
   static const String productMobileUrl = '$productPublicUrl/mobile';
   static const String shopPublicUrl = '$baseUrl/public/shops';
+  static const String shopMarkersUrl = '$shopPublicUrl/markers';
 
   // Shipping endpoints
   static const String ghtkOrdersFeeUrl = '$baseUrl/ghtk/orders/fee';
