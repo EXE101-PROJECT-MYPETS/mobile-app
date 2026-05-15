@@ -11,6 +11,7 @@ import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
 import 'package:petpee_mobile/common/store/app_state.dart';
 import 'package:petpee_mobile/apps/shop/page/shop_detail_screen.dart';
 import 'package:petpee_mobile/common/toast/app_toast.dart';
+import 'package:petpee_mobile/features/chat/providers/chat_provider.dart';
 import 'package:petpee_mobile/features/chat/screens/chat_detail_screen.dart';
 import 'package:petpee_mobile/apps/product/api/product_service.dart';
 import 'package:petpee_mobile/common/user/dto/product_public_detail_dto.dart';
@@ -1284,11 +1285,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  void _onTapBottomAction(
+  Future<void> _onTapBottomAction(
     String action,
     ProductPublicDetailDTO detail,
     ShopPublicDTO? shop,
-  ) {
+  ) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (authProvider.currentUser == null) {
       _showAuthDialog(context);
@@ -1309,17 +1310,44 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
 
     if (action == 'Chat ngay') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ChatDetailScreen(
-            conversationId: 'temp_conv', // Temporary ID until integrated with actual logic
-            shopId: shop?.id?.toString() ?? detail.shopId?.toString() ?? '',
-            shopName: shop?.name ?? detail.shopName ?? 'Cửa hàng',
-            shopAvatarUrl: shop?.imageUrl ?? detail.shopLogoUrl,
+      final shopId = shop?.id?.toString() ?? detail.shopId?.toString() ?? '';
+      if (shopId.isEmpty) {
+        showAppToast(
+          context,
+          message: 'Không xác định được shop để mở chat',
+          type: AppToastType.error,
+        );
+        return;
+      }
+
+      final chatProvider = context.read<ChatProvider>();
+      try {
+        final conversation = await chatProvider.openConversationForShop(shopId);
+        if (!mounted) {
+          return;
+        }
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatDetailScreen(
+              conversationId: conversation.id,
+              shopId: conversation.shopId,
+              shopName: shop?.name ?? detail.shopName ?? 'Cửa hàng',
+              shopAvatarUrl: shop?.imageUrl ?? detail.shopLogoUrl,
+            ),
           ),
-        ),
-      );
+        );
+      } catch (e) {
+        if (!mounted) {
+          return;
+        }
+        showAppToast(
+          context,
+          message: 'Không thể mở chat: $e',
+          type: AppToastType.error,
+        );
+      }
       return;
     }
 

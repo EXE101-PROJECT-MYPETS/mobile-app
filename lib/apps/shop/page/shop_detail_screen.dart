@@ -1,10 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:provider/provider.dart';
+import 'package:petpee_mobile/features/chat/providers/chat_provider.dart';
 import 'package:petpee_mobile/features/chat/screens/chat_detail_screen.dart';
+import 'package:petpee_mobile/apps/product/api/product_service.dart';
+import 'package:petpee_mobile/common/user/dto/product_dto.dart';
+import 'package:petpee_mobile/common/user/dto/shop_public_dto.dart';
 
-class ShopDetailScreen extends StatelessWidget {
+class ShopDetailScreen extends StatefulWidget {
   const ShopDetailScreen({super.key});
+
+  @override
+  State<ShopDetailScreen> createState() => _ShopDetailScreenState();
+}
+
+class _ShopDetailScreenState extends State<ShopDetailScreen> {
+  final ProductService _productService = ProductService();
+  ShopPublicDTO? _shop;
+  List<ProductDTO> _products = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadShopData();
+  }
+
+  Future<void> _loadShopData() async {
+    try {
+      // Default to shopId 1 for now (previous UI used hardcoded shop id elsewhere)
+      const shopId = 1;
+      final shop = await _productService.getShopDetail(shopId);
+      final paging = await _productService.getAllMobile(shopId: shopId, size: 20);
+      setState(() {
+        _shop = shop;
+        _products = paging.content;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _shop = null;
+        _products = [];
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -141,19 +182,40 @@ class ShopDetailScreen extends StatelessWidget {
                       children: [
                         Expanded(
                           child: ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const ChatDetailScreen(
-                                    conversationId: 'temp_1',
-                                    shopId: '1',
-                                    shopName: 'Golden Paws Spa',
-                                    shopAvatarUrl:
-                                        'https://picsum.photos/seed/shopprofile/200/200',
+                            onPressed: () async {
+                              final chatProvider = context.read<ChatProvider>();
+                              try {
+                                final conversation =
+                                    await chatProvider.openConversationForShop(
+                                  '1',
+                                );
+                                if (!context.mounted) {
+                                  return;
+                                }
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ChatDetailScreen(
+                                      conversationId: conversation.id,
+                                      shopId: conversation.shopId,
+                                      shopName: 'Golden Paws Spa',
+                                      shopAvatarUrl:
+                                          'https://picsum.photos/seed/shopprofile/200/200',
+                                    ),
                                   ),
-                                ),
-                              );
+                                );
+                              } catch (e) {
+                                if (!context.mounted) {
+                                  return;
+                                }
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Không thể mở chat: $e'),
+                                  ),
+                                );
+                              }
                             },
                             icon: const Icon(
                               LucideIcons.messageSquare,
@@ -247,8 +309,12 @@ class ShopDetailScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildStatColumn('Đánh giá', '4.6', subValue: ' (210)'),
-          _buildStatColumn('Sản phẩm', '8'),
+          _buildStatColumn(
+            'Đánh giá',
+            _shop?.rating?.toStringAsFixed(1) ?? '—',
+            subValue: ' (${_shop?.productCount ?? _products.length})',
+          ),
+          _buildStatColumn('Sản phẩm', '${_shop?.productCount ?? _products.length}'),
           _buildStatColumn('Giờ mở cửa', '09:00 - 19:00'),
           _buildStatColumn('Hotline', '0902 456 789'),
         ],
@@ -337,25 +403,6 @@ class ShopDetailScreen extends StatelessWidget {
   }
 
   Widget _buildProductsSection() {
-    final List<Map<String, dynamic>> products = [
-      {
-        'name': 'Gói spa cao cấp cho chó',
-        'price': '349,000 VND',
-        'rating': 4.7,
-        'reviews': 98,
-        'image': 'https://picsum.photos/seed/spa_dog/400/300',
-        'badge': 'DỊCH VỤ',
-      },
-      {
-        'name': 'Lấy cao răng thú y',
-        'price': '150,000 VND',
-        'rating': 4.7,
-        'reviews': 89,
-        'image': 'https://picsum.photos/seed/spa_cat/400/300',
-        'badge': 'THÚ Y',
-      },
-    ];
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -370,25 +417,52 @@ class ShopDetailScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: EdgeInsets.zero,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.65, // Adjust based on your cell size
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
+          if (_isLoading)
+            const SizedBox(
+              height: 120,
+              child: Center(child: CircularProgressIndicator()),
+            )
+          else if (_products.isEmpty)
+            const SizedBox(
+              height: 80,
+              child: Center(child: Text('Không có sản phẩm')),
+            )
+          else
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.zero,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.65, // Adjust based on your cell size
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+              ),
+              itemCount: _products.length,
+              itemBuilder: (context, index) {
+                final p = _products[index];
+                return _ProductCard(product: _productToMap(p));
+              },
             ),
-            itemCount: products.length,
-            itemBuilder: (context, index) {
-              return _ProductCard(product: products[index]);
-            },
-          ),
           const SizedBox(height: 40),
         ],
       ),
     );
+  }
+
+  Map<String, dynamic> _productToMap(ProductDTO p) {
+    final image = (p.imageUrls != null && p.imageUrls!.isNotEmpty)
+        ? p.imageUrls!.first
+        : 'https://picsum.photos/seed/product/200/200';
+    final priceText = p.price != null ? '${p.price} VND' : '-';
+    return {
+      'name': p.name ?? '-',
+      'price': priceText,
+      'rating': p.reviewAvg ?? p.rating ?? 0.0,
+      'reviews': p.totalReviews ?? p.reviewCount ?? 0,
+      'image': image,
+      'badge': p.categoryName ?? 'DỊCH VỤ',
+    };
   }
 }
 

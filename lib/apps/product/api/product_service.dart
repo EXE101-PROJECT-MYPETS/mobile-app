@@ -18,6 +18,7 @@ class ProductService {
     String? keyword,
     bool? active,
     int? cursor,
+    int? shopId,
     int size = 20,
   }) async {
     final queryParams = <String, String>{};
@@ -26,6 +27,9 @@ class ProductService {
     }
     if (active != null) {
       queryParams['active'] = active.toString();
+    }
+    if (shopId != null) {
+      queryParams['shopId'] = shopId.toString();
     }
     if (cursor != null) {
       queryParams['cursor'] = cursor.toString();

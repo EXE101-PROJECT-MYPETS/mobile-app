@@ -48,12 +48,16 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     super.initState();
     _currentConversationId = widget.conversationId;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ChatProvider>().fetchMessages(_currentConversationId);
+      context.read<ChatProvider>().openConversation(
+        _currentConversationId,
+        shopId: widget.shopId,
+      );
     });
   }
 
   @override
   void dispose() {
+    context.read<ChatProvider>().stopListening();
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -82,6 +86,10 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
               setState(() {
                 _currentConversationId = newId;
               });
+              context.read<ChatProvider>().openConversation(
+                    newId,
+                    shopId: widget.shopId,
+                  );
             }
           }
         });

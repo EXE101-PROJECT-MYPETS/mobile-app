@@ -3,7 +3,7 @@ class ApiConfig {
   // Nếu dùng máy ảo Android (Emulator), dùng 10.0.2.2
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://192.168.16.107:8080/api',
+    defaultValue: 'http://192.168.1.16:8080/api',
   );
 
   static const String authUrl = '$baseUrl/auth';
@@ -32,6 +32,13 @@ class ApiConfig {
   // Chat endpoints
   static const String chatUrl = '$baseUrl/customer/conversations';
   static const String chatConversationsUrl = chatUrl;
+
+  static String get chatWebSocketUrl {
+    final uri = Uri.parse(baseUrl);
+    final scheme = uri.scheme == 'https' ? 'wss' : 'ws';
+    final authority = uri.hasPort ? '${uri.host}:${uri.port}' : uri.host;
+    return '$scheme://$authority/ws';
+  }
 
   static String formatImageUrl(String? url) {
     if (url == null || url.isEmpty) return '';
