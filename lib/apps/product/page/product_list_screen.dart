@@ -3,12 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:petpee_mobile/common/store/app_state.dart';
-import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
 import 'package:petpee_mobile/common/component/product_card.dart';
-import 'package:petpee_mobile/apps/home/page/home_screen.dart';
-import 'package:petpee_mobile/apps/home/page/notifications_screen.dart';
-import 'package:petpee_mobile/apps/profile/page/profile_screen.dart';
-import 'spa_service_screen.dart';
 
 class ProductListScreen extends StatefulWidget {
   const ProductListScreen({super.key});
@@ -108,39 +103,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
               child: Center(child: CircularProgressIndicator()),
             ),
         ],
-      ),
-      // 3. Thanh điều hướng dưới cùng
-      bottomNavigationBar: CommonBottomNavBar(
-        currentIndex: 1,
-        onTap: (index) {
-          if (index == 0) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const HomeScreen()),
-              (route) => false,
-            );
-          } else if (index == 2) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const SpaServiceScreen()),
-              (route) => false,
-            );
-          } else if (index == 3) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const NotificationsScreen(),
-              ),
-              (route) => false,
-            );
-          } else if (index == 4) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const ProfileScreen()),
-              (route) => false,
-            );
-          }
-        },
       ),
     );
   }

@@ -6,9 +6,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:petpee_mobile/apps/home/page/notifications_screen.dart';
 import 'package:petpee_mobile/apps/home/page/map_screen.dart';
-import 'package:petpee_mobile/apps/product/page/product_list_screen.dart';
 import 'package:petpee_mobile/apps/product/page/spa_service_screen.dart';
 import 'package:petpee_mobile/apps/profile/page/profile_screen.dart';
+import 'package:petpee_mobile/features/chat/screens/pet_ai_selection_screen.dart';
 import 'package:petpee_mobile/features/chat/screens/chat_list_screen.dart';
 import 'package:petpee_mobile/apps/search/page/search_screen.dart';
 import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
@@ -189,15 +189,15 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: const _FloatingGiftButton(),
       bottomNavigationBar: CommonBottomNavBar(
         currentIndex: 0,
         onTap: (index) {
           if (index == 1) {
-            Navigator.pushAndRemoveUntil(
+            Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ProductListScreen()),
-              (route) => false,
+              MaterialPageRoute(
+                builder: (context) => const PetAiSelectionScreen(),
+              ),
             );
           } else if (index == 2) {
             Navigator.pushAndRemoveUntil(
@@ -316,10 +316,15 @@ class _StickySearchHeader extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ChatListScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => const ChatListScreen(),
+                  ),
                 );
               },
-              child: const _TopIcon(icon: LucideIcons.messageCircle, badge: '27'),
+              child: const _TopIcon(
+                icon: LucideIcons.messageCircle,
+                badge: '27',
+              ),
             ),
           ],
         ),
@@ -773,62 +778,6 @@ class _ServiceSection extends StatelessWidget {
                 },
               );
             },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FloatingGiftButton extends StatelessWidget {
-  const _FloatingGiftButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 62,
-      height: 62,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFFC54D), Color(0xFFFF8A34)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFFF9A3D).withValues(alpha: 0.35),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          const Center(
-            child: Icon(LucideIcons.gift, color: Colors.white, size: 28),
-          ),
-          Positioned(
-            top: -2,
-            right: -2,
-            child: Container(
-              width: 22,
-              height: 22,
-              decoration: const BoxDecoration(
-                color: Color(0xFFFF314D),
-                shape: BoxShape.circle,
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                '1',
-                style: GoogleFonts.inter(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
           ),
         ],
       ),

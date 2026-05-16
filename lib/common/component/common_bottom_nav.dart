@@ -28,21 +28,27 @@ class CommonBottomNavBar extends StatelessWidget {
         fontWeight: FontWeight.w600,
       ),
       onTap: onTap,
-      items: const [
-        BottomNavigationBarItem(
+      items: [
+        const BottomNavigationBarItem(
           icon: Icon(LucideIcons.home),
           label: 'Trang chủ',
         ),
-        BottomNavigationBarItem(icon: Icon(LucideIcons.store), label: 'Mall'),
-        BottomNavigationBarItem(
+        const BottomNavigationBarItem(
+          icon: Icon(LucideIcons.bot),
+          label: 'Trợ lý AI',
+        ),
+        const BottomNavigationBarItem(
           icon: Icon(LucideIcons.clapperboard),
           label: 'Live',
         ),
-        BottomNavigationBarItem(
+        const BottomNavigationBarItem(
           icon: Icon(LucideIcons.bell),
           label: 'Thông báo',
         ),
-        BottomNavigationBarItem(icon: Icon(LucideIcons.user), label: 'Tôi'),
+        const BottomNavigationBarItem(
+          icon: Icon(LucideIcons.user),
+          label: 'Tôi',
+        ),
       ],
     );
   }
