@@ -1,47 +1,34 @@
 import 'dart:convert';
+
+import 'package:petpee_mobile/apps/profile/model/pet_dto.dart';
 import 'package:petpee_mobile/common/config/api_client.dart';
 import 'package:petpee_mobile/common/config/api_config.dart';
-import 'package:petpee_mobile/apps/profile/model/pet_dto.dart';
 
 class PetService {
   final ApiClient _client;
 
   PetService({ApiClient? client}) : _client = client ?? ApiClient.instance;
 
-  /// Get all pets for current customer (from current user login)
+  /// Get all pets for the current user from the JWT access token.
   Future<List<PetDTO>> getAll() async {
-    // Use the /customer endpoint to get pets for the logged-in customer
-    final uri = Uri.parse('${ApiConfig.baseUrl}/pets/customer');
+    final uri = Uri.parse('${ApiConfig.baseUrl}/pets');
+    final response = await _client.get(uri, includeContextHeaders: false);
 
-    try {
-      final response = await _client.get(uri);
-
-      print('[PetService] getAll response: statusCode=${response.statusCode}');
-      if (response.statusCode == 200 || response.statusCode == 400) {
-        print('[PetService] response body: ${response.body}');
-      }
-
-      if (response.statusCode == 200) {
-        final jsonResponse = json.decode(response.body) as List<dynamic>;
-        return jsonResponse
-            .map((pet) => PetDTO.fromJson(pet as Map<String, dynamic>))
-            .toList();
-      } else if (response.statusCode == 401) {
-        print('[PetService] 401 Error: ${response.body}');
-        throw Exception('Unauthorized - vui lòng đăng nhập lại');
-      } else if (response.statusCode == 400) {
-        print('[PetService] 400 Error: ${response.body}');
-        throw Exception('Bad Request: ${response.body}');
-      } else {
-        throw Exception('Failed to load pets: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('[PetService] getAll error: $e');
-      rethrow;
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body) as List<dynamic>;
+      return jsonResponse
+          .map((pet) => PetDTO.fromJson(pet as Map<String, dynamic>))
+          .toList();
+    } else if (response.statusCode == 401) {
+      throw Exception('Unauthorized - vui lòng đăng nhập lại');
+    } else if (response.statusCode == 400) {
+      throw Exception('Bad Request: ${response.body}');
+    } else {
+      throw Exception('Failed to load pets: ${response.statusCode}');
     }
   }
 
-  /// Get pet by ID
+  /// Get pet by ID.
   Future<PetDTO> getById(int petId) async {
     final uri = Uri.parse('${ApiConfig.baseUrl}/pets/$petId');
     final response = await _client.get(uri);
@@ -56,7 +43,7 @@ class PetService {
     }
   }
 
-  /// Create new pet
+  /// Create new pet.
   Future<PetDTO> create(PetDTO petDTO) async {
     final uri = Uri.parse('${ApiConfig.baseUrl}/pets');
     final body = jsonEncode(petDTO.toJson());
@@ -79,7 +66,7 @@ class PetService {
     }
   }
 
-  /// Update existing pet
+  /// Update existing pet.
   Future<PetDTO> update(int petId, PetDTO petDTO) async {
     final uri = Uri.parse('${ApiConfig.baseUrl}/pets/$petId');
     final body = jsonEncode(petDTO.toJson());
@@ -102,7 +89,7 @@ class PetService {
     }
   }
 
-  /// Delete pet
+  /// Delete pet.
   Future<void> delete(int petId) async {
     final uri = Uri.parse('${ApiConfig.baseUrl}/pets/$petId');
     final response = await _client.delete(uri);

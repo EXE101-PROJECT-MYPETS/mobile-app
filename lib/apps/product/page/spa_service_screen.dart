@@ -3,16 +3,27 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:petpee_mobile/apps/home/page/home_screen.dart';
 import 'package:petpee_mobile/apps/home/page/notifications_screen.dart';
-import 'package:petpee_mobile/apps/product/page/product_list_screen.dart';
 import 'package:petpee_mobile/apps/profile/page/profile_screen.dart';
 import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
 import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
 import 'package:petpee_mobile/common/component/login_required_sheet.dart';
+import 'package:petpee_mobile/features/chat/screens/pet_ai_selection_screen.dart';
 import 'package:provider/provider.dart';
 import 'spa_booking_confirmation_screen.dart';
 
 class SpaServiceScreen extends StatefulWidget {
-  const SpaServiceScreen({super.key});
+  const SpaServiceScreen({
+    super.key,
+    this.petId,
+    this.prefillKeyword,
+    this.serviceType,
+    this.preferredDateText,
+  });
+
+  final int? petId;
+  final String? prefillKeyword;
+  final String? serviceType;
+  final String? preferredDateText;
 
   @override
   State<SpaServiceScreen> createState() => _SpaServiceScreenState();
@@ -30,6 +41,25 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
     1,
   );
   DateTime _selectedDate = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedPackage = _initialPackageIndex();
+  }
+
+  int _initialPackageIndex() {
+    final serviceType = widget.serviceType?.trim().toUpperCase();
+    final keyword = widget.prefillKeyword?.trim().toLowerCase() ?? '';
+    if (serviceType == 'VET' || keyword.contains('khám')) return 2;
+    if (keyword.contains('tắm')) return 1;
+    if (serviceType == 'GROOMING' ||
+        keyword.contains('groom') ||
+        keyword.contains('lông')) {
+      return 0;
+    }
+    return 0;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +92,10 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
                   const _SectionTitle(title: 'Thông Tin Spa'),
                   _buildShopLocation(),
                   const SizedBox(height: 12),
+                  if (_hasAiPrefill) ...[
+                    _buildAiPrefillCard(),
+                    const SizedBox(height: 4),
+                  ],
 
                   const _SectionTitle(title: 'Chọn Gói Dịch Vụ'),
                   _buildServicePackages(),
@@ -98,12 +132,11 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
               (route) => false,
             );
           } else if (index == 1) {
-            Navigator.pushAndRemoveUntil(
+            Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const ProductListScreen(),
+                builder: (context) => const PetAiSelectionScreen(),
               ),
-              (route) => false,
             );
           } else if (index == 3) {
             Navigator.pushAndRemoveUntil(
@@ -121,6 +154,71 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
             );
           }
         },
+      ),
+    );
+  }
+
+  bool get _hasAiPrefill =>
+      widget.petId != null ||
+      (widget.prefillKeyword?.trim().isNotEmpty ?? false) ||
+      (widget.serviceType?.trim().isNotEmpty ?? false) ||
+      (widget.preferredDateText?.trim().isNotEmpty ?? false);
+
+  Widget _buildAiPrefillCard() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF7ED),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFFFD8BE)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.bot, color: Color(0xFFE76F51), size: 18),
+              const SizedBox(width: 8),
+              Text(
+                'Gợi ý từ PetPee AI',
+                style: GoogleFonts.inter(
+                  color: const Color(0xFF2E251F),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          if (widget.petId != null)
+            _buildPrefillLine('Thú cưng', 'ID ${widget.petId}'),
+          if (widget.prefillKeyword?.trim().isNotEmpty ?? false)
+            _buildPrefillLine('Từ khóa', widget.prefillKeyword!.trim()),
+          if (widget.serviceType?.trim().isNotEmpty ?? false)
+            _buildPrefillLine('Nhóm dịch vụ', widget.serviceType!.trim()),
+          if (widget.preferredDateText?.trim().isNotEmpty ?? false)
+            _buildPrefillLine(
+              'Thời gian gợi ý',
+              widget.preferredDateText!.trim(),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPrefillLine(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Text(
+        '$label: $value',
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: GoogleFonts.inter(
+          color: const Color(0xFF7B685B),
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
@@ -224,7 +322,7 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
         border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

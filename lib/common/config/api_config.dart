@@ -3,7 +3,8 @@ class ApiConfig {
   // Nếu dùng máy ảo Android (Emulator), dùng 10.0.2.2
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://evolutive-anneliese-distrustingly.ngrok-free.dev/api',
+    defaultValue:
+        'https://evolutive-anneliese-distrustingly.ngrok-free.dev/api',
   );
 
   static const String authUrl = '$baseUrl/auth';
@@ -33,6 +34,12 @@ class ApiConfig {
   // Chat endpoints
   static const String chatUrl = '$baseUrl/customer/conversations';
   static const String chatConversationsUrl = chatUrl;
+  static const String aiPetHealthUrl = '$baseUrl/ai/pet-health';
+  static const String aiPetHealthConversationsUrl =
+      '$aiPetHealthUrl/conversations';
+  static const String aiPetHealthGetOrCreateConversationUrl =
+      '$aiPetHealthConversationsUrl/get-or-create';
+  static const String aiPetHealthChatUrl = '$aiPetHealthUrl/chat';
 
   static String get chatWebSocketUrl {
     final uri = Uri.parse(baseUrl);
@@ -44,7 +51,7 @@ class ApiConfig {
   static String formatImageUrl(String? url) {
     if (url == null || url.isEmpty) return '';
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    
+
     // Remove /api from baseUrl since images are usually hosted at /uploads directly
     final base = baseUrl.replaceAll('/api', '');
     if (url.startsWith('/')) {

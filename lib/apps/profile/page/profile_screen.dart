@@ -3,9 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:petpee_mobile/apps/home/page/home_screen.dart';
 import 'package:petpee_mobile/apps/home/page/notifications_screen.dart';
-import 'package:petpee_mobile/apps/product/page/product_list_screen.dart';
 import 'package:petpee_mobile/apps/product/page/spa_service_screen.dart';
 import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
+import 'package:petpee_mobile/features/chat/screens/pet_ai_selection_screen.dart';
 import 'settings_screen.dart';
 import 'orders_screen.dart';
 import 'favorite_products_screen.dart';
@@ -294,12 +294,11 @@ class ProfileScreen extends StatelessWidget {
               (route) => false,
             );
           } else if (index == 1) {
-            Navigator.pushAndRemoveUntil(
+            Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const ProductListScreen(),
+                builder: (context) => const PetAiSelectionScreen(),
               ),
-              (route) => false,
             );
           } else if (index == 2) {
             Navigator.pushAndRemoveUntil(

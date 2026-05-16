@@ -1,5 +1,6 @@
 class PetDTO {
   final int? id;
+  final int? userId;
   final int? shopId;
   final int? customerId;
   final int? speciesId;
@@ -9,12 +10,14 @@ class PetDTO {
   final String name;
   final String? gender;
   final DateTime? dob;
+  final double? weightKg;
   final String? note;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
   PetDTO({
     this.id,
+    this.userId,
     this.shopId,
     this.customerId,
     this.speciesId,
@@ -24,6 +27,7 @@ class PetDTO {
     required this.name,
     this.gender,
     this.dob,
+    this.weightKg,
     this.note,
     this.createdAt,
     this.updatedAt,
@@ -32,8 +36,9 @@ class PetDTO {
   factory PetDTO.fromJson(Map<String, dynamic> json) {
     return PetDTO(
       id: json['id'] as int?,
+      userId: json['userId'] as int?,
       shopId: json['shopId'] as int?,
-      customerId: json['customerId'] as int?,
+      customerId: json['customerId'] as int? ?? json['userId'] as int?,
       speciesId: json['speciesId'] as int?,
       breedId: json['breedId'] as int?,
       breedText: json['breedText'] as String?,
@@ -41,6 +46,7 @@ class PetDTO {
       name: json['name'] as String? ?? 'Unknown',
       gender: json['gender'] as String?,
       dob: json['dob'] != null ? DateTime.parse(json['dob'] as String) : null,
+      weightKg: _parseDouble(json['weightKg']),
       note: json['note'] as String?,
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'] as String)
@@ -54,6 +60,7 @@ class PetDTO {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'userId': userId,
       'shopId': shopId,
       'customerId': customerId,
       'speciesId': speciesId,
@@ -63,6 +70,7 @@ class PetDTO {
       'name': name,
       'gender': gender,
       'dob': dob?.toIso8601String(),
+      'weightKg': weightKg,
       'note': note,
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
@@ -72,5 +80,11 @@ class PetDTO {
   @override
   String toString() {
     return 'PetDTO(id: $id, name: $name, gender: $gender, dob: $dob)';
+  }
+
+  static double? _parseDouble(dynamic value) {
+    if (value == null) return null;
+    if (value is num) return value.toDouble();
+    return double.tryParse(value.toString());
   }
 }
