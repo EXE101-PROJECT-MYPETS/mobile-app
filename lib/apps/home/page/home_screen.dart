@@ -10,6 +10,7 @@ import 'package:petpee_mobile/apps/product/page/product_list_screen.dart';
 import 'package:petpee_mobile/apps/product/page/spa_service_screen.dart';
 import 'package:petpee_mobile/apps/profile/page/profile_screen.dart';
 import 'package:petpee_mobile/features/chat/screens/chat_list_screen.dart';
+import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
 import 'package:petpee_mobile/apps/search/page/search_screen.dart';
 import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
 import 'package:petpee_mobile/common/component/product_card.dart';
@@ -229,6 +230,9 @@ class _StickySearchHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    final isLoggedIn = authProvider.token?.isNotEmpty ?? false;
+
     return SafeArea(
       bottom: false,
       child: Padding(
@@ -300,27 +304,58 @@ class _StickySearchHeader extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 10),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MapScreen()),
-                );
-              },
-              child: const _TopIcon(icon: LucideIcons.map, badge: null),
-            ),
-            const SizedBox(width: 8),
-            const _TopIcon(icon: LucideIcons.bell, badge: '36'),
-            const SizedBox(width: 8),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ChatListScreen()),
-                );
-              },
-              child: const _TopIcon(icon: LucideIcons.messageCircle, badge: '27'),
-            ),
+            if (isLoggedIn) ...[
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => MapScreen()),
+                  );
+                },
+                child: const _TopIcon(icon: LucideIcons.map, badge: null),
+              ),
+              const SizedBox(width: 8),
+              const _TopIcon(icon: LucideIcons.bell, badge: '36'),
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ChatListScreen(),
+                    ),
+                  );
+                },
+                child: const _TopIcon(
+                  icon: LucideIcons.messageCircle,
+                  badge: '27',
+                ),
+              ),
+            ] else ...[
+              const SizedBox(width: 10),
+              SizedBox(
+                height: 36,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/login');
+                  },
+                  icon: Icon(LucideIcons.logIn, size: 16),
+                  label: const Text(
+                    'Đăng nhập',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF4F8B),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),

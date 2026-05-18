@@ -46,6 +46,7 @@ class ApiClient {
       if (_token != null) 'authorization': 'Bearer $_token',
       'X-Shop-Id': (_shopId ?? 1).toString(), // Default to 1 for guests
       if (_customerId != null) 'X-Customer-Id': _customerId.toString(),
+      'Bypass-Tunnel-Reminder': 'true', // Bypass Localtunnel warning screen
     };
     if (extra != null) headers.addAll(extra);
     print('🚀 [ApiClient] Sending Headers: $headers');

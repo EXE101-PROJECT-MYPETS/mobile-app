@@ -18,6 +18,7 @@ class CustomTextField extends StatefulWidget {
     this.readOnly = false,
     this.onTap,
     this.suffixIcon,
+    this.enabled = true,
   });
 
   final TextEditingController controller;
@@ -33,6 +34,7 @@ class CustomTextField extends StatefulWidget {
   final bool readOnly;
   final VoidCallback? onTap;
   final IconData? suffixIcon;
+  final bool enabled;
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
@@ -70,6 +72,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           onFieldSubmitted: widget.onFieldSubmitted,
           readOnly: widget.readOnly,
           onTap: widget.onTap,
+          enabled: widget.enabled,
           style: GoogleFonts.inter(
             color: const Color(0xFF1F2937),
             fontSize: 14,

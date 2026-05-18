@@ -25,6 +25,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   late String _currentConversationId;
+  int _lastRenderedMessageCount = 0;
 
   String? get _safeShopAvatarUrl {
     final raw = widget.shopAvatarUrl?.trim();
@@ -87,9 +88,9 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                 _currentConversationId = newId;
               });
               context.read<ChatProvider>().openConversation(
-                    newId,
-                    shopId: widget.shopId,
-                  );
+                newId,
+                shopId: widget.shopId,
+              );
             }
           }
         });
@@ -155,6 +156,14 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                 }
 
                 final messages = chatProvider.currentMessages.reversed.toList();
+                if (messages.length != _lastRenderedMessageCount) {
+                  _lastRenderedMessageCount = messages.length;
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted) {
+                      _scrollToBottom();
+                    }
+                  });
+                }
 
                 return ListView.builder(
                   controller: _scrollController,

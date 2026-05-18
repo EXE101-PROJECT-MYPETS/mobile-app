@@ -1,9 +1,10 @@
 class ApiConfig {
   // Thay đổi IP này thành IP của máy tính bạn trong mạng LAN (IPv4)
   // Nếu dùng máy ảo Android (Emulator), dùng 10.0.2.2
+  // Nếu dùng máy thật, dùng IPv4 LAN của máy chạy backend
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://192.168.1.16:8080/api',
+    defaultValue: 'http://192.168.16.104:8080/api',
   );
 
   static const String authUrl = '$baseUrl/auth';
@@ -15,8 +16,17 @@ class ApiConfig {
   static const String registerEmailVerifyCodeUrl =
       '$registerEmailVerificationUrl/verify-code';
   static const String customerLoginUrl = '$authUrl/customer/login';
+  static const String customerGoogleLoginUrl = '$authUrl/customer/google-login';
+  static const String customerFacebookLoginUrl =
+      '$authUrl/customer/facebook-login';
   static const String shopLoginUrl = '$authUrl/shop/login';
+  static const String currentUserProfileUrl = '$baseUrl/users/me';
   static const String currentUserAddressUrl = '$baseUrl/users/me/address';
+
+  static const String googleWebClientId = String.fromEnvironment(
+    'GOOGLE_WEB_CLIENT_ID',
+    defaultValue: '959472405909-jcckrg23puil1dtti4pkgrplms1tsq2l.apps.googleusercontent.com',
+  );
 
   // Product endpoints (Public)
   static const String productPublicUrl = '$baseUrl/public/products';
@@ -44,7 +54,7 @@ class ApiConfig {
   static String formatImageUrl(String? url) {
     if (url == null || url.isEmpty) return '';
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    
+
     // Remove /api from baseUrl since images are usually hosted at /uploads directly
     final base = baseUrl.replaceAll('/api', '');
     if (url.startsWith('/')) {

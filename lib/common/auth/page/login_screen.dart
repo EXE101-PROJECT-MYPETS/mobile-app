@@ -1,12 +1,15 @@
 import 'dart:math' as math;
 
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:petpee_mobile/apps/home/page/home_screen.dart';
 import 'package:petpee_mobile/common/auth/page/forgot_password_screen.dart';
 import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
 import 'package:petpee_mobile/common/component/auth_text_field.dart';
+import 'package:petpee_mobile/common/config/api_config.dart';
 import 'package:petpee_mobile/common/toast/app_toast.dart';
 import 'package:provider/provider.dart';
 
@@ -43,6 +46,12 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _rememberMe = false;
+  String? _socialLoginProvider;
+
+  String? get _googleServerClientId {
+    final clientId = ApiConfig.googleWebClientId.trim();
+    return clientId.isEmpty ? null : clientId;
+  }
 
   @override
   void dispose() {
@@ -80,6 +89,148 @@ class _LoginScreenState extends State<LoginScreen> {
         message: e.toString().replaceAll('Exception: ', ''),
         type: AppToastType.error,
       );
+    }
+  }
+
+  Future<void> _handleGoogleSignIn(AuthProvider authProvider) async {
+    if (_socialLoginProvider != null) {
+      return;
+    }
+
+    setState(() {
+      _socialLoginProvider = 'google';
+    });
+
+    try {
+      final googleSignIn = GoogleSignIn(
+        scopes: const ['email', 'profile'],
+        serverClientId: _googleServerClientId,
+      );
+      final googleUser = await googleSignIn.signIn();
+
+      if (googleUser == null) {
+        return;
+      }
+
+      final authentication = await googleUser.authentication;
+      final idToken = authentication.idToken;
+
+      if (idToken == null) {
+        if (!mounted) return;
+        showAppToast(
+          context,
+          message:
+              'Không thể lấy token từ Google. Vui lòng kiểm tra GOOGLE_WEB_CLIENT_ID.',
+          type: AppToastType.error,
+        );
+        return;
+      }
+
+      await authProvider.googleLogin(idToken);
+
+      if (!mounted) {
+        return;
+      }
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+
+      showAppToast(
+        context,
+        message: e.toString().replaceAll('Exception: ', ''),
+        type: AppToastType.error,
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _socialLoginProvider = null;
+        });
+      }
+    }
+  }
+
+  Future<void> _handleFacebookSignIn(AuthProvider authProvider) async {
+    if (_socialLoginProvider != null) {
+      return;
+    }
+
+    setState(() {
+      _socialLoginProvider = 'facebook';
+    });
+
+    try {
+      final result = await FacebookAuth.instance.login(
+        permissions: const ['email', 'public_profile'],
+        loginTracking: LoginTracking.enabled,
+      );
+
+      if (result.status == LoginStatus.cancelled) {
+        return;
+      }
+
+      if (result.status == LoginStatus.operationInProgress) {
+        if (!mounted) {
+          return;
+        }
+
+        showAppToast(
+          context,
+          message: 'Đăng nhập Facebook đang được xử lý',
+          type: AppToastType.info,
+        );
+        return;
+      }
+
+      if (result.status != LoginStatus.success) {
+        throw Exception(result.message ?? 'Đăng nhập Facebook thất bại');
+      }
+
+      final accessToken = result.accessToken?.tokenString;
+      if (accessToken == null || accessToken.isEmpty) {
+        if (!mounted) {
+          return;
+        }
+
+        showAppToast(
+          context,
+          message: 'Không thể lấy token từ Facebook',
+          type: AppToastType.error,
+        );
+        return;
+      }
+
+      await authProvider.facebookLogin(accessToken);
+
+      if (!mounted) {
+        return;
+      }
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+
+      showAppToast(
+        context,
+        message: e.toString().replaceAll('Exception: ', ''),
+        type: AppToastType.error,
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _socialLoginProvider = null;
+        });
+      }
     }
   }
 
@@ -282,24 +433,53 @@ class _LoginScreenState extends State<LoginScreen> {
                                 const SizedBox(height: 18),
                                 const _DividerLabel(label: 'hoặc'),
                                 const SizedBox(height: 16),
-                                const _SocialButton(
-                                  providerName: 'Google',
-                                  label: 'Đăng nhập với Google',
-                                  brandIcon: _GoogleMark(),
-                                ),
-                                const SizedBox(height: 8),
-                                const _SocialButton(
-                                  providerName: 'Facebook',
-                                  label: 'Đăng nhập với Facebook',
-                                  icon: Icons.facebook,
-                                  iconColor: Color(0xFF1877F2),
-                                ),
-                                const SizedBox(height: 8),
-                                const _SocialButton(
-                                  providerName: 'Apple',
-                                  label: 'Đăng nhập với Apple',
-                                  icon: Icons.apple,
-                                  iconColor: Colors.black,
+                                Consumer<AuthProvider>(
+                                  builder: (context, authProvider, child) {
+                                    final socialEnabled =
+                                        !authProvider.isLoading &&
+                                        _socialLoginProvider == null;
+                                    final googleLoading =
+                                        _socialLoginProvider == 'google';
+                                    final facebookLoading =
+                                        _socialLoginProvider == 'facebook';
+
+                                    return Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        _SocialButton(
+                                          providerName: 'Google',
+                                          label: 'Đăng nhập với Google',
+                                          brandIcon: const _GoogleMark(),
+                                          enabled: socialEnabled,
+                                          isLoading: googleLoading,
+                                          onPressed: () =>
+                                              _handleGoogleSignIn(authProvider),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        _SocialButton(
+                                          providerName: 'Facebook',
+                                          label: 'Đăng nhập với Facebook',
+                                          icon: Icons.facebook,
+                                          iconColor: const Color(0xFF1877F2),
+                                          enabled: socialEnabled,
+                                          isLoading: facebookLoading,
+                                          onPressed: () =>
+                                              _handleFacebookSignIn(
+                                                authProvider,
+                                              ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        _SocialButton(
+                                          providerName: 'Apple',
+                                          label: 'Đăng nhập với Apple',
+                                          icon: Icons.apple,
+                                          iconColor: Colors.black,
+                                          enabled: socialEnabled,
+                                        ),
+                                      ],
+                                    );
+                                  },
                                 ),
                                 const Spacer(),
                                 Padding(
@@ -394,7 +574,7 @@ class _LoginHero extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Pet Marketplace',
+                  'Sàn thú cưng',
                   style: GoogleFonts.inter(
                     color: const Color(0xFF7A8391),
                     fontSize: 12,
@@ -629,6 +809,9 @@ class _SocialButton extends StatelessWidget {
     this.icon,
     this.iconColor = Colors.black,
     this.brandIcon,
+    this.onPressed,
+    this.enabled = true,
+    this.isLoading = false,
   });
 
   final String providerName;
@@ -636,19 +819,25 @@ class _SocialButton extends StatelessWidget {
   final IconData? icon;
   final Color iconColor;
   final Widget? brandIcon;
+  final VoidCallback? onPressed;
+  final bool enabled;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 35,
       child: OutlinedButton(
-        onPressed: () {
-          showAppToast(
-            context,
-            message: '$providerName chưa được cấu hình',
-            type: AppToastType.info,
-          );
-        },
+        onPressed: enabled && !isLoading
+            ? onPressed ??
+                  () {
+                    showAppToast(
+                      context,
+                      message: '$providerName chưa được cấu hình',
+                      type: AppToastType.info,
+                    );
+                  }
+            : null,
         style: OutlinedButton.styleFrom(
           foregroundColor: const Color(0xFF2F3744),
           side: const BorderSide(color: Color(0xFFE4E8EF)),
@@ -663,7 +852,16 @@ class _SocialButton extends StatelessWidget {
             SizedBox(
               width: 22,
               child: Center(
-                child: brandIcon ?? Icon(icon, color: iconColor, size: 20),
+                child: isLoading
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Color(0xFFFF4F8B),
+                        ),
+                      )
+                    : brandIcon ?? Icon(icon, color: iconColor, size: 20),
               ),
             ),
             const SizedBox(width: 8),

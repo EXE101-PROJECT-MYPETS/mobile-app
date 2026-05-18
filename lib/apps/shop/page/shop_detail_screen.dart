@@ -322,10 +322,7 @@ class _ShopHeroHeader extends StatelessWidget {
 }
 
 class _HeaderIconButton extends StatelessWidget {
-  const _HeaderIconButton({
-    required this.icon,
-    required this.onTap,
-  });
+  const _HeaderIconButton({required this.icon, required this.onTap});
 
   final IconData icon;
   final VoidCallback onTap;
@@ -369,18 +366,13 @@ class _OutlineHeroButton extends StatelessWidget {
         icon: Icon(icon, size: 13),
         label: Text(
           label,
-          style: GoogleFonts.inter(
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-          ),
+          style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700),
         ),
         style: OutlinedButton.styleFrom(
           foregroundColor: Colors.white,
           side: BorderSide(color: Colors.white.withValues(alpha: 0.88)),
           padding: EdgeInsets.zero,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(9),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
         ),
       ),
     );
@@ -417,11 +409,7 @@ class _ShopTabBar extends StatelessWidget {
 }
 
 class _TabItem extends StatelessWidget {
-  const _TabItem({
-    required this.label,
-    this.active = false,
-    this.badge,
-  });
+  const _TabItem({required this.label, this.active = false, this.badge});
 
   final String label;
   final bool active;
@@ -773,9 +761,8 @@ class _MarketplaceProductCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProductDetailScreen(
-              productId: productId.toString(),
-            ),
+            builder: (context) =>
+                ProductDetailScreen(productId: productId.toString()),
           ),
         );
       },
@@ -938,11 +925,7 @@ class _ProductImageFallback extends StatelessWidget {
     return const DecoratedBox(
       decoration: BoxDecoration(color: Color(0xFFF1F5F9)),
       child: Center(
-        child: Icon(
-          LucideIcons.image,
-          size: 36,
-          color: Color(0xFF94A3B8),
-        ),
+        child: Icon(LucideIcons.image, size: 36, color: Color(0xFF94A3B8)),
       ),
     );
   }

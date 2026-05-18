@@ -586,7 +586,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         builder: (context) => ShopDetailScreen(
                           shopId: detail.shopId ?? shop?.id ?? 1,
                           shopName: shopName,
-                          shopAvatarUrl: detail.shopLogoUrl ?? shop?.imageUrl ?? '',
+                          shopAvatarUrl:
+                              detail.shopLogoUrl ?? shop?.imageUrl ?? '',
                         ),
                       ),
                     );

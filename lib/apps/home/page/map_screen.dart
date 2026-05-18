@@ -225,11 +225,9 @@ class _MapScreenState extends State<MapScreen> {
 
     if (launchedWeb || !mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Không mở được Google Maps.'),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Không mở được Google Maps.')));
   }
 
   void _showShopDetails(ShopMarkerDTO shop) {
@@ -333,9 +331,7 @@ class _MapScreenState extends State<MapScreen> {
                     icon: const Icon(LucideIcons.navigation),
                     label: Text(
                       'Chỉ đường',
-                      style: GoogleFonts.inter(
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: GoogleFonts.inter(fontWeight: FontWeight.w700),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF2563EB),
@@ -379,10 +375,7 @@ class _MapScreenState extends State<MapScreen> {
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(
-            LucideIcons.chevronLeft,
-            color: Color(0xFF1F2937),
-          ),
+          icon: const Icon(LucideIcons.chevronLeft, color: Color(0xFF1F2937)),
         ),
         title: Text(
           'Bản đồ vị trí',
@@ -477,10 +470,7 @@ class _MapScreenState extends State<MapScreen> {
               child: FloatingActionButton(
                 onPressed: _loadMapData,
                 backgroundColor: const Color(0xFFFF5A4E),
-                child: const Icon(
-                  LucideIcons.rotateCw,
-                  color: Colors.white,
-                ),
+                child: const Icon(LucideIcons.rotateCw, color: Colors.white),
               ),
             ),
         ],
@@ -622,10 +612,7 @@ class _ShopMapMarkerCard extends StatelessWidget {
                       width: double.infinity,
                       child: OutlinedButton.icon(
                         onPressed: onDirectionsTap,
-                        icon: const Icon(
-                          LucideIcons.navigation,
-                          size: 14,
-                        ),
+                        icon: const Icon(LucideIcons.navigation, size: 14),
                         label: Text(
                           'Chỉ đường',
                           style: GoogleFonts.inter(
@@ -635,9 +622,7 @@ class _ShopMapMarkerCard extends StatelessWidget {
                         ),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: const Color(0xFF2563EB),
-                          side: const BorderSide(
-                            color: Color(0xFFBFDBFE),
-                          ),
+                          side: const BorderSide(color: Color(0xFFBFDBFE)),
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -684,11 +669,7 @@ class _ShopMapMarkerPin extends StatelessWidget {
               color: Color(0xFFFF8A1F),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
-              LucideIcons.store,
-              size: 13,
-              color: Colors.white,
-            ),
+            child: const Icon(LucideIcons.store, size: 13, color: Colors.white),
           ),
         ),
       ),
@@ -761,11 +742,7 @@ class _StarFill extends StatelessWidget {
       height: size,
       child: Stack(
         children: [
-          const Icon(
-            Icons.star_rounded,
-            size: size,
-            color: Color(0xFFE2E8F0),
-          ),
+          const Icon(Icons.star_rounded, size: size, color: Color(0xFFE2E8F0)),
           if (fill > 0)
             ClipRect(
               child: Align(
@@ -790,11 +767,7 @@ class _ShopMapMarkerImageFallback extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Center(
-      child: Icon(
-        LucideIcons.store,
-        size: 28,
-        color: Color(0xFFFF5A4E),
-      ),
+      child: Icon(LucideIcons.store, size: 28, color: Color(0xFFFF5A4E)),
     );
   }
 }
