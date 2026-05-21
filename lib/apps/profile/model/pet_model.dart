@@ -2,6 +2,7 @@ import 'package:petpee_mobile/apps/profile/model/pet_dto.dart';
 
 class PetModel {
   final int? id;
+  final int? userId;
   final int? shopId;
   final int? customerId;
   final int? speciesId;
@@ -11,6 +12,7 @@ class PetModel {
   final String? avatarUrl;
   final String? gender;
   final DateTime? dob;
+  final double? weightKg;
   final String? note;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -22,6 +24,7 @@ class PetModel {
 
   PetModel({
     this.id,
+    this.userId,
     this.shopId,
     this.customerId,
     this.speciesId,
@@ -31,6 +34,7 @@ class PetModel {
     this.avatarUrl,
     this.gender,
     this.dob,
+    this.weightKg,
     this.note,
     this.createdAt,
     this.updatedAt,
@@ -43,6 +47,7 @@ class PetModel {
   factory PetModel.fromDTO(PetDTO dto) {
     return PetModel(
       id: dto.id,
+      userId: dto.userId,
       shopId: dto.shopId,
       customerId: dto.customerId,
       speciesId: dto.speciesId,
@@ -52,6 +57,7 @@ class PetModel {
       avatarUrl: dto.avatarUrl,
       gender: dto.gender,
       dob: dto.dob,
+      weightKg: dto.weightKg,
       note: dto.note,
       createdAt: dto.createdAt,
       updatedAt: dto.updatedAt,
@@ -62,6 +68,7 @@ class PetModel {
   PetDTO toDTO() {
     return PetDTO(
       id: id,
+      userId: userId,
       shopId: shopId,
       customerId: customerId,
       speciesId: speciesId,
@@ -71,6 +78,7 @@ class PetModel {
       avatarUrl: avatarUrl,
       gender: gender,
       dob: dob,
+      weightKg: weightKg,
       note: note,
       createdAt: createdAt,
       updatedAt: updatedAt,

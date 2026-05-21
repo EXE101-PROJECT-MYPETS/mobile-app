@@ -10,17 +10,30 @@ import '../models/message_model.dart';
 class ChatSocketService {
   WebSocket? _socket;
   StreamSubscription<dynamic>? _subscription;
-  Timer? _reconnectTimer;
   String _incomingBuffer = '';
   bool _stompConnected = false;
-  bool _manuallyDisconnected = false;
-  int _reconnectAttempts = 0;
   int _subscriptionCounter = 0;
   String? _conversationSubscriptionId;
   String? _shopSubscriptionId;
   String? _activeConversationId;
   String? _activeShopId;
   void Function(MessageModel message)? _onMessage;
+
+  /// Whether we should try to reconnect when the socket is closed.
+  bool _shouldReconnect = false;
+
+  /// Delay between reconnect attempts.
+  static const Duration _reconnectDelay = Duration(seconds: 3);
+
+  /// Maximum consecutive reconnect attempts before giving up temporarily.
+  static const int _maxReconnectAttempts = 10;
+  int _reconnectAttempts = 0;
+
+  Timer? _reconnectTimer;
+  Timer? _heartbeatTimer;
+
+  /// Heartbeat interval to keep ngrok WebSocket alive.
+  static const Duration _heartbeatInterval = Duration(seconds: 15);
 
   Future<void> listenToConversation(
     String conversationId,
@@ -30,7 +43,10 @@ class ChatSocketService {
     _activeConversationId = conversationId;
     _activeShopId = shopId;
     _onMessage = onMessage;
-    _manuallyDisconnected = false;
+    _shouldReconnect = true;
+    _reconnectAttempts = 0;
+
+    debugPrint('[ChatSocket] listenToConversation: convId=$conversationId, shopId=$shopId');
 
     if (_socket == null) {
       await _connect();
@@ -44,9 +60,13 @@ class ChatSocketService {
   }
 
   Future<void> disconnect() async {
-    _manuallyDisconnected = true;
+    debugPrint('[ChatSocket] disconnect() called');
+    _shouldReconnect = false;
     _reconnectTimer?.cancel();
     _reconnectTimer = null;
+    _heartbeatTimer?.cancel();
+    _heartbeatTimer = null;
+    _reconnectAttempts = 0;
     _stompConnected = false;
     _conversationSubscriptionId = null;
     _shopSubscriptionId = null;
@@ -60,12 +80,25 @@ class ChatSocketService {
   }
 
   Future<void> _connect() async {
-    _reconnectTimer?.cancel();
-    _reconnectTimer = null;
+    // Clean up any existing connection first
+    await _subscription?.cancel();
+    _subscription = null;
+    _socket = null;
+    _stompConnected = false;
+    _incomingBuffer = '';
+
+    final wsUrl = ApiConfig.chatWebSocketUrl;
+    debugPrint('[ChatSocket] Connecting to $wsUrl ...');
 
     try {
-      final socket = await WebSocket.connect(ApiConfig.chatWebSocketUrl);
+      final socket = await WebSocket.connect(
+        wsUrl,
+        headers: const {'ngrok-skip-browser-warning': 'true'},
+      );
       _socket = socket;
+      _reconnectAttempts = 0; // Reset on successful connection
+      debugPrint('[ChatSocket] WebSocket connected successfully');
+
       _subscription = socket.listen(
         _handleData,
         onDone: _handleDone,
@@ -73,16 +106,41 @@ class ChatSocketService {
         cancelOnError: true,
       );
 
-      _sendFrame('CONNECT', {
-        'accept-version': '1.2',
-        'heart-beat': '0,0',
-        'host': Uri.parse(ApiConfig.baseUrl).host,
-      });
+      _sendFrame(
+        'CONNECT',
+        const {
+          'accept-version': '1.2',
+          'heart-beat': '15000,15000',
+        },
+      );
     } catch (e) {
-      debugPrint('Error connecting chat websocket: $e');
-      _clearSocketState();
+      debugPrint('[ChatSocket] Error connecting websocket: $e');
+      _socket = null;
+      _subscription = null;
+      _stompConnected = false;
       _scheduleReconnect();
     }
+  }
+
+  void _scheduleReconnect() {
+    if (!_shouldReconnect) {
+      debugPrint('[ChatSocket] Reconnect disabled, not reconnecting');
+      return;
+    }
+
+    _reconnectAttempts++;
+    if (_reconnectAttempts > _maxReconnectAttempts) {
+      debugPrint('[ChatSocket] Max reconnect attempts reached ($_maxReconnectAttempts), stopping');
+      return;
+    }
+
+    debugPrint('[ChatSocket] Scheduling reconnect attempt $_reconnectAttempts/$_maxReconnectAttempts in ${_reconnectDelay.inSeconds}s');
+    _reconnectTimer?.cancel();
+    _reconnectTimer = Timer(_reconnectDelay, () {
+      if (_shouldReconnect) {
+        _connect();
+      }
+    });
   }
 
   void _handleData(dynamic data) {
@@ -106,9 +164,8 @@ class ChatSocketService {
   }
 
   void _processFrame(String frame) {
-    final lines = frame.split('\n').map((line) {
-      return line.endsWith('\r') ? line.substring(0, line.length - 1) : line;
-    }).toList();
+    final normalizedFrame = frame.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
+    final lines = normalizedFrame.split('\n');
     if (lines.isEmpty) {
       return;
     }
@@ -118,7 +175,7 @@ class ChatSocketService {
       return;
     }
 
-    final blankLineIndex = lines.indexWhere((line) => line.trim().isEmpty);
+    final blankLineIndex = lines.indexWhere((line) => line.isEmpty);
     final headerEndIndex = blankLineIndex == -1 ? lines.length : blankLineIndex;
     final headers = <String, String>{};
 
@@ -140,8 +197,9 @@ class ChatSocketService {
 
     switch (command) {
       case 'CONNECTED':
+        debugPrint('[ChatSocket] STOMP CONNECTED');
         _stompConnected = true;
-        _reconnectAttempts = 0;
+        _startHeartbeat();
         _subscribeToActiveConversation();
         _subscribeToActiveShop();
         break;
@@ -149,24 +207,35 @@ class ChatSocketService {
         _handleMessage(headers, body);
         break;
       case 'ERROR':
-        debugPrint('Chat websocket error frame: $body');
+        debugPrint('[ChatSocket] STOMP ERROR frame: $body');
         break;
+      default:
+        debugPrint('[ChatSocket] Unknown STOMP command: $command');
     }
   }
 
   void _handleMessage(Map<String, String> headers, String body) {
     final destination = headers['destination'] ?? '';
+    debugPrint('[ChatSocket] MESSAGE received on destination: $destination');
+
     final activeConversationId = _activeConversationId;
-    final expectedConvDestination =
-        '/topic/conversations/$activeConversationId/messages';
-    final expectedShopDestination = _activeShopId != null
-        ? '/topic/shops/$_activeShopId/messages'
+    final activeShopId = _activeShopId;
+
+    // Check if this message is for our conversation or shop topic
+    final expectedConvDestination = activeConversationId != null
+        ? '/topic/conversations/$activeConversationId/messages'
+        : '';
+    final expectedShopDestination = activeShopId != null
+        ? '/topic/shops/$activeShopId/messages'
         : '';
 
-    if (destination.isNotEmpty &&
-        destination != expectedConvDestination &&
-        (expectedShopDestination.isEmpty ||
-            destination != expectedShopDestination)) {
+    final matchesConv = expectedConvDestination.isNotEmpty && destination == expectedConvDestination;
+    final matchesShop = expectedShopDestination.isNotEmpty && destination == expectedShopDestination;
+
+    if (!matchesConv && !matchesShop) {
+      debugPrint('[ChatSocket] Ignoring message for destination: $destination');
+      debugPrint('[ChatSocket]   expected conv: $expectedConvDestination');
+      debugPrint('[ChatSocket]   expected shop: $expectedShopDestination');
       return;
     }
 
@@ -174,15 +243,11 @@ class ChatSocketService {
       final decoded = json.decode(body);
       if (decoded is Map<String, dynamic>) {
         final message = MessageModel.fromJson(decoded);
-        if (activeConversationId == null ||
-            activeConversationId.isEmpty ||
-            message.conversationId == activeConversationId ||
-            message.shopId == _activeShopId) {
-          _onMessage?.call(message);
-        }
+        debugPrint('[ChatSocket] Delivering message id=${message.id} to handler');
+        _onMessage?.call(message);
       }
     } catch (e) {
-      debugPrint('Failed to decode chat websocket message: $e');
+      debugPrint('[ChatSocket] Failed to decode message: $e');
     }
   }
 
@@ -197,15 +262,22 @@ class ChatSocketService {
     }
 
     _conversationSubscriptionId = 'sub-${++_subscriptionCounter}';
-    _sendFrame('SUBSCRIBE', {
-      'id': _conversationSubscriptionId!,
-      'destination': '/topic/conversations/$conversationId/messages',
-    });
+    final destination = '/topic/conversations/$conversationId/messages';
+    debugPrint('[ChatSocket] SUBSCRIBE to $destination (id=${_conversationSubscriptionId})');
+    _sendFrame(
+      'SUBSCRIBE',
+      {
+        'id': _conversationSubscriptionId!,
+        'destination': destination,
+        'ack': 'auto',
+      },
+    );
   }
 
   void _subscribeToActiveShop() {
     final shopId = _activeShopId;
     if (!_stompConnected || _socket == null || shopId == null) {
+      debugPrint('[ChatSocket] Cannot subscribe to shop topic: stompConnected=$_stompConnected, socket=${_socket != null}, shopId=$shopId');
       return;
     }
 
@@ -214,10 +286,16 @@ class ChatSocketService {
     }
 
     _shopSubscriptionId = 'sub-shop-${++_subscriptionCounter}';
-    _sendFrame('SUBSCRIBE', {
-      'id': _shopSubscriptionId!,
-      'destination': '/topic/shops/$shopId/messages',
-    });
+    final destination = '/topic/shops/$shopId/messages';
+    debugPrint('[ChatSocket] SUBSCRIBE to $destination (id=${_shopSubscriptionId})');
+    _sendFrame(
+      'SUBSCRIBE',
+      {
+        'id': _shopSubscriptionId!,
+        'destination': destination,
+        'ack': 'auto',
+      },
+    );
   }
 
   void _sendFrame(
@@ -240,40 +318,42 @@ class ChatSocketService {
     socket.add(buffer.toString());
   }
 
+  /// Sends a STOMP heartbeat (newline) periodically to keep ngrok alive.
+  void _startHeartbeat() {
+    _stopHeartbeat();
+    _heartbeatTimer = Timer.periodic(_heartbeatInterval, (_) {
+      final socket = _socket;
+      if (socket != null && _stompConnected) {
+        socket.add('\n');
+      }
+    });
+    debugPrint('[ChatSocket] Heartbeat started (every ${_heartbeatInterval.inSeconds}s)');
+  }
+
+  void _stopHeartbeat() {
+    _heartbeatTimer?.cancel();
+    _heartbeatTimer = null;
+  }
+
   void _handleDone() {
-    _clearSocketState();
-    _scheduleReconnect();
-  }
-
-  void _handleError(Object error) {
-    debugPrint('Chat websocket closed with error: $error');
-    _clearSocketState();
-    _scheduleReconnect();
-  }
-
-  void _clearSocketState() {
+    debugPrint('[ChatSocket] WebSocket closed (onDone)');
+    _stopHeartbeat();
     _stompConnected = false;
     _conversationSubscriptionId = null;
     _shopSubscriptionId = null;
     _socket = null;
     _subscription = null;
+    _scheduleReconnect();
   }
 
-  void _scheduleReconnect() {
-    if (_manuallyDisconnected ||
-        _activeConversationId == null ||
-        _onMessage == null ||
-        _reconnectTimer != null) {
-      return;
-    }
-
-    final delaySeconds = _reconnectAttempts < 5 ? 1 << _reconnectAttempts : 30;
-    _reconnectAttempts++;
-    _reconnectTimer = Timer(Duration(seconds: delaySeconds), () {
-      _reconnectTimer = null;
-      if (!_manuallyDisconnected && _activeConversationId != null) {
-        _connect();
-      }
-    });
+  void _handleError(Object error) {
+    debugPrint('[ChatSocket] WebSocket error: $error');
+    _stopHeartbeat();
+    _stompConnected = false;
+    _conversationSubscriptionId = null;
+    _shopSubscriptionId = null;
+    _socket = null;
+    _subscription = null;
+    _scheduleReconnect();
   }
 }

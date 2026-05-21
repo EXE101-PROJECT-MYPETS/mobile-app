@@ -40,23 +40,34 @@ class ApiClient {
 
   // ─── Headers builder ──────────────────────────────────────────────────────
 
-  Map<String, String> _buildHeaders([Map<String, String>? extra]) {
+  Map<String, String> _buildHeaders([
+    Map<String, String>? extra,
+    bool includeContextHeaders = true,
+  ]) {
     final headers = <String, String>{
       'content-type': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
       if (_token != null) 'authorization': 'Bearer $_token',
-      'X-Shop-Id': (_shopId ?? 1).toString(), // Default to 1 for guests
-      if (_customerId != null) 'X-Customer-Id': _customerId.toString(),
-      'Bypass-Tunnel-Reminder': 'true', // Bypass Localtunnel warning screen
+      if (includeContextHeaders) ...{
+        'X-Shop-Id': (_shopId ?? 1).toString(), // Default to 1 for guests
+        if (_customerId != null) 'X-Customer-Id': _customerId.toString(),
+      },
     };
     if (extra != null) headers.addAll(extra);
-    print('🚀 [ApiClient] Sending Headers: $headers');
     return headers;
   }
 
   // ─── HTTP methods ─────────────────────────────────────────────────────────
 
-  Future<http.Response> get(Uri url, {Map<String, String>? headers}) {
-    return _client.get(url, headers: _buildHeaders(headers));
+  Future<http.Response> get(
+    Uri url, {
+    Map<String, String>? headers,
+    bool includeContextHeaders = true,
+  }) {
+    return _client.get(
+      url,
+      headers: _buildHeaders(headers, includeContextHeaders),
+    );
   }
 
   Future<http.Response> post(
@@ -64,10 +75,11 @@ class ApiClient {
     Map<String, String>? headers,
     Object? body,
     Encoding? encoding,
+    bool includeContextHeaders = true,
   }) {
     return _client.post(
       url,
-      headers: _buildHeaders(headers),
+      headers: _buildHeaders(headers, includeContextHeaders),
       body: body,
       encoding: encoding,
     );

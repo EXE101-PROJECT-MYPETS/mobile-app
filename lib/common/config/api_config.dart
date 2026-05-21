@@ -1,10 +1,10 @@
 class ApiConfig {
   // Thay đổi IP này thành IP của máy tính bạn trong mạng LAN (IPv4)
   // Nếu dùng máy ảo Android (Emulator), dùng 10.0.2.2
-  // Nếu dùng máy thật, dùng IPv4 LAN của máy chạy backend
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://192.168.16.104:8080/api',
+    defaultValue:
+        'https://evolutive-anneliese-distrustingly.ngrok-free.dev/api',
   );
 
   static const String authUrl = '$baseUrl/auth';
@@ -16,17 +16,8 @@ class ApiConfig {
   static const String registerEmailVerifyCodeUrl =
       '$registerEmailVerificationUrl/verify-code';
   static const String customerLoginUrl = '$authUrl/customer/login';
-  static const String customerGoogleLoginUrl = '$authUrl/customer/google-login';
-  static const String customerFacebookLoginUrl =
-      '$authUrl/customer/facebook-login';
   static const String shopLoginUrl = '$authUrl/shop/login';
-  static const String currentUserProfileUrl = '$baseUrl/users/me';
   static const String currentUserAddressUrl = '$baseUrl/users/me/address';
-
-  static const String googleWebClientId = String.fromEnvironment(
-    'GOOGLE_WEB_CLIENT_ID',
-    defaultValue: '959472405909-jcckrg23puil1dtti4pkgrplms1tsq2l.apps.googleusercontent.com',
-  );
 
   // Product endpoints (Public)
   static const String productPublicUrl = '$baseUrl/public/products';
@@ -43,6 +34,12 @@ class ApiConfig {
   // Chat endpoints
   static const String chatUrl = '$baseUrl/customer/conversations';
   static const String chatConversationsUrl = chatUrl;
+  static const String aiPetHealthUrl = '$baseUrl/ai/pet-health';
+  static const String aiPetHealthConversationsUrl =
+      '$aiPetHealthUrl/conversations';
+  static const String aiPetHealthGetOrCreateConversationUrl =
+      '$aiPetHealthConversationsUrl/get-or-create';
+  static const String aiPetHealthChatUrl = '$aiPetHealthUrl/chat';
 
   static String get chatWebSocketUrl {
     final uri = Uri.parse(baseUrl);
