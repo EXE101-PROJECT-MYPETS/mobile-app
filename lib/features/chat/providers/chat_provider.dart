@@ -20,9 +20,16 @@ class ChatProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
 
   int _compareMessages(MessageModel a, MessageModel b) {
-    final idA = int.tryParse(a.id) ?? 0;
-    final idB = int.tryParse(b.id) ?? 0;
-    return idA.compareTo(idB);
+    final idA = int.tryParse(a.id);
+    final idB = int.tryParse(b.id);
+    if (idA != null && idB != null) {
+      return idA.compareTo(idB);
+    }
+    final timeCompare = a.createdAt.compareTo(b.createdAt);
+    if (timeCompare != 0) {
+      return timeCompare;
+    }
+    return a.id.compareTo(b.id);
   }
 
   void _upsertCurrentMessage(MessageModel message) {

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Petpee</string>
+    <string name="facebook_app_id">973482605605490</string>
+    <string name="fb_login_protocol_scheme">fb973482605605490</string>
+    <string name="facebook_client_token">73ee0c55bb7c2cece57f984bfa0281a3</string>
+</resources>

@@ -92,6 +92,19 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> _saveCurrentUser(UserModel user) async {
+    final box = await Hive.openBox('auth_box');
+    await box.put('user_data', jsonEncode(user.toJson()));
+
+    _currentUser = user;
+    ApiClient.instance.configure(
+      token: _token,
+      shopId: _currentShopId,
+      customerId: user.id,
+    );
+    notifyListeners();
+  }
+
   Future<void> login(String email, String password) async {
     try {
       _isLoading = true;
@@ -139,6 +152,56 @@ class AuthProvider extends ChangeNotifier {
           avatarUrlPreview: avatar,
         ),
       );
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<UserModel> updateProfile({
+    required String email,
+    required String fullName,
+    required String phone,
+    String? address,
+    int? age,
+    String? currentPassword,
+    String? newPassword,
+    XFile? avatar,
+  }) async {
+    final accessToken = _token;
+    if (accessToken == null || accessToken.isEmpty) {
+      throw Exception('Cần đăng nhập để cập nhật thông tin cá nhân');
+    }
+
+    final previousEmail = _currentUser?.email;
+
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      final updatedUser = await _authService.updateCurrentUserProfile(
+        accessToken: accessToken,
+        updateRequest: UpdateProfileRequest(
+          email: email,
+          fullName: fullName,
+          phone: phone,
+          address: address,
+          age: age,
+          currentPassword: currentPassword,
+          newPassword: newPassword,
+          avatarUrlPreview: avatar,
+        ),
+      );
+      await _saveCurrentUser(updatedUser);
+
+      final emailChanged =
+          previousEmail != null &&
+          previousEmail.toLowerCase() != updatedUser.email.toLowerCase();
+      if (emailChanged && _refreshToken != null && _refreshToken!.isNotEmpty) {
+        await refreshSession();
+      }
+
+      return _currentUser ?? updatedUser;
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -239,5 +302,41 @@ class AuthProvider extends ChangeNotifier {
     }
 
     print('==============================\n');
+  }
+
+  Future<void> googleLogin(String idToken) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      final response = await _authService.googleLogin(
+        GoogleLoginRequest(idToken: idToken),
+      );
+      await _saveAuthentication(response);
+    } catch (e) {
+      debugPrint('Google login error: $e');
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> facebookLogin(String accessToken) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      final response = await _authService.facebookLogin(
+        FacebookLoginRequest(accessToken: accessToken),
+      );
+      await _saveAuthentication(response);
+    } catch (e) {
+      debugPrint('Facebook login error: $e');
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 }

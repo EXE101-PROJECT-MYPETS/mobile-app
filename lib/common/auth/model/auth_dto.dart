@@ -57,6 +57,37 @@ class RegisterRequest {
   }
 }
 
+class UpdateProfileRequest {
+  const UpdateProfileRequest({
+    required this.email,
+    required this.fullName,
+    required this.phone,
+    this.address,
+    this.age,
+    this.currentPassword,
+    this.newPassword,
+    this.avatarUrlPreview,
+  });
+
+  final String email;
+  final String fullName;
+  final String phone;
+  final String? address;
+  final int? age;
+  final String? currentPassword;
+  final String? newPassword;
+  final XFile? avatarUrlPreview;
+
+  Map<String, String> toMultipartFields() {
+    final fields = {'email': email, 'fullName': fullName, 'phone': phone};
+    if (address != null) fields['address'] = address!;
+    if (age != null) fields['age'] = age.toString();
+    if (currentPassword != null) fields['currentPassword'] = currentPassword!;
+    if (newPassword != null) fields['newPassword'] = newPassword!;
+    return fields;
+  }
+}
+
 class RegisterEmailVerificationSendRequest {
   const RegisterEmailVerificationSendRequest({required this.email});
 
@@ -212,5 +243,87 @@ class TokenRefresh {
         json['user'] as Map<String, dynamic>? ?? const <String, dynamic>{},
       ),
     );
+  }
+}
+
+// ── Forgot Password DTOs ────────────────────────────────────────────
+
+class ForgotPasswordRequest {
+  const ForgotPasswordRequest({required this.email});
+
+  final String email;
+
+  Map<String, dynamic> toJson() {
+    return {'email': email};
+  }
+}
+
+class VerifyOtpForgotPasswordRequest {
+  const VerifyOtpForgotPasswordRequest({
+    required this.email,
+    required this.otp,
+  });
+
+  final String email;
+  final String otp;
+
+  Map<String, dynamic> toJson() {
+    return {'email': email, 'otp': otp};
+  }
+}
+
+class ResetPasswordRequest {
+  const ResetPasswordRequest({
+    required this.email,
+    required this.otp,
+    required this.newPassword,
+  });
+
+  final String email;
+  final String otp;
+  final String newPassword;
+
+  Map<String, dynamic> toJson() {
+    return {'email': email, 'otp': otp, 'newPassword': newPassword};
+  }
+}
+
+class ForgotPasswordResponse {
+  const ForgotPasswordResponse({
+    required this.message,
+    required this.email,
+    required this.expiresInSeconds,
+  });
+
+  final String message;
+  final String email;
+  final int expiresInSeconds;
+
+  factory ForgotPasswordResponse.fromJson(Map<String, dynamic> json) {
+    return ForgotPasswordResponse(
+      message: json['message'] as String? ?? '',
+      email: json['email'] as String? ?? '',
+      expiresInSeconds: (json['expiresInSeconds'] as num?)?.toInt() ?? 600,
+    );
+  }
+}
+
+class GoogleLoginRequest {
+  const GoogleLoginRequest({required this.idToken});
+
+  final String idToken;
+
+  Map<String, dynamic> toJson() {
+    return {'idToken': idToken};
+  }
+}
+
+class FacebookLoginRequest {
+  const FacebookLoginRequest({required this.accessToken});
+
+  final String accessToken;
+
+  Map<String, dynamic> toJson() {
+    return {'accessToken': accessToken};
   }
 }

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "959472405909",
+    "project_id": "petpee-13d85",
+    "storage_bucket": "petpee-13d85.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:959472405909:android:67613f1e51fe75c95dfa9c",
+        "android_client_info": {
+          "package_name": "com.petpee.app.v2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "959472405909-0k06e56lfu3ug788ipbrd02a0qaql78p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.petpee.app.v2",
+            "certificate_hash": "19a3fe704a20693d46681bc17576454d17aa341e"
+          }
+        },
+        {
+          "client_id": "959472405909-jcckrg23puil1dtti4pkgrplms1tsq2l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSk0n_Z_nYyUl3zolpaqn7lljiLkSIMLY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "959472405909-jcckrg23puil1dtti4pkgrplms1tsq2l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
