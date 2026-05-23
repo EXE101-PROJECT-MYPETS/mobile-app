@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:petpee_mobile/apps/profile/model/pet_dto.dart';
+import 'package:petpee_mobile/apps/profile/model/pet_model.dart';
 import 'package:petpee_mobile/apps/profile/api/pet_service.dart';
 import 'package:petpee_mobile/common/toast/app_toast.dart';
+import 'package:petpee_mobile/apps/profile/model/pet_species_dto.dart';
+import 'dart:io';
 
 class AddPetScreen extends StatefulWidget {
-  const AddPetScreen({super.key});
+  final PetModel? pet;
+
+  const AddPetScreen({super.key, this.pet});
 
   @override
   State<AddPetScreen> createState() => _AddPetScreenState();
@@ -15,14 +21,61 @@ class AddPetScreen extends StatefulWidget {
 class _AddPetScreenState extends State<AddPetScreen> {
   final _formKey = GlobalKey<FormState>();
   final PetService _petService = PetService();
+  final ImagePicker _imagePicker = ImagePicker();
   bool _isLoading = false;
 
   String _name = '';
-  String _speciesId = 'dog'; // Will map to speciesId: 1 for dog
+  String _speciesId = '';
   String _breed = '';
   String _gender = '';
   DateTime? _dob;
   String _note = '';
+  XFile? _avatarFile;
+
+  bool get _isEditing => widget.pet != null;
+
+  List<PetSpeciesDTO> _speciesList = [];
+  bool _isLoadingSpecies = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSpecies();
+    final pet = widget.pet;
+    if (pet != null) {
+      _name = pet.name;
+      _breed = pet.breedText ?? '';
+      _gender = pet.gender ?? '';
+      _dob = pet.dob;
+      _note = pet.note ?? '';
+      _speciesId = pet.speciesId?.toString() ?? '';
+    }
+  }
+
+  Future<void> _loadSpecies() async {
+    setState(() => _isLoadingSpecies = true);
+    try {
+      final species = await _petService.getSpecies();
+      setState(() {
+        _speciesList = species;
+        if (_speciesId.isEmpty && species.isNotEmpty) {
+          _speciesId = species.first.id.toString();
+        }
+      });
+    } catch (e) {
+      if (mounted) {
+        showAppToast(
+          context,
+          message: 'Lỗi tải danh sách loài: $e',
+          type: AppToastType.error,
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingSpecies = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +90,7 @@ class _AddPetScreenState extends State<AddPetScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Thêm thú cưng mới',
+          _isEditing ? 'Cập nhật thú cưng' : 'Thêm thú cưng mới',
           style: GoogleFonts.inter(
             color: Colors.black87,
             fontWeight: FontWeight.bold,
@@ -55,39 +108,60 @@ class _AddPetScreenState extends State<AddPetScreen> {
               children: [
                 // Image Placeholder
                 Center(
-                  child: Stack(
-                    children: [
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.grey.shade300),
-                        ),
-                        child: const Icon(
-                          LucideIcons.camera,
-                          color: Colors.grey,
-                          size: 40,
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFE91E63),
+                  child: GestureDetector(
+                    onTap: _pickAvatar,
+                    child: Stack(
+                      children: [
+                        Container(
+                          width: 100,
+                          height: 100,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
                             shape: BoxShape.circle,
+                            border: Border.all(color: Colors.grey.shade300),
                           ),
-                          child: const Icon(
-                            Icons.add,
-                            color: Colors.white,
-                            size: 18,
+                          child: ClipOval(
+                            child: _avatarFile != null
+                                ? Image.file(
+                                    File(_avatarFile!.path),
+                                    fit: BoxFit.cover,
+                                  )
+                                : (widget.pet?.avatarUrl != null &&
+                                      widget.pet!.avatarUrl!.isNotEmpty)
+                                ? Image.network(
+                                    widget.pet!.avatarUrl!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => const Icon(
+                                      LucideIcons.camera,
+                                      color: Colors.grey,
+                                      size: 40,
+                                    ),
+                                  )
+                                : const Icon(
+                                    LucideIcons.camera,
+                                    color: Colors.grey,
+                                    size: 40,
+                                  ),
                           ),
                         ),
-                      ),
-                    ],
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFE91E63),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.add,
+                              color: Colors.white,
+                              size: 18,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -96,32 +170,40 @@ class _AddPetScreenState extends State<AddPetScreen> {
                   'Tên thú cưng (*)',
                   'Nhập tên...',
                   (v) => _name = v!,
+                  initialValue: _name,
                 ),
                 const SizedBox(height: 16),
 
                 Row(
                   children: [
                     Expanded(
-                      child: _buildDropdownField(
-                        'Loại',
-                        {
-                          'dog': 'Chó',
-                          'cat': 'Mèo',
-                          'other': 'Khác',
-                        }.entries.map((e) => e.value).toList(),
-                        _speciesId == 'dog'
-                            ? 'Chó'
-                            : _speciesId == 'cat'
-                            ? 'Mèo'
-                            : 'Khác',
-                        (v) => setState(() {
-                          _speciesId = v == 'Chó'
-                              ? 'dog'
-                              : v == 'Mèo'
-                              ? 'cat'
-                              : 'other';
-                        }),
-                      ),
+                      child: _isLoadingSpecies
+                          ? const Center(child: CircularProgressIndicator())
+                          : _buildDropdownField(
+                              'Loại',
+                              _speciesList.map((e) => e.name).toList(),
+                              _speciesList.any(
+                                    (e) => e.id.toString() == _speciesId,
+                                  )
+                                  ? _speciesList
+                                        .firstWhere(
+                                          (e) => e.id.toString() == _speciesId,
+                                        )
+                                        .name
+                                  : (_speciesList.isNotEmpty
+                                        ? _speciesList.first.name
+                                        : ''),
+                              (v) {
+                                if (v != null) {
+                                  setState(() {
+                                    _speciesId = _speciesList
+                                        .firstWhere((e) => e.name == v)
+                                        .id
+                                        .toString();
+                                  });
+                                }
+                              },
+                            ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -141,6 +223,7 @@ class _AddPetScreenState extends State<AddPetScreen> {
                   'VD: Golden Retriever...',
                   (v) => _breed = v!,
                   isRequired: false,
+                  initialValue: _breed,
                 ),
                 const SizedBox(height: 16),
 
@@ -157,6 +240,7 @@ class _AddPetScreenState extends State<AddPetScreen> {
                   (v) => _note = v!,
                   maxLines: 3,
                   isRequired: false,
+                  initialValue: _note,
                 ),
                 const SizedBox(height: 32),
 
@@ -198,6 +282,7 @@ class _AddPetScreenState extends State<AddPetScreen> {
 
   Future<void> _submitForm() async {
     if (!_formKey.currentState!.validate()) return;
+    _formKey.currentState!.save();
     if (_name.isEmpty) {
       showAppToast(
         context,
@@ -211,23 +296,32 @@ class _AddPetScreenState extends State<AddPetScreen> {
 
     try {
       final petDTO = PetDTO(
+        id: widget.pet?.id,
         name: _name,
-        speciesId: _speciesId == 'dog'
-            ? 1
-            : _speciesId == 'cat'
-            ? 2
-            : 3,
+        shopId: widget.pet?.shopId,
+        customerId: widget.pet?.customerId,
+        speciesId: int.tryParse(_speciesId),
         gender: _gender.isEmpty ? null : _gender,
         breedText: _breed.isEmpty ? null : _breed,
         dob: _dob,
         note: _note.isEmpty ? null : _note,
       );
 
-      await _petService.create(petDTO);
+      if (_isEditing && widget.pet?.id != null) {
+        await _petService.update(
+          widget.pet!.id!,
+          petDTO,
+          avatarFile: _avatarFile,
+        );
+      } else {
+        await _petService.create(petDTO, avatarFile: _avatarFile);
+      }
       if (mounted) {
         showAppToast(
           context,
-          message: 'Thêm thú cưng thành công',
+          message: _isEditing
+              ? 'Cập nhật thú cưng thành công'
+              : 'Thêm thú cưng thành công',
           type: AppToastType.success,
         );
         Navigator.pop(context, true);
@@ -243,12 +337,28 @@ class _AddPetScreenState extends State<AddPetScreen> {
     }
   }
 
+  Future<void> _pickAvatar() async {
+    final picked = await _imagePicker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1200,
+      maxHeight: 1200,
+      imageQuality: 85,
+    );
+
+    if (!mounted || picked == null) return;
+
+    setState(() {
+      _avatarFile = picked;
+    });
+  }
+
   Widget _buildTextField(
     String label,
     String hint,
     void Function(String?) onSaved, {
     bool isRequired = true,
     int maxLines = 1,
+    String? initialValue,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,6 +369,7 @@ class _AddPetScreenState extends State<AddPetScreen> {
         ),
         const SizedBox(height: 8),
         TextFormField(
+          initialValue: initialValue,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),

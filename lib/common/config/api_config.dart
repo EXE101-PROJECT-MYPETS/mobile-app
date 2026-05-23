@@ -3,8 +3,10 @@ class ApiConfig {
   // Nếu dùng máy ảo Android (Emulator), dùng 10.0.2.2
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue:
-        'https://evolutive-anneliese-distrustingly.ngrok-free.dev/api',
+    // Mặc định sử dụng IP nội bộ của bạn (Ethernet): 192.168.16.103:8080
+    // Nếu bạn muốn dùng Wi‑Fi, đổi thành 192.168.16.104
+    // Nếu dùng Android emulator, chạy app với --dart-define=API_BASE_URL="http://10.0.2.2:8080/api"
+    defaultValue: 'http://192.168.16.103:8080/api',
   );
 
   static const String authUrl = '$baseUrl/auth';
@@ -16,8 +18,18 @@ class ApiConfig {
   static const String registerEmailVerifyCodeUrl =
       '$registerEmailVerificationUrl/verify-code';
   static const String customerLoginUrl = '$authUrl/customer/login';
+  static const String customerGoogleLoginUrl = '$authUrl/customer/google-login';
+  static const String customerFacebookLoginUrl =
+      '$authUrl/customer/facebook-login';
   static const String shopLoginUrl = '$authUrl/shop/login';
+  static const String currentUserProfileUrl = '$baseUrl/users/me';
   static const String currentUserAddressUrl = '$baseUrl/users/me/address';
+
+  static const String googleWebClientId = String.fromEnvironment(
+    'GOOGLE_WEB_CLIENT_ID',
+    defaultValue:
+        '959472405909-jcckrg23puil1dtti4pkgrplms1tsq2l.apps.googleusercontent.com',
+  );
 
   // Product endpoints (Public)
   static const String productPublicUrl = '$baseUrl/public/products';
