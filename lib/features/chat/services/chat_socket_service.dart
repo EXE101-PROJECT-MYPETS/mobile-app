@@ -46,7 +46,9 @@ class ChatSocketService {
     _shouldReconnect = true;
     _reconnectAttempts = 0;
 
-    debugPrint('[ChatSocket] listenToConversation: convId=$conversationId, shopId=$shopId');
+    debugPrint(
+      '[ChatSocket] listenToConversation: convId=$conversationId, shopId=$shopId',
+    );
 
     if (_socket == null) {
       await _connect();
@@ -106,13 +108,10 @@ class ChatSocketService {
         cancelOnError: true,
       );
 
-      _sendFrame(
-        'CONNECT',
-        const {
-          'accept-version': '1.2',
-          'heart-beat': '15000,15000',
-        },
-      );
+      _sendFrame('CONNECT', const {
+        'accept-version': '1.2',
+        'heart-beat': '15000,15000',
+      });
     } catch (e) {
       debugPrint('[ChatSocket] Error connecting websocket: $e');
       _socket = null;
@@ -130,11 +129,15 @@ class ChatSocketService {
 
     _reconnectAttempts++;
     if (_reconnectAttempts > _maxReconnectAttempts) {
-      debugPrint('[ChatSocket] Max reconnect attempts reached ($_maxReconnectAttempts), stopping');
+      debugPrint(
+        '[ChatSocket] Max reconnect attempts reached ($_maxReconnectAttempts), stopping',
+      );
       return;
     }
 
-    debugPrint('[ChatSocket] Scheduling reconnect attempt $_reconnectAttempts/$_maxReconnectAttempts in ${_reconnectDelay.inSeconds}s');
+    debugPrint(
+      '[ChatSocket] Scheduling reconnect attempt $_reconnectAttempts/$_maxReconnectAttempts in ${_reconnectDelay.inSeconds}s',
+    );
     _reconnectTimer?.cancel();
     _reconnectTimer = Timer(_reconnectDelay, () {
       if (_shouldReconnect) {
@@ -164,7 +167,9 @@ class ChatSocketService {
   }
 
   void _processFrame(String frame) {
-    final normalizedFrame = frame.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
+    final normalizedFrame = frame
+        .replaceAll('\r\n', '\n')
+        .replaceAll('\r', '\n');
     final lines = normalizedFrame.split('\n');
     if (lines.isEmpty) {
       return;
@@ -229,8 +234,12 @@ class ChatSocketService {
         ? '/topic/shops/$activeShopId/messages'
         : '';
 
-    final matchesConv = expectedConvDestination.isNotEmpty && destination == expectedConvDestination;
-    final matchesShop = expectedShopDestination.isNotEmpty && destination == expectedShopDestination;
+    final matchesConv =
+        expectedConvDestination.isNotEmpty &&
+        destination == expectedConvDestination;
+    final matchesShop =
+        expectedShopDestination.isNotEmpty &&
+        destination == expectedShopDestination;
 
     if (!matchesConv && !matchesShop) {
       debugPrint('[ChatSocket] Ignoring message for destination: $destination');
@@ -243,7 +252,9 @@ class ChatSocketService {
       final decoded = json.decode(body);
       if (decoded is Map<String, dynamic>) {
         final message = MessageModel.fromJson(decoded);
-        debugPrint('[ChatSocket] Delivering message id=${message.id} to handler');
+        debugPrint(
+          '[ChatSocket] Delivering message id=${message.id} to handler',
+        );
         _onMessage?.call(message);
       }
     } catch (e) {
@@ -263,21 +274,22 @@ class ChatSocketService {
 
     _conversationSubscriptionId = 'sub-${++_subscriptionCounter}';
     final destination = '/topic/conversations/$conversationId/messages';
-    debugPrint('[ChatSocket] SUBSCRIBE to $destination (id=${_conversationSubscriptionId})');
-    _sendFrame(
-      'SUBSCRIBE',
-      {
-        'id': _conversationSubscriptionId!,
-        'destination': destination,
-        'ack': 'auto',
-      },
+    debugPrint(
+      '[ChatSocket] SUBSCRIBE to $destination (id=${_conversationSubscriptionId})',
     );
+    _sendFrame('SUBSCRIBE', {
+      'id': _conversationSubscriptionId!,
+      'destination': destination,
+      'ack': 'auto',
+    });
   }
 
   void _subscribeToActiveShop() {
     final shopId = _activeShopId;
     if (!_stompConnected || _socket == null || shopId == null) {
-      debugPrint('[ChatSocket] Cannot subscribe to shop topic: stompConnected=$_stompConnected, socket=${_socket != null}, shopId=$shopId');
+      debugPrint(
+        '[ChatSocket] Cannot subscribe to shop topic: stompConnected=$_stompConnected, socket=${_socket != null}, shopId=$shopId',
+      );
       return;
     }
 
@@ -287,15 +299,14 @@ class ChatSocketService {
 
     _shopSubscriptionId = 'sub-shop-${++_subscriptionCounter}';
     final destination = '/topic/shops/$shopId/messages';
-    debugPrint('[ChatSocket] SUBSCRIBE to $destination (id=${_shopSubscriptionId})');
-    _sendFrame(
-      'SUBSCRIBE',
-      {
-        'id': _shopSubscriptionId!,
-        'destination': destination,
-        'ack': 'auto',
-      },
+    debugPrint(
+      '[ChatSocket] SUBSCRIBE to $destination (id=${_shopSubscriptionId})',
     );
+    _sendFrame('SUBSCRIBE', {
+      'id': _shopSubscriptionId!,
+      'destination': destination,
+      'ack': 'auto',
+    });
   }
 
   void _sendFrame(
@@ -327,7 +338,9 @@ class ChatSocketService {
         socket.add('\n');
       }
     });
-    debugPrint('[ChatSocket] Heartbeat started (every ${_heartbeatInterval.inSeconds}s)');
+    debugPrint(
+      '[ChatSocket] Heartbeat started (every ${_heartbeatInterval.inSeconds}s)',
+    );
   }
 
   void _stopHeartbeat() {

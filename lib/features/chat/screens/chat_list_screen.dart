@@ -89,7 +89,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                             width: 52,
                             height: 52,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) {
+                            errorBuilder: (context, error, stackTrace) {
                               return const Icon(
                                 Icons.store,
                                 color: Colors.grey,
@@ -162,7 +162,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
     } else if (difference.inDays == 1) {
       return 'Hôm qua';
     } else {
-      return '\${time.day}/\${time.month}';
+      return '${time.day.toString().padLeft(2, '0')}/${time.month.toString().padLeft(2, '0')}';
     }
   }
 }

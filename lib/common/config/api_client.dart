@@ -22,6 +22,10 @@ class ApiClient {
   int? _shopId;
   int? _customerId;
 
+  String? get token => _token;
+  int? get shopId => _shopId;
+  int? get customerId => _customerId;
+
   final http.Client _client = http.Client();
 
   /// Cập nhật token, shopId, và customerId (gọi sau login / load từ Hive).

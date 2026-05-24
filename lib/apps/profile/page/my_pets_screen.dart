@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:petpee_mobile/apps/profile/model/pet_model.dart';
 import 'package:petpee_mobile/apps/profile/api/pet_service.dart';
 import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
+import 'package:petpee_mobile/common/config/api_config.dart';
 import 'package:petpee_mobile/common/toast/app_toast.dart';
 import 'add_pet_screen.dart';
 
@@ -19,6 +20,18 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
   final PetService _petService = PetService();
   late final AuthProvider _authProvider;
   late Future<List<PetModel>> _petsFuture;
+
+  String? _resolvePetAvatarUrl(String? avatarUrl) {
+    final value = avatarUrl?.trim();
+    if (value == null || value.isEmpty) return null;
+
+    final uri = Uri.tryParse(value);
+    if (uri != null && uri.scheme == 'file') {
+      return ApiConfig.formatImageUrl(uri.path);
+    }
+
+    return ApiConfig.formatImageUrl(value);
+  }
 
   @override
   void initState() {
@@ -232,6 +245,8 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
   }
 
   Widget _buildPetCard(BuildContext context, PetModel pet) {
+    final avatarUrl = _resolvePetAvatarUrl(pet.avatarUrl);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -252,6 +267,17 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
                 'Sửa',
                 Colors.pink.shade100,
                 Colors.pink,
+                onTap: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddPetScreen(pet: pet),
+                    ),
+                  );
+                  if (result == true) {
+                    _onAddPetSuccess();
+                  }
+                },
               ),
               const SizedBox(width: 8),
               _buildSmallIconButton(
@@ -306,10 +332,10 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
             children: [
               CircleAvatar(
                 radius: 30,
-                backgroundImage: pet.avatarUrl != null
-                    ? NetworkImage(pet.avatarUrl!)
+                backgroundImage: avatarUrl != null
+                    ? NetworkImage(avatarUrl)
                     : null,
-                child: pet.avatarUrl == null
+                child: avatarUrl == null
                     ? const Icon(LucideIcons.dog, size: 30)
                     : null,
               ),

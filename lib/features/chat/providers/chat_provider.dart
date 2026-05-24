@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import '../models/conversation_model.dart';
 import '../models/message_model.dart';
@@ -86,17 +88,10 @@ class ChatProvider with ChangeNotifier {
   }
 
   Future<ConversationModel> openConversationForShop(String shopId) async {
-    await fetchConversations();
-
-    final existingIndex = _conversations.indexWhere(
-      (conversation) => conversation.shopId == shopId,
-    );
-    if (existingIndex != -1) {
-      return _conversations[existingIndex];
-    }
-
     final createdConversation = await _chatService.createConversation(shopId);
-    await fetchConversations();
+
+    unawaited(fetchConversations());
+
     return createdConversation;
   }
 
