@@ -111,7 +111,9 @@ class PetService {
   /// Delete pet.
   Future<void> delete(int petId) async {
     final uri = Uri.parse('${ApiConfig.baseUrl}/pets/my/$petId');
-    final response = await _client.delete(uri);
+    final request = http.Request('DELETE', uri);
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
 
     if (response.statusCode == 204) {
       return;
