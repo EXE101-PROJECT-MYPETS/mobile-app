@@ -61,13 +61,6 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
         }
       }
 
-      if (mounted) {
-        showAppToast(
-          context,
-          message: 'Lỗi tải thú cưng: $e',
-          type: AppToastType.error,
-        );
-      }
       rethrow;
     }
   }
@@ -126,30 +119,7 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
           }
 
           if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    LucideIcons.alertCircle,
-                    size: 48,
-                    color: Colors.grey,
-                  ),
-                  const SizedBox(height: 16),
-                  Text('Lỗi: ${snapshot.error}', textAlign: TextAlign.center),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      final future = _loadPets();
-                      setState(() {
-                        _petsFuture = future;
-                      });
-                    },
-                    child: const Text('Thử lại'),
-                  ),
-                ],
-              ),
-            );
+            return const _PetLoginRequiredState();
           }
 
           final pets = snapshot.data ?? [];
@@ -451,6 +421,97 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
                 fontSize: 10,
                 color: textColor,
                 fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PetLoginRequiredState extends StatelessWidget {
+  const _PetLoginRequiredState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 68,
+              height: 68,
+              decoration: const BoxDecoration(
+                color: Color(0xFFFFE9DC),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                LucideIcons.alertCircle,
+                color: Color(0xFFE76F51),
+                size: 30,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Vui lòng đăng nhập để xem danh sách thú cưng',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                color: const Color(0xFF2E251F),
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Đăng nhập để PetPee tải hồ sơ thú cưng và đồng bộ dữ liệu của bạn.',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                color: const Color(0xFF7B685B),
+                fontSize: 13,
+                height: 1.4,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 18),
+            SizedBox(
+              height: 48,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFFB7185), Color(0xFFE11D48)],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFE11D48).withValues(alpha: 0.22),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: ElevatedButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, '/login'),
+                  icon: const Icon(LucideIcons.logIn, size: 18),
+                  label: const Text('Đăng nhập'),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    padding: const EdgeInsets.symmetric(horizontal: 22),
+                    textStyle: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                ),
               ),
             ),
           ],
