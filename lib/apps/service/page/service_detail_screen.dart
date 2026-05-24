@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:petpee_mobile/apps/product/page/spa_service_screen.dart';
+import 'package:petpee_mobile/common/store/app_state.dart';
+import 'package:petpee_mobile/common/toast/app_toast.dart';
+import 'package:petpee_mobile/common/user/dto/service_public_dto.dart';
 import 'package:petpee_mobile/common/utils/image_url_util.dart';
 import 'package:petpee_mobile/common/utils/price_formatter.dart';
+import 'package:provider/provider.dart';
 
 class ServiceDetailScreen extends StatelessWidget {
   const ServiceDetailScreen({
@@ -114,25 +118,89 @@ class ServiceDetailScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 14),
-          SizedBox(
-            height: 48,
-            child: FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFFFF5A4E),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+          Row(
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: 48,
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Color(0xFFFF5A4E)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    onPressed: () {
+                      final appState = context.read<AppState>();
+                      final serviceDto = ServicePublicDTO(
+                        service: ServiceInfoDTO(
+                          id: serviceId,
+                          name: name,
+                          basePrice: price?.toInt(),
+                          imageUrl: image,
+                          rating: rating,
+                          ratingCount: soldCount,
+                        ),
+                        shop: ShopInfoDTO(
+                          shopId: shopId,
+                          shopName: shopName,
+                          shopAddress: address,
+                        ),
+                        distanceKm: distanceKm,
+                      );
+                      appState.addServiceToCart(serviceDto);
+                      showAppToast(
+                        context,
+                        message: 'Đã thêm dịch vụ vào giỏ hàng',
+                        type: AppToastType.success,
+                      );
+                    },
+                    child: const Text('Thêm vào giỏ'),
+                  ),
                 ),
               ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SpaServiceScreen(),
+              const SizedBox(width: 12),
+              Expanded(
+                child: SizedBox(
+                  height: 48,
+                  child: FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: const Color(0xFFFF5A4E),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    onPressed: () {
+                      final serviceDto = ServicePublicDTO(
+                        service: ServiceInfoDTO(
+                          id: serviceId,
+                          name: name,
+                          basePrice: price?.toInt(),
+                          imageUrl: image,
+                          rating: rating,
+                          ratingCount: soldCount,
+                        ),
+                        shop: ShopInfoDTO(
+                          shopId: shopId,
+                          shopName: shopName,
+                          shopAddress: address,
+                        ),
+                        distanceKm: distanceKm,
+                      );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SpaServiceScreen(
+                            service: serviceDto,
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text('Đặt lịch ngay'),
                   ),
-                );
-              },
-              child: const Text('Xem danh sách dịch vụ'),
-            ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

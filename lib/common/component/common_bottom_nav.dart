@@ -38,8 +38,8 @@ class CommonBottomNavBar extends StatelessWidget {
           label: 'Trợ lý AI',
         ),
         const BottomNavigationBarItem(
-          icon: Icon(LucideIcons.clapperboard),
-          label: 'Live',
+          icon: Icon(LucideIcons.shoppingCart),
+          label: 'Giỏ hàng',
         ),
         const BottomNavigationBarItem(
           icon: Icon(LucideIcons.bell),

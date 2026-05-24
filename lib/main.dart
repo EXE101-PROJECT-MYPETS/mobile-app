@@ -17,7 +17,17 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => AuthProvider()),
         ChangeNotifierProvider(create: (context) => ChatProvider()),
-        ChangeNotifierProvider(create: (context) => AppState()),
+        ChangeNotifierProxyProvider<AuthProvider, AppState>(
+          create: (context) => AppState(),
+          update: (context, auth, previous) {
+            final appState = previous ?? AppState();
+            final currentUserId = auth.currentUser?.id;
+            if (appState.currentUserId != currentUserId) {
+              appState.loadUserCart(currentUserId);
+            }
+            return appState;
+          },
+        ),
       ],
       child: const MyApp(),
     ),
