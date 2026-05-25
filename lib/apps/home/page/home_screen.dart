@@ -16,6 +16,7 @@ import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
 import 'package:petpee_mobile/common/component/product_card.dart';
 import 'package:petpee_mobile/common/component/service_card.dart';
 import 'package:petpee_mobile/common/store/app_state.dart';
+import 'package:petpee_mobile/common/user/dto/service_public_dto.dart';
 import 'package:provider/provider.dart';
 
 const Color _homeHeaderBackground = Color(0xFFD5F4FF);
@@ -81,6 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
         await appState.loadServices();
+        await appState.loadVeterinaryServices();
         return;
       }
 
@@ -95,8 +97,16 @@ class _HomeScreenState extends State<HomeScreen> {
         lng: position.longitude,
         radiusKm: appState.serviceRadiusKm,
       );
+      await appState.loadVeterinaryServices(
+        lat: position.latitude,
+        lng: position.longitude,
+        radiusKm: appState.serviceRadiusKm,
+        perShopLimit: 5,
+        size: 20,
+      );
     } catch (_) {
       await appState.loadServices();
+      await appState.loadVeterinaryServices();
     }
   }
 
@@ -123,10 +133,11 @@ class _HomeScreenState extends State<HomeScreen> {
           const SliverToBoxAdapter(child: _PromoTicker()),
           const SliverToBoxAdapter(child: _QuickShortcutGrid()),
           const SliverToBoxAdapter(child: _ServiceSection()),
+          const SliverToBoxAdapter(child: _VeterinarySection()),
           const SliverToBoxAdapter(child: _FeedHeader()),
           Consumer<AppState>(
             builder: (context, state, child) {
-              if (state.productsError != null && state.allProducts.isEmpty) {
+              if (state.productsError != null && state.allProducts.length == 0) {
                 return SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
@@ -148,7 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               }
 
-              if (state.allProducts.isEmpty) {
+              if (state.allProducts.length == 0) {
                 return const SliverToBoxAdapter(
                   child: Padding(
                     padding: EdgeInsets.all(16.0),
@@ -741,14 +752,16 @@ class _ServiceSection extends StatelessWidget {
           ),
           Consumer<AppState>(
             builder: (context, state, child) {
-              if (state.isLoadingServices && state.allServices.isEmpty) {
+              final services = state.allServices ?? <ServicePublicDTO>[];
+
+              if (state.isLoadingServices && services.length == 0) {
                 return const SizedBox(
                   height: 188,
                   child: Center(child: CircularProgressIndicator()),
                 );
               }
 
-              if (state.servicesError != null && state.allServices.isEmpty) {
+              if (state.servicesError != null && services.length == 0) {
                 return SizedBox(
                   height: 188,
                   child: Center(
@@ -761,7 +774,7 @@ class _ServiceSection extends StatelessWidget {
                 );
               }
 
-              if (state.allServices.isEmpty) {
+              if (services.length == 0) {
                 return const SizedBox(
                   height: 188,
                   child: Center(child: Text('Chưa có dịch vụ nào')),
@@ -793,12 +806,12 @@ class _ServiceSection extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                           horizontal: horizontalPadding,
                         ),
-                        itemCount: state.allServices.length,
+                        itemCount: services.length,
                         separatorBuilder: (context, index) =>
                             const SizedBox(width: itemGap),
                         itemBuilder: (context, index) {
                           return ServiceCard(
-                            service: state.allServices[index],
+                            service: services[index],
                             width: itemWidth,
                           );
                         },
@@ -807,6 +820,128 @@ class _ServiceSection extends StatelessWidget {
                   );
                 },
               );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _VeterinarySection extends StatelessWidget {
+  const _VeterinarySection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: _homeContentBackground,
+      padding: const EdgeInsets.fromLTRB(12, 16, 12, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Row(
+              children: [
+                Text(
+                  'Dịch vụ thú y gần bạn',
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFF1F2937),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Consumer<AppState>(
+            builder: (context, state, child) {
+              try {
+                final vetList = state.veterinaryServices ?? <ServicePublicDTO>[];
+
+                if (state.isLoadingVeterinary && vetList.length == 0) {
+                  return const SizedBox(
+                    height: 188,
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+
+                if (state.veterinaryError != null && vetList.length == 0) {
+                  return SizedBox(
+                    height: 188,
+                    child: Center(
+                      child: Text(
+                        state.veterinaryError ?? 'Lỗi tải dịch vụ thú y',
+                        style: const TextStyle(color: Colors.red),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  );
+                }
+
+                if (vetList.length == 0) {
+                  return const SizedBox(
+                    height: 188,
+                    child: Center(child: Text('Chưa có dịch vụ thú y')), 
+                  );
+                }
+
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    const horizontalPadding = 12.0;
+                    const itemGap = 12.0;
+                    final availableWidth =
+                        constraints.maxWidth - (horizontalPadding * 2) - itemGap;
+                    final itemWidth = (availableWidth / 2).clamp(194.0, 204.0);
+
+                    return SizedBox(
+                      height: 282,
+                      child: ScrollConfiguration(
+                        behavior: ScrollConfiguration.of(context).copyWith(
+                          dragDevices: {
+                            PointerDeviceKind.touch,
+                            PointerDeviceKind.mouse,
+                            PointerDeviceKind.trackpad,
+                            PointerDeviceKind.stylus,
+                          },
+                        ),
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          physics: const BouncingScrollPhysics(),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: horizontalPadding,
+                          ),
+                          itemCount: vetList.length,
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(width: itemGap),
+                          itemBuilder: (context, index) {
+                            return ServiceCard(
+                              service: vetList[index],
+                              width: itemWidth,
+                            );
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                );
+              } catch (e, st) {
+                // Show error details in UI to help debugging on web
+                return SizedBox(
+                  height: 220,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Center(
+                      child: SingleChildScrollView(
+                        child: Text(
+                          'Lỗi khi render dịch vụ thú y:\n$e\n\n${st.toString()}',
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }
             },
           ),
         ],

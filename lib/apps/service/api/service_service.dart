@@ -75,4 +75,74 @@ class ServicePublicService {
       rethrow;
     }
   }
+
+  Future<ScrollResponse<ServicePublicDTO>> getVeterinaryForScroll({
+    int? shopId,
+    String? search,
+    int? categoryId,
+    bool active = true,
+    double? minRating,
+    double? lat,
+    double? lng,
+    double? radiusKm,
+    int? perShopLimit,
+    int? cursor,
+    int size = 20,
+  }) async {
+    final queryParams = <String, String>{};
+
+    if (shopId != null) {
+      queryParams['shopId'] = shopId.toString();
+    }
+    if (search != null && search.isNotEmpty) {
+      queryParams['search'] = search;
+    }
+    if (categoryId != null) {
+      queryParams['categoryId'] = categoryId.toString();
+    }
+    queryParams['active'] = active.toString();
+
+    if (minRating != null) {
+      queryParams['minRating'] = minRating.toString();
+    }
+    if (lat != null) {
+      queryParams['lat'] = lat.toString();
+    }
+    if (lng != null) {
+      queryParams['lng'] = lng.toString();
+    }
+    if (radiusKm != null) {
+      queryParams['radiusKm'] = radiusKm.toString();
+    }
+    if (perShopLimit != null) {
+      queryParams['perShopLimit'] = perShopLimit.toString();
+    }
+    if (cursor != null) {
+      queryParams['cursor'] = cursor.toString();
+    }
+    queryParams['size'] = size.toString();
+
+    final uri = Uri.parse(
+      '${ApiConfig.baseUrl}/public/services/veterinary',
+    ).replace(queryParameters: queryParams);
+
+    try {
+      final response = await _client.get(
+        uri,
+        headers: const {'ngrok-skip-browser-warning': 'true'},
+      );
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body) as Map<String, dynamic>;
+        return ScrollResponse<ServicePublicDTO>.fromJson(
+          json,
+          (item) => ServicePublicDTO.fromJson(item),
+        );
+      } else {
+        throw Exception('Failed to load veterinary services: ${response.statusCode}');
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

@@ -31,6 +31,13 @@ class AppState extends ChangeNotifier {
   double? _serviceUserLng;
   double _serviceRadiusKm = 5;
 
+  // --- VETERINARY SERVICE DATA ---
+  List<ServicePublicDTO> _veterinaryServices = [];
+  bool _isLoadingVeterinary = false;
+  String? _veterinaryError;
+  int? _veterinaryCursor;
+  bool _hasMoreVeterinary = true;
+
   bool get hasMoreProducts => _hasMoreProducts;
 
   // --- MOCK DATA FOR OTHER FEATURES ---
@@ -134,6 +141,12 @@ class AppState extends ChangeNotifier {
   bool get isLoadingServices => _isLoadingServices;
   String? get servicesError => _servicesError;
   bool get hasMoreServices => _hasMoreServices;
+  
+  // Veterinary getters
+  List<ServicePublicDTO> get veterinaryServices => _veterinaryServices;
+  bool get isLoadingVeterinary => _isLoadingVeterinary;
+  String? get veterinaryError => _veterinaryError;
+  bool get hasMoreVeterinary => _hasMoreVeterinary;
   double? get serviceUserLat => _serviceUserLat;
   double? get serviceUserLng => _serviceUserLng;
   double get serviceRadiusKm => _serviceRadiusKm;
@@ -607,6 +620,67 @@ class AppState extends ChangeNotifier {
       // Keep existing services if API fails
     } finally {
       _isLoadingServices = false;
+      notifyListeners();
+    }
+  }
+
+  /// Load veterinary services from backend API (endpoint filters to VETERINARY)
+  Future<void> loadVeterinaryServices({
+    int? shopId,
+    String? search,
+    int? categoryId,
+    bool active = true,
+    double? minRating,
+    double? lat,
+    double? lng,
+    double? radiusKm,
+    int? perShopLimit = 5,
+    int? cursor,
+    int size = 20,
+  }) async {
+    if (_isLoadingVeterinary) return;
+
+    // Store last known user location
+    if (lat != null) {
+      _serviceUserLat = lat;
+    }
+    if (lng != null) {
+      _serviceUserLng = lng;
+    }
+
+    final effectiveLat = lat ?? _serviceUserLat;
+    final effectiveLng = lng ?? _serviceUserLng;
+    final effectiveRadiusKm = effectiveLat != null && effectiveLng != null
+        ? (radiusKm ?? _serviceRadiusKm)
+        : null;
+
+    _isLoadingVeterinary = true;
+    _veterinaryError = null;
+    notifyListeners();
+
+    try {
+      final response = await _servicePublicService.getVeterinaryForScroll(
+        shopId: shopId,
+        search: search,
+        categoryId: categoryId,
+        active: active,
+        minRating: minRating,
+        lat: effectiveLat,
+        lng: effectiveLng,
+        radiusKm: effectiveRadiusKm,
+        perShopLimit: perShopLimit,
+        cursor: cursor,
+        size: size,
+      );
+
+      _veterinaryServices = response.content;
+      _veterinaryCursor = response.nextCursor;
+      _hasMoreVeterinary = response.hasNext;
+      _veterinaryError = null;
+    } catch (e) {
+      _veterinaryError = 'Không thể tải dịch vụ thú y: $e';
+    } finally {
+      _isLoadingVeterinary = false;
       notifyListeners();
     }
   }
