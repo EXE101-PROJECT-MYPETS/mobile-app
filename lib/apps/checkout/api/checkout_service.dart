@@ -11,10 +11,29 @@ class CheckoutService {
   CheckoutService({ApiClient? client}) : _client = client ?? ApiClient.instance;
 
   Future<CheckoutResponseModel> checkout(CheckoutRequestModel request) async {
-    final uri = Uri.parse(ApiConfig.checkoutUrl);
+    final uri = Uri.parse(ApiConfig.ordersUrl);
+    
+    // Map CheckoutRequestModel to OrderDTO expected by backend
+    final payload = {
+      'shopId': request.shopId,
+      'userId': request.userId,
+      if (request.customerId != null) 'customerId': request.customerId,
+      'receiverName': request.receiverName,
+      'receiverPhone': request.receiverPhone,
+      'shippingAddress': request.shippingAddress,
+      'shippingFee': request.shippingFee,
+      'discountAmount': request.discountAmount,
+      if (request.note != null && request.note!.trim().isNotEmpty) 'note': request.note!.trim(),
+      'items': request.productOrders.map((item) => {
+        'productId': item.productId,
+        'qty': item.qty,
+        'unitPrice': item.unitPrice,
+      }).toList(),
+    };
+
     final response = await _client.post(
       uri,
-      body: jsonEncode(request.toJson()),
+      body: jsonEncode(payload),
     );
 
     final body = utf8.decode(response.bodyBytes);
