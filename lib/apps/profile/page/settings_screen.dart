@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
 import 'package:petpee_mobile/common/auth/page/login_screen.dart';
+import 'profile_addresses_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -83,7 +84,18 @@ class SettingsScreen extends StatelessWidget {
               _buildMenuCard([
                 _buildMenuItem('Tài khoản & Bảo mật', LucideIcons.shieldCheck),
                 const Divider(height: 1, indent: 48),
-                _buildMenuItem('Địa chỉ', LucideIcons.mapPin),
+                _buildMenuItem(
+                  'Địa chỉ',
+                  LucideIcons.mapPin,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProfileAddressesScreen(),
+                      ),
+                    );
+                  },
+                ),
                 const Divider(height: 1, indent: 48),
                 _buildMenuItem(
                   'Tài khoản / Thẻ ngân hàng',
@@ -191,7 +203,7 @@ class SettingsScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -206,6 +218,7 @@ class SettingsScreen extends StatelessWidget {
     IconData icon, {
     String? subtitle,
     bool isDestructive = false,
+    VoidCallback? onTap,
   }) {
     return ListTile(
       leading: Icon(
@@ -232,7 +245,7 @@ class SettingsScreen extends StatelessWidget {
         color: Colors.black26,
         size: 20,
       ),
-      onTap: () {},
+      onTap: onTap ?? () {},
     );
   }
 }

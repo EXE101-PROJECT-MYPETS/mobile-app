@@ -62,28 +62,19 @@ class UpdateProfileRequest {
     required this.email,
     required this.fullName,
     required this.phone,
-    this.address,
     this.age,
-    this.currentPassword,
-    this.newPassword,
     this.avatarUrlPreview,
   });
 
   final String email;
   final String fullName;
   final String phone;
-  final String? address;
   final int? age;
-  final String? currentPassword;
-  final String? newPassword;
   final XFile? avatarUrlPreview;
 
   Map<String, String> toMultipartFields() {
     final fields = {'email': email, 'fullName': fullName, 'phone': phone};
-    if (address != null) fields['address'] = address!;
     if (age != null) fields['age'] = age.toString();
-    if (currentPassword != null) fields['currentPassword'] = currentPassword!;
-    if (newPassword != null) fields['newPassword'] = newPassword!;
     return fields;
   }
 }

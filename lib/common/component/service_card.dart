@@ -188,12 +188,15 @@ class ServiceCard extends StatelessWidget {
   }
 
   bool _shouldShowDistanceBadge(double? distanceKm) {
-    return distanceKm != null && distanceKm < 15;
+    return distanceKm != null && distanceKm >= 0;
   }
 
   String _formatDistanceBadge(double distanceKm) {
     if (distanceKm < 1) {
       return '< 1 km';
+    }
+    if (distanceKm >= 100) {
+      return '${distanceKm.round()} km';
     }
     final value = distanceKm.toStringAsFixed(1);
     return '${value.endsWith('.0') ? value.substring(0, value.length - 2) : value} km';

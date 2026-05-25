@@ -5,6 +5,10 @@ class AddressModel {
   final String phone;
   final String location; // e.g. Tên đường, Số nhà
   final String region; // e.g. Xã..., Huyện..., Tỉnh...
+  final String province;
+  final String district;
+  final String ward;
+  final String hamlet;
   final bool isDefault;
   final String type; // e.g. 'Văn Phòng', 'Nhà Riêng'
 
@@ -15,6 +19,10 @@ class AddressModel {
     required this.phone,
     required this.location,
     required this.region,
+    this.province = '',
+    this.district = '',
+    this.ward = '',
+    this.hamlet = '',
     this.isDefault = false,
     this.type = 'Nhà Riêng',
   });
@@ -37,9 +45,26 @@ class AddressModel {
       phone: _readString(json['tel']),
       location: _readString(json['address']),
       region: regionParts.join(', '),
+      province: province,
+      district: district,
+      ward: ward,
+      hamlet: hamlet,
       isDefault: _readBool(json['isDefault']),
-      type: hamlet.isNotEmpty ? hamlet : 'Nha Rieng',
+      type: hamlet.isNotEmpty ? hamlet : 'Nhà Riêng',
     );
+  }
+
+  Map<String, dynamic> toApiJson() {
+    return {
+      'name': name,
+      'tel': phone,
+      'address': location,
+      'province': province,
+      'district': district,
+      'ward': ward,
+      'hamlet': hamlet,
+      'isDefault': isDefault,
+    };
   }
 
   static String _readString(dynamic value) {

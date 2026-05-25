@@ -17,8 +17,37 @@ import 'package:provider/provider.dart';
 import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
 import 'package:petpee_mobile/common/config/api_config.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  bool _requestedProfile = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadProfile();
+    });
+  }
+
+  Future<void> _loadProfile() async {
+    if (_requestedProfile || !mounted) return;
+    _requestedProfile = true;
+
+    final authProvider = context.read<AuthProvider>();
+    if (!_isLoggedIn(authProvider)) return;
+
+    try {
+      await authProvider.loadCurrentUserProfile();
+    } catch (_) {
+      // Giữ dữ liệu đang có trong Hive/login response nếu refresh profile lỗi.
+    }
+  }
 
   bool _isLoggedIn(AuthProvider authProvider) {
     return authProvider.currentUser != null &&
