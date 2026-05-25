@@ -9,6 +9,7 @@ import 'package:petpee_mobile/apps/profile/page/profile_screen.dart';
 import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
 import 'package:petpee_mobile/features/chat/models/ai_pet_health_models.dart';
 import 'package:petpee_mobile/features/chat/services/ai_pet_health_service.dart';
+import 'package:petpee_mobile/apps/cart/page/cart_screen.dart';
 
 class AiAssistantChatScreen extends StatefulWidget {
   const AiAssistantChatScreen({super.key, this.selectedPet, this.conversation});
@@ -150,7 +151,7 @@ class _AiAssistantChatScreenState extends State<AiAssistantChatScreen> {
     if (index == 0) {
       screen = const HomeScreen();
     } else if (index == 2) {
-      screen = const SpaServiceScreen();
+      screen = const CartScreen();
     } else if (index == 3) {
       screen = const NotificationsScreen();
     } else if (index == 4) {

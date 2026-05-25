@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:provider/provider.dart';
+import 'package:petpee_mobile/common/store/app_state.dart';
 
 class CommonBottomNavBar extends StatelessWidget {
   const CommonBottomNavBar({
@@ -14,6 +16,8 @@ class CommonBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cartItemCount = context.watch<AppState>().cartItems.length;
+
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       currentIndex: currentIndex,
@@ -37,9 +41,13 @@ class CommonBottomNavBar extends StatelessWidget {
           icon: Icon(LucideIcons.bot),
           label: 'Trợ lý AI',
         ),
-        const BottomNavigationBarItem(
-          icon: Icon(LucideIcons.clapperboard),
-          label: 'Live',
+        BottomNavigationBarItem(
+          icon: Badge(
+            isLabelVisible: cartItemCount > 0,
+            label: Text(cartItemCount.toString()),
+            child: const Icon(LucideIcons.shoppingCart),
+          ),
+          label: 'Giỏ hàng',
         ),
         const BottomNavigationBarItem(
           icon: Icon(LucideIcons.bell),

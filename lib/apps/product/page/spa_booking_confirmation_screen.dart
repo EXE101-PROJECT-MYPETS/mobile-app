@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:petpee_mobile/common/store/app_state.dart';
+import 'package:provider/provider.dart';
 import 'spa_booking_success_screen.dart';
 
 class SpaBookingConfirmationScreen extends StatefulWidget {
@@ -36,13 +38,14 @@ class _SpaBookingConfirmationScreenState
   ];
 
   final _times = ['10:00 AM', '11:30 AM', '1:00 PM', '3:30 PM'];
-  final _pets = ['Buddy (Chó)', 'Lucy (Mèo)'];
-
   @override
   Widget build(BuildContext context) {
     final package = _packages[widget.selectedPackage];
     final time = _times[widget.selectedTime];
-    final pet = _pets[widget.selectedPet];
+    final pets = context.watch<AppState>().myPets;
+    final pet = pets.isNotEmpty && widget.selectedPet < pets.length
+        ? pets[widget.selectedPet].name
+        : 'Chưa có thú cưng';
 
     // Tính tổng tiền
     int basePrice = package['price'] as int;

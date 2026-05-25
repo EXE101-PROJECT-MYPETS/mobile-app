@@ -301,10 +301,9 @@ class ProfileScreen extends StatelessWidget {
               ),
             );
           } else if (index == 2) {
-            Navigator.pushAndRemoveUntil(
+            Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const SpaServiceScreen()),
-              (route) => false,
+              MaterialPageRoute(builder: (context) => const CartScreen()),
             );
           } else if (index == 3) {
             Navigator.pushAndRemoveUntil(

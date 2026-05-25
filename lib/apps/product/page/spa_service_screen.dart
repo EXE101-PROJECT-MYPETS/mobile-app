@@ -7,8 +7,16 @@ import 'package:petpee_mobile/apps/profile/page/profile_screen.dart';
 import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
 import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
 import 'package:petpee_mobile/common/component/login_required_sheet.dart';
+import 'package:petpee_mobile/common/store/app_state.dart';
+import 'package:petpee_mobile/common/user/dto/service_public_dto.dart';
+import 'package:petpee_mobile/common/utils/external_url_launcher.dart';
+import 'package:petpee_mobile/common/utils/price_formatter.dart';
+import 'package:petpee_mobile/apps/profile/page/add_pet_screen.dart';
 import 'package:petpee_mobile/features/chat/screens/pet_ai_selection_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:petpee_mobile/apps/cart/model/cart_item_model.dart';
+import 'package:petpee_mobile/apps/checkout/page/checkout_screen.dart';
+import 'package:petpee_mobile/apps/cart/page/cart_screen.dart';
 import 'spa_booking_confirmation_screen.dart';
 
 class SpaServiceScreen extends StatefulWidget {
@@ -18,8 +26,10 @@ class SpaServiceScreen extends StatefulWidget {
     this.prefillKeyword,
     this.serviceType,
     this.preferredDateText,
+    this.service,
   });
 
+  final ServicePublicDTO? service;
   final int? petId;
   final String? prefillKeyword;
   final String? serviceType;
@@ -32,7 +42,7 @@ class SpaServiceScreen extends StatefulWidget {
 class _SpaServiceScreenState extends State<SpaServiceScreen> {
   int _selectedPackage = 0;
   int _selectedTime = 1;
-  int _selectedPet = 0;
+  int? _selectedPetId;
 
   // Lịch thực tế
   DateTime _currentMonth = DateTime(
@@ -46,6 +56,18 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
   void initState() {
     super.initState();
     _selectedPackage = _initialPackageIndex();
+    if (widget.service == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        final appState = context.read<AppState>();
+        await appState.loadMyPets();
+        if (!mounted) return;
+        if (appState.myPets.isNotEmpty) {
+          setState(() {
+            _selectedPetId ??= widget.petId ?? appState.myPets.first.id;
+          });
+        }
+      });
+    }
   }
 
   int _initialPackageIndex() {
@@ -63,6 +85,10 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.service != null) {
+      return _buildServiceLanding(context);
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -138,6 +164,11 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
                 builder: (context) => const PetAiSelectionScreen(),
               ),
             );
+          } else if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CartScreen()),
+            );
           } else if (index == 3) {
             Navigator.pushAndRemoveUntil(
               context,
@@ -163,6 +194,173 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
       (widget.prefillKeyword?.trim().isNotEmpty ?? false) ||
       (widget.serviceType?.trim().isNotEmpty ?? false) ||
       (widget.preferredDateText?.trim().isNotEmpty ?? false);
+
+  Widget _buildServiceLanding(BuildContext context) {
+    final service = widget.service!;
+    final shopName = service.shopName?.trim() ?? 'Thông tin shop';
+    final shopAddress = service.shopAddress?.trim();
+    final distanceText = service.distanceKm != null
+        ? '${service.distanceKm!.toStringAsFixed(1)} km'
+        : null;
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        title: Text(
+          'Thông tin spa',
+          style: GoogleFonts.inter(
+            color: const Color(0xFF111827),
+            fontWeight: FontWeight.w800,
+            fontSize: 18,
+          ),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          _SpaLandingCard(
+            title: 'Shop và vị trí',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  service.name ?? 'Dịch vụ spa',
+                  style: GoogleFonts.inter(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF111827),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  shopName,
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF334155),
+                  ),
+                ),
+                if (shopAddress != null && shopAddress.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    shopAddress,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: const Color(0xFF64748B),
+                      height: 1.35,
+                    ),
+                  ),
+                ],
+                if (distanceText != null) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    'Cách bạn: $distanceText',
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: const Color(0xFFE11D48),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      final lat = service.shopLat;
+                      final lng = service.shopLng;
+                      final Uri uri = lat != null && lng != null
+                          ? Uri.parse('google.navigation:q=$lat,$lng')
+                          : Uri.parse(
+                              'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(shopAddress ?? shopName)}',
+                            );
+                      await openExternalUrl(uri);
+                    },
+                    icon: const Icon(LucideIcons.mapPin, size: 18),
+                    label: const Text('Chỉ đường'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          _SpaLandingCard(
+            title: 'Dịch vụ đã chọn',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Bạn sẽ chọn ngày, giờ, thú cưng và hình thức nhận bé ở màn thanh toán tiếp theo.',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    color: const Color(0xFF64748B),
+                    height: 1.35,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Giá dịch vụ',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF111827),
+                      ),
+                    ),
+                    Text(
+                      PriceFormatter.formatVnd(service.basePrice ?? 0),
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFFE11D48),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: FilledButton(
+              onPressed: () {
+                final authProvider = context.read<AuthProvider>();
+                if (authProvider.currentUser == null) {
+                  showLoginRequiredSheet(context);
+                  return;
+                }
+
+                final appState = context.read<AppState>();
+                appState.prepareBuyNowService(service);
+                final selectedItems = List<CartItem>.from(appState.selectedCartItems);
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CheckoutScreen(selectedItems: selectedItems),
+                  ),
+                );
+              },
+              child: Text(
+                'Tiếp tục đặt lịch',
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildAiPrefillCard() {
     return Container(
@@ -496,56 +694,138 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
   }
 
   Widget _buildPetSelection() {
-    final pets = [
-      {'name': 'Buddy', 'image': 'https://picsum.photos/seed/dog2/200'},
-      {'name': 'Lucy', 'image': 'https://picsum.photos/seed/cat2/200'},
-    ];
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: List.generate(pets.length, (index) {
-          bool isSelected = _selectedPet == index;
-          return GestureDetector(
-            onTap: () => setState(() => _selectedPet = index),
-            child: Padding(
-              padding: const EdgeInsets.only(right: 16),
-              child: Column(
-                children: [
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: isSelected
-                            ? const Color(0xFFE91E63)
-                            : Colors.transparent,
-                        width: 2,
-                      ),
-                      image: DecorationImage(
-                        image: NetworkImage(pets[index]['image'] as String),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    pets[index]['name'] as String,
-                    style: TextStyle(
-                      fontWeight: isSelected
-                          ? FontWeight.bold
-                          : FontWeight.normal,
-                      color: isSelected
-                          ? const Color(0xFFE91E63)
-                          : Colors.black87,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
+    final appState = context.watch<AppState>();
+    final pets = appState.myPets;
+
+    if (appState.isLoadingPets && pets.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (pets.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Bạn chưa có thú cưng nào',
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF111827),
               ),
             ),
-          );
-        }),
+            const SizedBox(height: 6),
+            Text(
+              'Hãy thêm thú cưng để tiếp tục đặt lịch spa.',
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                color: const Color(0xFF64748B),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AddPetScreen(),
+                    ),
+                  );
+                  if (result == true && mounted) {
+                    await context.read<AppState>().loadMyPets();
+                  }
+                },
+                icon: const Icon(LucideIcons.plus, size: 18),
+                label: const Text('Thêm thú cưng'),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: List.generate(pets.length, (index) {
+                final pet = pets[index];
+                final isSelected = _selectedPetId == pet.id;
+                return GestureDetector(
+                  onTap: () => setState(() => _selectedPetId = pet.id),
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 16),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isSelected
+                                  ? const Color(0xFFE91E63)
+                                  : Colors.transparent,
+                              width: 2,
+                            ),
+                            image: DecorationImage(
+                              image: NetworkImage(
+                                pet.avatarUrl ?? 'https://picsum.photos/seed/pet${pet.id ?? index}/200',
+                              ),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          pet.name,
+                          style: TextStyle(
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                            color: isSelected
+                                ? const Color(0xFFE91E63)
+                                : Colors.black87,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AddPetScreen(),
+                  ),
+                );
+                if (result == true && mounted) {
+                  await context.read<AppState>().loadMyPets();
+                }
+              },
+              icon: const Icon(LucideIcons.plus, size: 18),
+              label: const Text('Thêm thú cưng'),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -570,14 +850,29 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
           );
           if (authProvider.currentUser == null) {
             _showAuthDialog(context);
+          } else if (widget.service != null) {
+            final appState = context.read<AppState>();
+            appState.prepareBuyNowService(widget.service!);
+            final selectedItems = List<CartItem>.from(appState.selectedCartItems);
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CheckoutScreen(selectedItems: selectedItems),
+              ),
+            );
           } else {
+            final appState = context.read<AppState>();
+            final selectedPetIndex = appState.myPets.indexWhere(
+              (pet) => pet.id == _selectedPetId,
+            );
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => SpaBookingConfirmationScreen(
                   selectedPackage: _selectedPackage,
                   selectedTime: _selectedTime,
-                  selectedPet: _selectedPet,
+                  selectedPet: selectedPetIndex >= 0 ? selectedPetIndex : 0,
                   selectedDate: _selectedDate,
                 ),
               ),
@@ -681,6 +976,48 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
             ),
             child: const Icon(LucideIcons.map, color: Colors.pink, size: 20),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SpaLandingCard extends StatelessWidget {
+  const _SpaLandingCard({required this.title, required this.child});
+
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF111827),
+            ),
+          ),
+          const SizedBox(height: 12),
+          child,
         ],
       ),
     );

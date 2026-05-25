@@ -25,4 +25,38 @@ class OrderService {
 
     throw Exception('Tạo đơn thất bại (${response.statusCode}): $body');
   }
+
+  Future<Map<String, dynamic>> getCustomerOrders({
+    String? status,
+    int? cursor,
+    int size = 10,
+    String? token,
+  }) async {
+    final queryParams = <String, String>{
+      'size': size.toString(),
+    };
+    if (status != null) {
+      queryParams['status'] = status;
+    }
+    if (cursor != null) {
+      queryParams['cursor'] = cursor.toString();
+    }
+
+    final uri = Uri.parse('${ApiConfig.ordersUrl}/customer')
+        .replace(queryParameters: queryParams);
+
+    final headers = <String, String>{};
+    if (token != null) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+
+    final response = await _client.get(uri, headers: headers);
+    final body = utf8.decode(response.bodyBytes);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      if (body.trim().isEmpty) return <String, dynamic>{};
+      return jsonDecode(body) as Map<String, dynamic>;
+    }
+    throw Exception('Lỗi lấy đơn hàng (${response.statusCode}): $body');
+  }
 }
