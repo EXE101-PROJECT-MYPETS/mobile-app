@@ -4,6 +4,7 @@ class PetDTO {
   final int? shopId;
   final int? customerId;
   final int? speciesId;
+  final String? speciesName;
   final int? breedId;
   final String? breedText;
   final String? avatarUrl;
@@ -21,6 +22,7 @@ class PetDTO {
     this.shopId,
     this.customerId,
     this.speciesId,
+    this.speciesName,
     this.breedId,
     this.breedText,
     this.avatarUrl,
@@ -40,6 +42,7 @@ class PetDTO {
       shopId: json['shopId'] as int?,
       customerId: json['customerId'] as int? ?? json['userId'] as int?,
       speciesId: json['speciesId'] as int?,
+      speciesName: _parseSpeciesName(json),
       breedId: json['breedId'] as int?,
       breedText: json['breedText'] as String?,
       avatarUrl: json['avatarUrl'] as String?,
@@ -64,6 +67,7 @@ class PetDTO {
       'shopId': shopId,
       'customerId': customerId,
       'speciesId': speciesId,
+      'speciesName': speciesName,
       'breedId': breedId,
       'breedText': breedText,
       'avatarUrl': avatarUrl,
@@ -86,5 +90,18 @@ class PetDTO {
     if (value == null) return null;
     if (value is num) return value.toDouble();
     return double.tryParse(value.toString());
+  }
+
+  static String? _parseSpeciesName(Map<String, dynamic> json) {
+    final direct = json['speciesName']?.toString().trim();
+    if (direct != null && direct.isNotEmpty) return direct;
+
+    final species = json['species'];
+    if (species is Map<String, dynamic>) {
+      final nested = species['name']?.toString().trim();
+      if (nested != null && nested.isNotEmpty) return nested;
+    }
+
+    return null;
   }
 }

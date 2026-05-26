@@ -141,7 +141,7 @@ class AppState extends ChangeNotifier {
   bool get isLoadingServices => _isLoadingServices;
   String? get servicesError => _servicesError;
   bool get hasMoreServices => _hasMoreServices;
-  
+
   // Veterinary getters
   List<ServicePublicDTO> get veterinaryServices => _veterinaryServices;
   bool get isLoadingVeterinary => _isLoadingVeterinary;

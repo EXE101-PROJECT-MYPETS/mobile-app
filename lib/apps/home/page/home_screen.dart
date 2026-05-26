@@ -6,9 +6,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:petpee_mobile/apps/home/page/notifications_screen.dart';
 import 'package:petpee_mobile/apps/home/page/map_screen.dart';
-import 'package:petpee_mobile/apps/product/page/product_list_screen.dart';
 import 'package:petpee_mobile/apps/product/page/spa_service_screen.dart';
 import 'package:petpee_mobile/apps/profile/page/profile_screen.dart';
+import 'package:petpee_mobile/features/chat/screens/pet_ai_selection_screen.dart';
 import 'package:petpee_mobile/features/chat/screens/chat_list_screen.dart';
 import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
 import 'package:petpee_mobile/apps/search/page/search_screen.dart';
@@ -137,7 +137,8 @@ class _HomeScreenState extends State<HomeScreen> {
           const SliverToBoxAdapter(child: _FeedHeader()),
           Consumer<AppState>(
             builder: (context, state, child) {
-              if (state.productsError != null && state.allProducts.length == 0) {
+              if (state.productsError != null &&
+                  state.allProducts.length == 0) {
                 return SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
@@ -208,7 +209,9 @@ class _HomeScreenState extends State<HomeScreen> {
           if (index == 1) {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => ProductListScreen()),
+              MaterialPageRoute(
+                builder: (context) => const PetAiSelectionScreen(),
+              ),
               (route) => false,
             );
           } else if (index == 2) {
@@ -711,7 +714,7 @@ class _FeedHeader extends StatelessWidget {
       child: Row(
         children: [
           Text(
-            'Dành cho bạn',
+            'Các sản phẩm dành cho bạn',
             style: GoogleFonts.inter(
               color: const Color(0xFF1F2937),
               fontSize: 16,
@@ -740,7 +743,7 @@ class _ServiceSection extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  'Dịch vụ nổi bật gần bạn',
+                  'Dịch vụ spa nổi bật gần bạn',
                   style: GoogleFonts.inter(
                     color: const Color(0xFF1F2937),
                     fontSize: 16,
@@ -857,7 +860,8 @@ class _VeterinarySection extends StatelessWidget {
           Consumer<AppState>(
             builder: (context, state, child) {
               try {
-                final vetList = state.veterinaryServices ?? <ServicePublicDTO>[];
+                final vetList =
+                    state.veterinaryServices ?? <ServicePublicDTO>[];
 
                 if (state.isLoadingVeterinary && vetList.length == 0) {
                   return const SizedBox(
@@ -882,7 +886,7 @@ class _VeterinarySection extends StatelessWidget {
                 if (vetList.length == 0) {
                   return const SizedBox(
                     height: 188,
-                    child: Center(child: Text('Chưa có dịch vụ thú y')), 
+                    child: Center(child: Text('Chưa có dịch vụ thú y')),
                   );
                 }
 
@@ -891,7 +895,9 @@ class _VeterinarySection extends StatelessWidget {
                     const horizontalPadding = 12.0;
                     const itemGap = 12.0;
                     final availableWidth =
-                        constraints.maxWidth - (horizontalPadding * 2) - itemGap;
+                        constraints.maxWidth -
+                        (horizontalPadding * 2) -
+                        itemGap;
                     final itemWidth = (availableWidth / 2).clamp(194.0, 204.0);
 
                     return SizedBox(

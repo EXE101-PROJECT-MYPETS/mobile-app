@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:petpee_mobile/apps/service/page/service_detail_screen.dart';
 import 'package:petpee_mobile/common/user/dto/service_public_dto.dart';
 import 'package:petpee_mobile/common/utils/price_formatter.dart';
 
@@ -29,7 +30,31 @@ class ServiceCard extends StatelessWidget {
         width: width,
         child: GestureDetector(
           onTap: () {
-            // TODO: Navigate to service detail page
+            final serviceId = service.id;
+            if (serviceId == null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Không tìm thấy mã dịch vụ')),
+              );
+              return;
+            }
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ServiceDetailScreen(
+                  serviceId: serviceId,
+                  name: service.name,
+                  image: service.imageUrl,
+                  price: service.basePrice,
+                  shopId: service.shopId,
+                  shopName: service.shopName,
+                  rating: service.rating,
+                  soldCount: service.ratingCount,
+                  address: service.shopAddress,
+                  distanceKm: service.distanceKm,
+                ),
+              ),
+            );
           },
           child: Container(
             decoration: BoxDecoration(

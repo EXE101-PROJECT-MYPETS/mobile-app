@@ -9,6 +9,25 @@ import 'profile_addresses_screen.dart';
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
+  bool _isLoggedIn(AuthProvider authProvider) {
+    return authProvider.currentUser != null &&
+        (authProvider.token?.trim().isNotEmpty ?? false);
+  }
+
+  void _openLoginRequiredScreen(
+    BuildContext context, {
+    required String title,
+    required String message,
+  }) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            _SettingsLoginRequiredScreen(title: title, message: message),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,7 +101,22 @@ class SettingsScreen extends StatelessWidget {
 
               _buildSectionHeader('Tài khoản của tôi'),
               _buildMenuCard([
-                _buildMenuItem('Tài khoản & Bảo mật', LucideIcons.shieldCheck),
+                _buildMenuItem(
+                  'Tài khoản & Bảo mật',
+                  LucideIcons.shieldCheck,
+                  onTap: () {
+                    final authProvider = context.read<AuthProvider>();
+                    if (!_isLoggedIn(authProvider)) {
+                      _openLoginRequiredScreen(
+                        context,
+                        title: 'Tài khoản & Bảo mật',
+                        message:
+                            'Vui lòng đăng nhập để xem tài khoản và bảo mật',
+                      );
+                      return;
+                    }
+                  },
+                ),
                 const Divider(height: 1, indent: 48),
                 _buildMenuItem(
                   'Địa chỉ',
@@ -246,6 +280,125 @@ class SettingsScreen extends StatelessWidget {
         size: 20,
       ),
       onTap: onTap ?? () {},
+    );
+  }
+}
+
+class _SettingsLoginRequiredScreen extends StatelessWidget {
+  const _SettingsLoginRequiredScreen({
+    required this.title,
+    required this.message,
+  });
+
+  final String title;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        centerTitle: true,
+        leading: IconButton(
+          tooltip: 'Quay lại',
+          icon: const Icon(LucideIcons.arrowLeft, color: Colors.black87),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          title,
+          style: GoogleFonts.inter(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 68,
+                height: 68,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFFE9DC),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  LucideIcons.alertCircle,
+                  color: Color(0xFFE76F51),
+                  size: 30,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  color: const Color(0xFF2E251F),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Đăng nhập để PetPee tải hồ sơ và đồng bộ thông tin tài khoản của bạn.',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  color: const Color(0xFF7B685B),
+                  fontSize: 13,
+                  height: 1.4,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 18),
+              SizedBox(
+                height: 48,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFFB7185), Color(0xFFE11D48)],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFE11D48).withValues(alpha: 0.22),
+                        blurRadius: 14,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: ElevatedButton.icon(
+                    onPressed: () => Navigator.pushNamed(context, '/login'),
+                    icon: const Icon(LucideIcons.logIn, size: 18),
+                    label: const Text('Đăng nhập'),
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      padding: const EdgeInsets.symmetric(horizontal: 22),
+                      textStyle: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

@@ -7,7 +7,7 @@ class ApiConfig {
     'API_BASE_URL',
     // Mặc định sử dụng IP nội bộ hiện tại của máy chạy backend.
     // Nếu dùng Android emulator, chạy app với --dart-define=API_BASE_URL="http://10.0.2.2:8080/api"
-    defaultValue: 'http://192.168.1.26:8080/api',
+    defaultValue: 'http://192.168.1.10:8080/api',
   );
 
   static const String authUrl = '$baseUrl/auth';
@@ -37,6 +37,9 @@ class ApiConfig {
   static const String productMobileUrl = '$productPublicUrl/mobile';
   static const String shopPublicUrl = '$baseUrl/public/shops';
   static const String shopMarkersUrl = '$shopPublicUrl/markers';
+  static String serviceDetailUrl(int id) => '$baseUrl/services/$id';
+  static String shopBookingsUrl(int shopId) =>
+      '$baseUrl/shops/$shopId/bookings';
 
   // Shipping endpoints
   static const String ghtkOrdersFeeUrl = '$baseUrl/ghtk/orders/fee';

@@ -1,14 +1,47 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:petpee_mobile/apps/service/model/booking_create_request.dart';
+import 'package:petpee_mobile/apps/service/model/service_detail_dto.dart';
+import 'package:petpee_mobile/common/config/api_client.dart';
 import 'package:petpee_mobile/common/config/api_config.dart';
 import 'package:petpee_mobile/common/user/dto/service_public_dto.dart';
 import 'package:petpee_mobile/common/user/dto/scroll_response.dart';
+
+class ServiceNotFoundException implements Exception {
+  const ServiceNotFoundException();
+
+  @override
+  String toString() => 'Không tìm thấy dịch vụ';
+}
 
 class ServicePublicService {
   final http.Client _client;
 
   ServicePublicService({http.Client? client})
     : _client = client ?? http.Client();
+
+  Future<ServiceDetailDTO> getDetail(int id) async {
+    final uri = Uri.parse(ApiConfig.serviceDetailUrl(id));
+
+    final response = await _client.get(
+      uri,
+      headers: const {'ngrok-skip-browser-warning': 'true'},
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(utf8.decode(response.bodyBytes));
+      if (json is Map<String, dynamic>) {
+        return ServiceDetailDTO.fromJson(json);
+      }
+      throw Exception('Dữ liệu chi tiết dịch vụ không hợp lệ');
+    }
+
+    if (response.statusCode == 404) {
+      throw const ServiceNotFoundException();
+    }
+
+    throw Exception('Không thể tải chi tiết dịch vụ (${response.statusCode})');
+  }
 
   Future<ScrollResponse<ServicePublicDTO>> getAllForScroll({
     int? shopId,
@@ -139,10 +172,47 @@ class ServicePublicService {
           (item) => ServicePublicDTO.fromJson(item),
         );
       } else {
-        throw Exception('Failed to load veterinary services: ${response.statusCode}');
+        throw Exception(
+          'Failed to load veterinary services: ${response.statusCode}',
+        );
       }
     } catch (e) {
       rethrow;
     }
+  }
+}
+
+class ServiceBookingService {
+  ServiceBookingService({ApiClient? client})
+    : _client = client ?? ApiClient.instance;
+
+  final ApiClient _client;
+
+  Future<void> createBooking({
+    required int shopId,
+    required BookingCreateRequest request,
+  }) async {
+    final uri = Uri.parse(ApiConfig.shopBookingsUrl(shopId));
+    final response = await _client.post(
+      uri,
+      includeContextHeaders: false,
+      body: jsonEncode(request.toJson()),
+    );
+
+    if (response.statusCode == 200 ||
+        response.statusCode == 201 ||
+        response.statusCode == 204) {
+      return;
+    }
+
+    if (response.statusCode == 401 || response.statusCode == 403) {
+      throw Exception('Vui lòng đăng nhập để đặt lịch');
+    }
+
+    if (response.statusCode == 400) {
+      throw Exception('Thông tin đặt lịch chưa hợp lệ');
+    }
+
+    throw Exception('Không thể tạo lịch hẹn (${response.statusCode})');
   }
 }
