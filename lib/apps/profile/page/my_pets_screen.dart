@@ -41,6 +41,11 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
   }
 
   Future<List<PetModel>> _loadPets() async {
+    final token = _authProvider.token;
+    if (token == null || token.isEmpty) {
+      throw const PetAuthRequiredException();
+    }
+
     try {
       final dtos = await _petService.getAll();
       return dtos.map((dto) => PetModel.fromDTO(dto)).toList();
@@ -61,13 +66,6 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
         }
       }
 
-      if (mounted) {
-        showAppToast(
-          context,
-          message: 'Lỗi tải thú cưng: $e',
-          type: AppToastType.error,
-        );
-      }
       rethrow;
     }
   }
@@ -89,6 +87,13 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
       message: 'Xóa thú cưng thành công',
       type: AppToastType.success,
     );
+  }
+
+  void _retryLoadPets() {
+    final future = _loadPets();
+    setState(() {
+      _petsFuture = future;
+    });
   }
 
   @override
@@ -126,30 +131,11 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
           }
 
           if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    LucideIcons.alertCircle,
-                    size: 48,
-                    color: Colors.grey,
-                  ),
-                  const SizedBox(height: 16),
-                  Text('Lỗi: ${snapshot.error}', textAlign: TextAlign.center),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      final future = _loadPets();
-                      setState(() {
-                        _petsFuture = future;
-                      });
-                    },
-                    child: const Text('Thử lại'),
-                  ),
-                ],
-              ),
-            );
+            final error = snapshot.error;
+            if (_isAuthError(error)) {
+              return const _PetLoginRequiredState();
+            }
+            return _PetLoadErrorState(error: error, onRetry: _retryLoadPets);
           }
 
           final pets = snapshot.data ?? [];
@@ -451,6 +437,190 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
                 fontSize: 10,
                 color: textColor,
                 fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  bool _isAuthError(Object? error) {
+    if (error is PetAuthRequiredException) return true;
+    final message = error.toString();
+    return message.contains('401') || message.contains('Unauthorized');
+  }
+}
+
+class PetAuthRequiredException implements Exception {
+  const PetAuthRequiredException();
+
+  @override
+  String toString() => 'Cần đăng nhập để xem danh sách thú cưng';
+}
+
+class _PetLoadErrorState extends StatelessWidget {
+  const _PetLoadErrorState({required this.error, required this.onRetry});
+
+  final Object? error;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final message = error.toString().replaceFirst('Exception: ', '');
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 68,
+              height: 68,
+              decoration: const BoxDecoration(
+                color: Color(0xFFFFE9DC),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                LucideIcons.alertTriangle,
+                color: Color(0xFFE76F51),
+                size: 30,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Không thể tải danh sách thú cưng',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                color: const Color(0xFF2E251F),
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              maxLines: 4,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.inter(
+                color: const Color(0xFF7B685B),
+                fontSize: 13,
+                height: 1.4,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 18),
+            SizedBox(
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: onRetry,
+                icon: const Icon(LucideIcons.refreshCw, size: 18),
+                label: const Text('Thử lại'),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: const Color(0xFFE11D48),
+                  padding: const EdgeInsets.symmetric(horizontal: 22),
+                  textStyle: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PetLoginRequiredState extends StatelessWidget {
+  const _PetLoginRequiredState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 68,
+              height: 68,
+              decoration: const BoxDecoration(
+                color: Color(0xFFFFE9DC),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                LucideIcons.alertCircle,
+                color: Color(0xFFE76F51),
+                size: 30,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Vui lòng đăng nhập để xem danh sách thú cưng',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                color: const Color(0xFF2E251F),
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Đăng nhập để PetPee tải hồ sơ thú cưng và đồng bộ dữ liệu của bạn.',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                color: const Color(0xFF7B685B),
+                fontSize: 13,
+                height: 1.4,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 18),
+            SizedBox(
+              height: 48,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFFB7185), Color(0xFFE11D48)],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFE11D48).withValues(alpha: 0.22),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: ElevatedButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, '/login'),
+                  icon: const Icon(LucideIcons.logIn, size: 18),
+                  label: const Text('Đăng nhập'),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    padding: const EdgeInsets.symmetric(horizontal: 22),
+                    textStyle: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                ),
               ),
             ),
           ],

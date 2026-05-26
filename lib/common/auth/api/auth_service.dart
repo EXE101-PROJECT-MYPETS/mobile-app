@@ -115,6 +115,23 @@ class AuthService {
     throw Exception(_extractErrorMessage(body, 'Đăng ký thất bại'));
   }
 
+  Future<UserModel> getCurrentUserProfile({required String accessToken}) async {
+    final response = await http.get(
+      Uri.parse(ApiConfig.currentUserProfileUrl),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'ngrok-skip-browser-warning': 'true',
+      },
+    );
+
+    final body = _decodeResponse(response);
+    if (_isSuccess(response.statusCode)) {
+      return UserModel.fromJson(body);
+    }
+
+    throw Exception(_extractErrorMessage(body, 'Tải hồ sơ thất bại'));
+  }
+
   Future<UserModel> updateCurrentUserProfile({
     required UpdateProfileRequest updateRequest,
     required String accessToken,

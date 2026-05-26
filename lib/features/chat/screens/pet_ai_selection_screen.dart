@@ -37,12 +37,6 @@ class _PetAiSelectionScreenState extends State<PetAiSelectionScreen> {
     return dtos.map(PetModel.fromDTO).toList();
   }
 
-  void _retryLoadPets() {
-    setState(() {
-      _petsFuture = _loadPets();
-    });
-  }
-
   Future<void> _openChat(PetModel pet) async {
     final petId = pet.id;
     if (petId == null || _openingPetId != null) return;
@@ -172,7 +166,7 @@ class _PetAiSelectionScreenState extends State<PetAiSelectionScreen> {
             }
 
             if (snapshot.hasError) {
-              return _PetLoadErrorState(onRetry: _retryLoadPets);
+              return const _PetLoadErrorState();
             }
 
             if (pets.isEmpty) {
@@ -497,9 +491,7 @@ class _QuestionChip extends StatelessWidget {
 }
 
 class _PetLoadErrorState extends StatelessWidget {
-  const _PetLoadErrorState({required this.onRetry});
-
-  final VoidCallback onRetry;
+  const _PetLoadErrorState();
 
   @override
   Widget build(BuildContext context) {
@@ -524,7 +516,7 @@ class _PetLoadErrorState extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Không thể tải danh sách thú cưng',
+              'Vui lòng đăng nhập để xem danh sách thú cưng',
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 color: const Color(0xFF2E251F),
@@ -534,7 +526,7 @@ class _PetLoadErrorState extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Vui lòng kiểm tra đăng nhập và thử lại.',
+              'Đăng nhập để PetPee AI tải hồ sơ thú cưng và tư vấn chính xác hơn.',
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 color: const Color(0xFF7B685B),
@@ -544,24 +536,43 @@ class _PetLoadErrorState extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 18),
-            OutlinedButton(
-              onPressed: onRetry,
-              style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFFE76F51),
-                side: const BorderSide(color: Color(0xFFFFC6A6)),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 22,
-                  vertical: 12,
-                ),
-                textStyle: GoogleFonts.inter(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
-                ),
-                shape: RoundedRectangleBorder(
+            SizedBox(
+              height: 48,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFFB7185), Color(0xFFE11D48)],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
                   borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFE11D48).withValues(alpha: 0.22),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: ElevatedButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, '/login'),
+                  icon: const Icon(LucideIcons.logIn, size: 18),
+                  label: const Text('Đăng nhập'),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    padding: const EdgeInsets.symmetric(horizontal: 22),
+                    textStyle: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
                 ),
               ),
-              child: const Text('Thử lại'),
             ),
           ],
         ),

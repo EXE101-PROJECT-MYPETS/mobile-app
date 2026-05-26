@@ -23,16 +23,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late final TextEditingController _emailController;
   late final TextEditingController _fullNameController;
   late final TextEditingController _phoneController;
-  late final TextEditingController _addressController;
   late final TextEditingController _ageController;
-  late final TextEditingController _currentPasswordController;
-  late final TextEditingController _newPasswordController;
-  late final TextEditingController _confirmPasswordController;
 
   XFile? _newAvatar;
-  bool _obscureCurrentPassword = true;
-  bool _obscureNewPassword = true;
-  bool _obscureConfirmPassword = true;
 
   @override
   void initState() {
@@ -41,11 +34,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _emailController = TextEditingController(text: user?.email ?? '');
     _fullNameController = TextEditingController(text: user?.fullName ?? '');
     _phoneController = TextEditingController(text: user?.phone ?? '');
-    _addressController = TextEditingController(text: user?.address ?? '');
     _ageController = TextEditingController(text: user?.age?.toString() ?? '');
-    _currentPasswordController = TextEditingController();
-    _newPasswordController = TextEditingController();
-    _confirmPasswordController = TextEditingController();
   }
 
   @override
@@ -53,11 +42,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _emailController.dispose();
     _fullNameController.dispose();
     _phoneController.dispose();
-    _addressController.dispose();
     _ageController.dispose();
-    _currentPasswordController.dispose();
-    _newPasswordController.dispose();
-    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -118,19 +103,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     FocusScope.of(context).unfocus();
     final authProvider = context.read<AuthProvider>();
     final ageText = _ageController.text.trim();
-    final passwordChanged = _hasPasswordInput;
 
     try {
       await authProvider.updateProfile(
         email: _emailController.text.trim(),
         fullName: _fullNameController.text.trim(),
         phone: _phoneController.text.trim(),
-        address: _emptyToNull(_addressController.text),
         age: ageText.isEmpty ? null : int.parse(ageText),
-        currentPassword: passwordChanged
-            ? _currentPasswordController.text
-            : null,
-        newPassword: passwordChanged ? _newPasswordController.text : null,
         avatar: _newAvatar,
       );
 
@@ -145,17 +124,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (!mounted) return;
       showAppToast(context, message: _formatError(e), type: AppToastType.error);
     }
-  }
-
-  bool get _hasPasswordInput {
-    return _currentPasswordController.text.isNotEmpty ||
-        _newPasswordController.text.isNotEmpty ||
-        _confirmPasswordController.text.isNotEmpty;
-  }
-
-  String? _emptyToNull(String value) {
-    final trimmed = value.trim();
-    return trimmed.isEmpty ? null : trimmed;
   }
 
   String _formatError(Object error) {
@@ -236,68 +204,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.next,
                 validator: _validateAge,
-              ),
-              const SizedBox(height: 16),
-              _buildTextField(
-                label: 'Địa chỉ',
-                controller: _addressController,
-                icon: LucideIcons.mapPin,
-                keyboardType: TextInputType.streetAddress,
-                textInputAction: TextInputAction.next,
-                maxLines: 2,
-              ),
-              const SizedBox(height: 28),
-              _buildSectionTitle('Đổi mật khẩu'),
-              const SizedBox(height: 16),
-              _buildTextField(
-                label: 'Mật khẩu hiện tại',
-                controller: _currentPasswordController,
-                icon: LucideIcons.lock,
-                obscureText: _obscureCurrentPassword,
-                textInputAction: TextInputAction.next,
-                validator: _validateCurrentPassword,
-                suffixIcon: _buildPasswordToggle(
-                  isObscured: _obscureCurrentPassword,
-                  onPressed: () {
-                    setState(() {
-                      _obscureCurrentPassword = !_obscureCurrentPassword;
-                    });
-                  },
-                ),
-              ),
-              const SizedBox(height: 16),
-              _buildTextField(
-                label: 'Mật khẩu mới',
-                controller: _newPasswordController,
-                icon: LucideIcons.keyRound,
-                obscureText: _obscureNewPassword,
-                textInputAction: TextInputAction.next,
-                validator: _validateNewPassword,
-                suffixIcon: _buildPasswordToggle(
-                  isObscured: _obscureNewPassword,
-                  onPressed: () {
-                    setState(() {
-                      _obscureNewPassword = !_obscureNewPassword;
-                    });
-                  },
-                ),
-              ),
-              const SizedBox(height: 16),
-              _buildTextField(
-                label: 'Nhập lại mật khẩu mới',
-                controller: _confirmPasswordController,
-                icon: LucideIcons.shieldCheck,
-                obscureText: _obscureConfirmPassword,
-                textInputAction: TextInputAction.done,
-                validator: _validateConfirmPassword,
-                suffixIcon: _buildPasswordToggle(
-                  isObscured: _obscureConfirmPassword,
-                  onPressed: () {
-                    setState(() {
-                      _obscureConfirmPassword = !_obscureConfirmPassword;
-                    });
-                  },
-                ),
               ),
               const SizedBox(height: 32),
               SizedBox(
@@ -468,21 +374,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildPasswordToggle({
-    required bool isObscured,
-    required VoidCallback onPressed,
-  }) {
-    return IconButton(
-      tooltip: isObscured ? 'Hiện mật khẩu' : 'Ẩn mật khẩu',
-      onPressed: onPressed,
-      icon: Icon(
-        isObscured ? LucideIcons.eye : LucideIcons.eyeOff,
-        color: const Color(0xFF64748B),
-        size: 18,
-      ),
-    );
-  }
-
   String? _validateRequired(String? value, String label) {
     if (value == null || value.trim().isEmpty) {
       return '$label không được để trống';
@@ -507,39 +398,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final age = int.tryParse(ageText);
     if (age == null) return 'Tuổi phải là số';
     if (age < 0 || age > 150) return 'Tuổi phải từ 0 đến 150';
-    return null;
-  }
-
-  String? _validateCurrentPassword(String? value) {
-    if (!_hasPasswordInput) return null;
-    if (value == null || value.isEmpty) {
-      return 'Mật khẩu hiện tại không được để trống';
-    }
-    if (value.length < 6 || value.length > 32) {
-      return 'Mật khẩu hiện tại phải có từ 6 đến 32 ký tự';
-    }
-    return null;
-  }
-
-  String? _validateNewPassword(String? value) {
-    if (!_hasPasswordInput) return null;
-    if (value == null || value.isEmpty) {
-      return 'Mật khẩu mới không được để trống';
-    }
-    if (value.length < 6 || value.length > 32) {
-      return 'Mật khẩu mới phải có từ 6 đến 32 ký tự';
-    }
-    return null;
-  }
-
-  String? _validateConfirmPassword(String? value) {
-    if (!_hasPasswordInput) return null;
-    if (value == null || value.isEmpty) {
-      return 'Vui lòng nhập lại mật khẩu mới';
-    }
-    if (value != _newPasswordController.text) {
-      return 'Mật khẩu mới không khớp';
-    }
     return null;
   }
 }

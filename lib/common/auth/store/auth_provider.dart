@@ -162,10 +162,7 @@ class AuthProvider extends ChangeNotifier {
     required String email,
     required String fullName,
     required String phone,
-    String? address,
     int? age,
-    String? currentPassword,
-    String? newPassword,
     XFile? avatar,
   }) async {
     final accessToken = _token;
@@ -185,10 +182,7 @@ class AuthProvider extends ChangeNotifier {
           email: email,
           fullName: fullName,
           phone: phone,
-          address: address,
           age: age,
-          currentPassword: currentPassword,
-          newPassword: newPassword,
           avatarUrlPreview: avatar,
         ),
       );
@@ -202,6 +196,27 @@ class AuthProvider extends ChangeNotifier {
       }
 
       return _currentUser ?? updatedUser;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<UserModel> loadCurrentUserProfile() async {
+    final accessToken = _token;
+    if (accessToken == null || accessToken.isEmpty) {
+      throw Exception('Cần đăng nhập để tải thông tin cá nhân');
+    }
+
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      final user = await _authService.getCurrentUserProfile(
+        accessToken: accessToken,
+      );
+      await _saveCurrentUser(user);
+      return user;
     } finally {
       _isLoading = false;
       notifyListeners();

@@ -30,12 +30,20 @@ class ServiceCard extends StatelessWidget {
         width: width,
         child: GestureDetector(
           onTap: () {
+            final serviceId = service.id;
+            if (serviceId == null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Không tìm thấy mã dịch vụ')),
+              );
+              return;
+            }
+
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => ServiceDetailScreen(
-                  serviceId: service.id ?? 0,
-                  name: service.name ?? 'Dịch vụ',
+                  serviceId: serviceId,
+                  name: service.name,
                   image: service.imageUrl,
                   price: service.basePrice,
                   shopId: service.shopId,
@@ -205,12 +213,15 @@ class ServiceCard extends StatelessWidget {
   }
 
   bool _shouldShowDistanceBadge(double? distanceKm) {
-    return distanceKm != null && distanceKm < 15;
+    return distanceKm != null && distanceKm >= 0;
   }
 
   String _formatDistanceBadge(double distanceKm) {
     if (distanceKm < 1) {
       return '< 1 km';
+    }
+    if (distanceKm >= 100) {
+      return '${distanceKm.round()} km';
     }
     final value = distanceKm.toStringAsFixed(1);
     return '${value.endsWith('.0') ? value.substring(0, value.length - 2) : value} km';

@@ -45,7 +45,9 @@ class PetService {
     } else if (response.statusCode == 400) {
       throw Exception('Bad Request: ${response.body}');
     } else {
-      throw Exception('Failed to load pets: ${response.statusCode}');
+      throw Exception(
+        'Không thể tải thú cưng (${response.statusCode}): ${response.body}',
+      );
     }
   }
 
@@ -60,7 +62,9 @@ class PetService {
     } else if (response.statusCode == 404) {
       throw Exception('Pet không tìm thấy');
     } else {
-      throw Exception('Failed to load pet: ${response.statusCode}');
+      throw Exception(
+        'Không thể tải thú cưng (${response.statusCode}): ${response.body}',
+      );
     }
   }
 
@@ -112,6 +116,11 @@ class PetService {
   Future<void> delete(int petId) async {
     final uri = Uri.parse('${ApiConfig.baseUrl}/pets/my/$petId');
     final request = http.Request('DELETE', uri);
+    final token = _client.token;
+    if (token != null && token.isNotEmpty) {
+      request.headers['Authorization'] = 'Bearer $token';
+    }
+    request.headers['ngrok-skip-browser-warning'] = 'true';
     final streamedResponse = await request.send();
     final response = await http.Response.fromStream(streamedResponse);
 
