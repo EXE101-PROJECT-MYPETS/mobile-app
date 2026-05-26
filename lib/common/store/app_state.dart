@@ -6,6 +6,7 @@ import 'package:petpee_mobile/apps/product/api/product_service.dart';
 import 'package:petpee_mobile/apps/service/api/service_service.dart';
 import 'package:petpee_mobile/common/user/dto/service_public_dto.dart';
 import 'package:petpee_mobile/apps/cart/model/cart_item_model.dart';
+import 'package:petpee_mobile/apps/profile/api/pet_service.dart';
 import 'package:petpee_mobile/apps/profile/model/pet_model.dart';
 import 'package:petpee_mobile/apps/checkout/model/address_model.dart';
 
@@ -13,6 +14,7 @@ class AppState extends ChangeNotifier {
   final ProductService _productService = ProductService();
   final ServicePublicService _servicePublicService = ServicePublicService();
   final AddressService _addressService = AddressService();
+  final PetService _petService = PetService();
 
   // --- REAL PRODUCT DATA ---
   List<ProductModel> _allProducts = [];
@@ -46,78 +48,14 @@ class AppState extends ChangeNotifier {
   List<String> _viewedProductIds = [];
   final Map<String, ProductModel> _viewedProductCache = {};
 
-  // --- MOCK CART DATA ---
-  final List<CartItemModel> _cartItems = [
-    CartItemModel(
-      id: 'c1',
-      product: ProductModel(
-        id: 'c1_p',
-        name: 'Gói spa cơ bản cho mèo',
-        price: '199.000đ',
-        rating: 4.8,
-        reviews: 10,
-        image: 'https://picsum.photos/seed/cart1/200',
-        type: 'spa',
-        category: 'Spa',
-      ),
-      shopName: 'PETPEEs Mall',
-      quantity: 1,
-    ),
-    CartItemModel(
-      id: 'c2',
-      product: ProductModel(
-        id: 'c2_p',
-        name: 'Gói spa cao cấp cho chó',
-        price: '349.000đ',
-        rating: 4.9,
-        reviews: 20,
-        image: 'https://picsum.photos/seed/cart2/200',
-        type: 'spa',
-        category: 'Spa',
-      ),
-      shopName: 'Spa House Official',
-      quantity: 2,
-    ),
-    CartItemModel(
-      id: 'c3',
-      product: ProductModel(
-        id: 'c3_p',
-        name: 'Khám tổng quát cho chó',
-        price: '259.000đ',
-        rating: 4.7,
-        reviews: 5,
-        image: 'https://picsum.photos/seed/cart3/200',
-        type: 'thu_y',
-        category: 'Thú y',
-      ),
-      shopName: 'Doggo Planet',
-      quantity: 3,
-    ),
-  ];
+  // --- CART DATA ---
+  List<CartItemModel> _cartItems = [];
+  int? _currentUserId;
 
   // --- MOCK PET DATA ---
-  final List<PetModel> _myPets = [
-    PetModel(
-      id: 1,
-      name: 'Bông',
-      speciesId: 1,
-      breedText: 'Golden Retriever',
-      gender: 'Đực',
-      dob: DateTime(2019, 7, 15),
-      note: 'Đã tiêm phòng đầy đủ',
-      avatarUrl: 'https://picsum.photos/seed/pet1/200',
-    ),
-    PetModel(
-      id: 2,
-      name: 'Nấm',
-      speciesId: 2,
-      breedText: 'Anh lông ngắn',
-      gender: 'Cái',
-      dob: DateTime(2021, 4, 10),
-      note: 'Ưa thích thức ăn hạt mềm',
-      avatarUrl: 'https://picsum.photos/seed/pet2/200',
-    ),
-  ];
+  final List<PetModel> _myPets = [];
+  bool _isLoadingPets = false;
+  String? _petsError;
 
   // --- ADDRESS DATA ---
   List<AddressModel> _addresses = [];
@@ -132,6 +70,8 @@ class AppState extends ChangeNotifier {
   Set<String> get likedProductIds => _likedProductIds;
   List<CartItemModel> get cartItems => _cartItems;
   List<PetModel> get myPets => _myPets;
+  bool get isLoadingPets => _isLoadingPets;
+  String? get petsError => _petsError;
   List<AddressModel> get addresses => _addresses;
   bool get isLoadingAddresses => _isLoadingAddresses;
   String? get addressesError => _addressesError;
@@ -150,6 +90,7 @@ class AppState extends ChangeNotifier {
   double? get serviceUserLat => _serviceUserLat;
   double? get serviceUserLng => _serviceUserLng;
   double get serviceRadiusKm => _serviceRadiusKm;
+  int? get currentUserId => _currentUserId;
   AddressModel? get defaultAddress {
     try {
       return _addresses.firstWhere((a) => a.isDefault);
@@ -189,7 +130,26 @@ class AppState extends ChangeNotifier {
       }
       notifyListeners();
     } catch (e) {
-      print('Error loading recently viewed products: $e');
+      debugPrint('Error loading recently viewed products: $e');
+    }
+  }
+
+  Future<void> loadMyPets() async {
+    _isLoadingPets = true;
+    _petsError = null;
+    notifyListeners();
+
+    try {
+      final petDtos = await _petService.getAll();
+      _myPets
+        ..clear()
+        ..addAll(petDtos.map(PetModel.fromDTO));
+      _petsError = null;
+    } catch (error) {
+      _petsError = error.toString();
+    } finally {
+      _isLoadingPets = false;
+      notifyListeners();
     }
   }
 
@@ -422,9 +382,33 @@ class AppState extends ChangeNotifier {
 
   // --- CART ACTIONS ---
 
+  Future<void> loadUserCart(int? userId) async {
+    _currentUserId = userId;
+    final box = await Hive.openBox('user_preferences');
+    final cartKey = 'cart_${_currentUserId ?? "guest"}';
+    final savedCart = box.get(cartKey);
+
+    if (savedCart is List) {
+      _cartItems = savedCart.map((item) {
+        return CartItemModel.fromMap(Map<String, dynamic>.from(item as Map));
+      }).toList();
+    } else {
+      _cartItems = [];
+    }
+    notifyListeners();
+  }
+
+  Future<void> _saveUserCart() async {
+    final box = await Hive.openBox('user_preferences');
+    final cartKey = 'cart_${_currentUserId ?? "guest"}';
+    final cartData = _cartItems.map((item) => item.toMap()).toList();
+    await box.put(cartKey, cartData);
+  }
+
   void toggleCartSelection(String id, bool? value) {
     final item = _cartItems.firstWhere((i) => i.id == id);
     item.isSelected = value ?? false;
+    _saveUserCart();
     notifyListeners();
   }
 
@@ -437,75 +421,202 @@ class AppState extends ChangeNotifier {
 
   void updateCartQuantity(String id, int delta) {
     final item = _cartItems.firstWhere((i) => i.id == id);
+    if (item.isService) return;
     if (item.quantity + delta > 0) {
       item.quantity += delta;
+      _saveUserCart();
       notifyListeners();
     }
   }
 
   void removeFromCart(String id) {
     _cartItems.removeWhere((i) => i.id == id);
+    _saveUserCart();
     notifyListeners();
   }
 
-  void addToCart(ProductModel product, String shopName, [int quantity = 1]) {
+  void addToCart(
+    ProductModel product,
+    String shopName, {
+    int? shopId,
+    int quantity = 1,
+  }) {
     final index = _cartItems.indexWhere(
-      (i) => i.product.id == product.id && i.shopName == shopName,
+      (i) => !i.isService && i.productId == _parseId(product.id) && i.shopName == shopName,
     );
     if (index >= 0) {
       _cartItems[index].quantity += quantity;
     } else {
       _cartItems.add(
-        CartItemModel(
+        CartItemModel.product(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
-          product: product,
+          shopId: shopId ?? 0,
           shopName: shopName,
+          productId: _parseId(product.id) ?? DateTime.now().millisecondsSinceEpoch,
+          name: product.name,
+          imageUrl: product.image,
+          unitPrice: _parsePrice(product.price),
           quantity: quantity,
+          isSelected: true,
+          description: product.description,
         ),
       );
     }
+    _saveUserCart();
+    notifyListeners();
+  }
+
+  void addServiceToCart(
+    ServicePublicDTO service,
+    {int quantity = 1}
+  ) {
+    final serviceId = service.id ?? DateTime.now().millisecondsSinceEpoch;
+    final index = _cartItems.indexWhere(
+      (item) => item.isService && item.serviceId == serviceId,
+    );
+
+    if (index >= 0) {
+      _cartItems[index].quantity += quantity;
+    } else {
+      _cartItems.add(
+        CartItemModel.service(
+          id: 'service-$serviceId-${DateTime.now().millisecondsSinceEpoch}',
+          shopId: service.shopId ?? 0,
+          shopName: service.shopName ?? 'Cửa hàng',
+          serviceId: serviceId,
+          name: service.name ?? 'Dịch vụ spa',
+          imageUrl: service.imageUrl ?? '',
+          unitPrice: service.basePrice ?? 0,
+          durationMin: service.durationMin ?? 0,
+          quantity: quantity,
+          isSelected: true,
+          description: service.shopAddress,
+        ),
+      );
+    }
+
+    _saveUserCart();
     notifyListeners();
   }
 
   void prepareBuyNow(
     ProductModel product,
-    String shopName, [
+    String shopName, {
+    int? shopId,
     int quantity = 1,
-  ]) {
+  }) {
     for (final item in _cartItems) {
       item.isSelected = false;
     }
 
     final index = _cartItems.indexWhere(
-      (i) => i.product.id == product.id && i.shopName == shopName,
+      (i) => !i.isService && i.productId == _parseId(product.id) && i.shopName == shopName,
     );
     if (index >= 0) {
       _cartItems[index].quantity = quantity;
       _cartItems[index].isSelected = true;
     } else {
       _cartItems.add(
-        CartItemModel(
+        CartItemModel.product(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
-          product: product,
+          shopId: shopId ?? 0,
           shopName: shopName,
+          productId: _parseId(product.id) ?? DateTime.now().millisecondsSinceEpoch,
+          name: product.name,
+          imageUrl: product.image,
+          unitPrice: _parsePrice(product.price),
           quantity: quantity,
           isSelected: true,
+          description: product.description,
         ),
       );
     }
 
+    _saveUserCart();
+    notifyListeners();
+  }
+
+  void prepareBuyNowService(
+    ServicePublicDTO service, {
+    int quantity = 1,
+  }) {
+    for (final item in _cartItems) {
+      item.isSelected = false;
+    }
+
+    final serviceId = service.id ?? DateTime.now().millisecondsSinceEpoch;
+    final index = _cartItems.indexWhere(
+      (item) => item.isService && item.serviceId == serviceId,
+    );
+
+    if (index >= 0) {
+      _cartItems[index].quantity = quantity;
+      _cartItems[index].isSelected = true;
+    } else {
+      _cartItems.add(
+        CartItemModel.service(
+          id: 'service-$serviceId-${DateTime.now().millisecondsSinceEpoch}',
+          shopId: service.shopId ?? 0,
+          shopName: service.shopName ?? 'Cửa hàng',
+          serviceId: serviceId,
+          name: service.name ?? 'Dịch vụ spa',
+          imageUrl: service.imageUrl ?? '',
+          unitPrice: service.basePrice ?? 0,
+          durationMin: service.durationMin ?? 0,
+          quantity: quantity,
+          isSelected: true,
+          description: service.shopAddress,
+        ),
+      );
+    }
+
+    _saveUserCart();
     notifyListeners();
   }
 
   double get cartTotalPrice {
     return _cartItems
         .where((i) => i.isSelected)
-        .fold(0.0, (sum, item) => sum + (item.priceAsDouble * item.quantity));
+        .fold(0.0, (sum, item) => sum + item.amount.toDouble());
   }
 
   bool get isAllCartSelected {
     if (_cartItems.isEmpty) return false;
     return _cartItems.every((i) => i.isSelected);
+  }
+
+  List<CartItemModel> get selectedCartItems {
+    return _cartItems.where((item) => item.isSelected).toList();
+  }
+
+  void clearSelectedCartItems() {
+    _cartItems.removeWhere((item) => item.isSelected);
+    _saveUserCart();
+    notifyListeners();
+  }
+
+  void removeSelectedCartItems() {
+    clearSelectedCartItems();
+  }
+
+  void unselectCartItems(Iterable<String> ids) {
+    final idSet = ids.toSet();
+    for (final item in _cartItems) {
+      if (idSet.contains(item.id)) {
+        item.isSelected = false;
+      }
+    }
+    _saveUserCart();
+    notifyListeners();
+  }
+
+  int? _parseId(String id) {
+    return int.tryParse(id);
+  }
+
+  int _parsePrice(String priceText) {
+    final normalized = priceText.replaceAll(RegExp(r'[^0-9]'), '');
+    return int.tryParse(normalized) ?? 0;
   }
 
   // --- PET ACTIONS ---
@@ -515,7 +626,7 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void removePet(String id) {
+  void removePet(int id) {
     _myPets.removeWhere((p) => p.id == id);
     notifyListeners();
   }
@@ -738,9 +849,4 @@ class AppState extends ChangeNotifier {
     }
   }
 
-  // --- CLEANUP ---
-  @override
-  void dispose() {
-    super.dispose();
-  }
 }

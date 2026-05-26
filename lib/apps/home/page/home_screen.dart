@@ -12,6 +12,7 @@ import 'package:petpee_mobile/features/chat/screens/pet_ai_selection_screen.dart
 import 'package:petpee_mobile/features/chat/screens/chat_list_screen.dart';
 import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
 import 'package:petpee_mobile/apps/search/page/search_screen.dart';
+import 'package:petpee_mobile/apps/cart/page/cart_screen.dart';
 import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
 import 'package:petpee_mobile/common/component/product_card.dart';
 import 'package:petpee_mobile/common/component/service_card.dart';
@@ -215,10 +216,9 @@ class _HomeScreenState extends State<HomeScreen> {
               (route) => false,
             );
           } else if (index == 2) {
-            Navigator.pushAndRemoveUntil(
+            Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SpaServiceScreen()),
-              (route) => false,
+              MaterialPageRoute(builder: (context) => const CartScreen()),
             );
           } else if (index == 3) {
             Navigator.pushAndRemoveUntil(

@@ -1,30 +1,149 @@
-import 'package:petpee_mobile/apps/product/model/product_model.dart';
-
-class CartItemModel {
+class CartItem {
   final String id;
-  final ProductModel product;
+  final bool isService;
+  final int shopId;
   final String shopName;
+  final int? productId;
+  final int? serviceId;
+  final String name;
+  final String imageUrl;
+  final String? description;
+  final int unitPrice;
+  final int? durationMin;
   int quantity;
   bool isSelected;
 
-  CartItemModel({
+  CartItem._({
     required this.id,
-    required this.product,
+    required this.isService,
+    required this.shopId,
     required this.shopName,
-    this.quantity = 1,
-    this.isSelected = false,
+    required this.productId,
+    required this.serviceId,
+    required this.name,
+    required this.imageUrl,
+    required this.unitPrice,
+    required this.quantity,
+    required this.isSelected,
+    this.description,
+    this.durationMin,
   });
 
-  // Giả lập giá tiền từ string "150.000đ" sang double để tiện tính toán
-  double get priceAsDouble {
-    try {
-      String cleanPrice = product.price
-          .replaceAll('đ', '')
-          .replaceAll('.', '')
-          .trim();
-      return double.parse(cleanPrice);
-    } catch (_) {
-      return 0.0;
-    }
+  factory CartItem.product({
+    required String id,
+    required int shopId,
+    required String shopName,
+    required int productId,
+    required String name,
+    required String imageUrl,
+    required int unitPrice,
+    int quantity = 1,
+    bool isSelected = false,
+    String? description,
+  }) {
+    return CartItem._(
+      id: id,
+      isService: false,
+      shopId: shopId,
+      shopName: shopName,
+      productId: productId,
+      serviceId: null,
+      name: name,
+      imageUrl: imageUrl,
+      unitPrice: unitPrice,
+      quantity: quantity,
+      isSelected: isSelected,
+      description: description,
+    );
+  }
+
+  factory CartItem.service({
+    required String id,
+    required int shopId,
+    required String shopName,
+    required int serviceId,
+    required String name,
+    required String imageUrl,
+    required int unitPrice,
+    required int durationMin,
+    int quantity = 1,
+    bool isSelected = false,
+    String? description,
+  }) {
+    return CartItem._(
+      id: id,
+      isService: true,
+      shopId: shopId,
+      shopName: shopName,
+      productId: null,
+      serviceId: serviceId,
+      name: name,
+      imageUrl: imageUrl,
+      unitPrice: unitPrice,
+      quantity: quantity,
+      isSelected: isSelected,
+      description: description,
+      durationMin: durationMin,
+    );
+  }
+
+  int get amount => unitPrice * quantity;
+
+  CartItem copyWith({
+    int? quantity,
+    bool? isSelected,
+  }) {
+    return CartItem._(
+      id: id,
+      isService: isService,
+      shopId: shopId,
+      shopName: shopName,
+      productId: productId,
+      serviceId: serviceId,
+      name: name,
+      imageUrl: imageUrl,
+      unitPrice: unitPrice,
+      quantity: quantity ?? this.quantity,
+      isSelected: isSelected ?? this.isSelected,
+      description: description,
+      durationMin: durationMin,
+    );
+  }
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'isService': isService,
+      'shopId': shopId,
+      'shopName': shopName,
+      'productId': productId,
+      'serviceId': serviceId,
+      'name': name,
+      'imageUrl': imageUrl,
+      'unitPrice': unitPrice,
+      'quantity': quantity,
+      'isSelected': isSelected,
+      'description': description,
+      'durationMin': durationMin,
+    };
+  }
+
+  factory CartItem.fromMap(Map<dynamic, dynamic> map) {
+    return CartItem._(
+      id: map['id'] ?? '',
+      isService: map['isService'] ?? false,
+      shopId: map['shopId'] ?? 0,
+      shopName: map['shopName'] ?? '',
+      productId: map['productId'],
+      serviceId: map['serviceId'],
+      name: map['name'] ?? '',
+      imageUrl: map['imageUrl'] ?? '',
+      unitPrice: map['unitPrice'] ?? 0,
+      quantity: map['quantity'] ?? 1,
+      isSelected: map['isSelected'] ?? false,
+      description: map['description'],
+      durationMin: map['durationMin'],
+    );
   }
 }
+
+typedef CartItemModel = CartItem;

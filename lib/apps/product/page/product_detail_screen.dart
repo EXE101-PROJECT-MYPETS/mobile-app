@@ -1312,6 +1312,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       appState.prepareBuyNow(
         _buildCheckoutProduct(detail),
         _resolveShopName(detail, shop),
+        shopId: detail.shopId ?? shop?.id ?? 1,
       );
       Navigator.push(
         context,
@@ -1367,6 +1368,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       appState.addToCart(
         _buildCheckoutProduct(detail),
         _resolveShopName(detail, shop),
+        shopId: detail.shopId ?? shop?.id ?? 1,
       );
     }
 

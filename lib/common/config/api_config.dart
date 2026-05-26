@@ -46,6 +46,7 @@ class ApiConfig {
 
   // Order endpoints
   static const String ordersUrl = '$baseUrl/orders';
+  static const String checkoutUrl = '$baseUrl/v1/checkout';
 
   // Chat endpoints
   static const String chatUrl = '$baseUrl/customer/conversations';

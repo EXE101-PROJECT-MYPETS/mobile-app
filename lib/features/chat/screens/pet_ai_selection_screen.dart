@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:petpee_mobile/apps/home/page/home_screen.dart';
 import 'package:petpee_mobile/apps/home/page/notifications_screen.dart';
-import 'package:petpee_mobile/apps/product/page/spa_service_screen.dart';
+
 import 'package:petpee_mobile/apps/profile/api/pet_service.dart';
 import 'package:petpee_mobile/apps/profile/model/pet_model.dart';
 import 'package:petpee_mobile/apps/profile/page/profile_screen.dart';
@@ -11,6 +11,7 @@ import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
 import 'package:petpee_mobile/common/utils/image_url_util.dart';
 import 'package:petpee_mobile/features/chat/services/ai_pet_health_service.dart';
 import 'package:petpee_mobile/features/chat/screens/ai_assistant_chat_screen.dart';
+import 'package:petpee_mobile/apps/cart/page/cart_screen.dart';
 
 class PetAiSelectionScreen extends StatefulWidget {
   const PetAiSelectionScreen({super.key});
@@ -81,7 +82,7 @@ class _PetAiSelectionScreenState extends State<PetAiSelectionScreen> {
     if (index == 0) {
       screen = const HomeScreen();
     } else if (index == 2) {
-      screen = const SpaServiceScreen();
+      screen = const CartScreen();
     } else if (index == 3) {
       screen = const NotificationsScreen();
     } else if (index == 4) {
