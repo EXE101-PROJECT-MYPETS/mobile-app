@@ -339,12 +339,15 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
 
                 final appState = context.read<AppState>();
                 appState.prepareBuyNowService(service);
-                final selectedItems = List<CartItem>.from(appState.selectedCartItems);
+                final selectedItems = List<CartItem>.from(
+                  appState.selectedCartItems,
+                );
 
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => CheckoutScreen(selectedItems: selectedItems),
+                    builder: (context) =>
+                        CheckoutScreen(selectedItems: selectedItems),
                   ),
                 );
               },
@@ -780,7 +783,8 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
                             ),
                             image: DecorationImage(
                               image: NetworkImage(
-                                pet.avatarUrl ?? 'https://picsum.photos/seed/pet${pet.id ?? index}/200',
+                                pet.avatarUrl ??
+                                    'https://picsum.photos/seed/pet${pet.id ?? index}/200',
                               ),
                               fit: BoxFit.cover,
                             ),
@@ -813,9 +817,7 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
               onPressed: () async {
                 final result = await Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const AddPetScreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const AddPetScreen()),
                 );
                 if (result == true && mounted) {
                   await context.read<AppState>().loadMyPets();
@@ -853,12 +855,15 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
           } else if (widget.service != null) {
             final appState = context.read<AppState>();
             appState.prepareBuyNowService(widget.service!);
-            final selectedItems = List<CartItem>.from(appState.selectedCartItems);
+            final selectedItems = List<CartItem>.from(
+              appState.selectedCartItems,
+            );
 
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => CheckoutScreen(selectedItems: selectedItems),
+                builder: (context) =>
+                    CheckoutScreen(selectedItems: selectedItems),
               ),
             );
           } else {

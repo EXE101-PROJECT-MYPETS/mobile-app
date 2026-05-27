@@ -22,6 +22,9 @@ class ServiceDetailDTO {
     this.vaccineName,
     this.imageUrl,
     this.active,
+    this.rating,
+    this.ratingCount,
+    this.reviews,
   });
 
   final int? id;
@@ -44,6 +47,9 @@ class ServiceDetailDTO {
   final String? vaccineName;
   final String? imageUrl;
   final bool? active;
+  final double? rating;
+  final int? ratingCount;
+  final List<ServiceDetailReviewDTO>? reviews;
 
   factory ServiceDetailDTO.fromJson(Map<String, dynamic> json) {
     return ServiceDetailDTO(
@@ -69,6 +75,9 @@ class ServiceDetailDTO {
       vaccineName: _asString(json['vaccineName']),
       imageUrl: ImageUrlUtil.buildPublicUrl(_asString(json['imageUrl'])),
       active: _asBool(json['active']),
+      rating: _asDouble(json['rating']),
+      ratingCount: _asInt(json['ratingCount']),
+      reviews: _asReviews(json['reviews']),
     );
   }
 
@@ -94,7 +103,18 @@ class ServiceDetailDTO {
       'vaccineName': vaccineName,
       'imageUrl': imageUrl,
       'active': active,
+      'rating': rating,
+      'ratingCount': ratingCount,
+      'reviews': reviews?.map((review) => review.toJson()).toList(),
     };
+  }
+
+  static List<ServiceDetailReviewDTO> _asReviews(dynamic value) {
+    if (value is! List) return const [];
+    return value
+        .whereType<Map<String, dynamic>>()
+        .map(ServiceDetailReviewDTO.fromJson)
+        .toList();
   }
 
   static String? _asString(dynamic value) {
@@ -125,5 +145,83 @@ class ServiceDetailDTO {
     if (text == 'true') return true;
     if (text == 'false') return false;
     return null;
+  }
+}
+
+class ServiceDetailReviewDTO {
+  const ServiceDetailReviewDTO({
+    this.id,
+    this.star,
+    this.content,
+    this.user,
+    this.date,
+  });
+
+  final int? id;
+  final int? star;
+  final String? content;
+  final ServiceDetailReviewUserDTO? user;
+  final String? date;
+
+  factory ServiceDetailReviewDTO.fromJson(Map<String, dynamic> json) {
+    return ServiceDetailReviewDTO(
+      id: ServiceDetailDTO._asInt(json['id']),
+      star: ServiceDetailDTO._asInt(json['star']),
+      content: ServiceDetailDTO._asString(json['content']),
+      user: json['user'] is Map<String, dynamic>
+          ? ServiceDetailReviewUserDTO.fromJson(
+              json['user'] as Map<String, dynamic>,
+            )
+          : null,
+      date: ServiceDetailDTO._asString(json['date']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'star': star,
+      'content': content,
+      'user': user?.toJson(),
+      'date': date,
+    };
+  }
+}
+
+class ServiceDetailReviewUserDTO {
+  const ServiceDetailReviewUserDTO({
+    this.id,
+    this.fullName,
+    this.email,
+    this.avatarUrl,
+  });
+
+  final int? id;
+  final String? fullName;
+  final String? email;
+  final String? avatarUrl;
+
+  factory ServiceDetailReviewUserDTO.fromJson(Map<String, dynamic> json) {
+    return ServiceDetailReviewUserDTO(
+      id: ServiceDetailDTO._asInt(json['id']),
+      fullName:
+          ServiceDetailDTO._asString(json['fullName']) ??
+          ServiceDetailDTO._asString(json['name']),
+      email: ServiceDetailDTO._asString(json['email']),
+      avatarUrl: ImageUrlUtil.buildPublicUrl(
+        ServiceDetailDTO._asString(
+          json['avatarUrl'] ?? json['avatarUrlPreview'],
+        ),
+      ),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'fullName': fullName,
+      'email': email,
+      'avatarUrl': avatarUrl,
+    };
   }
 }

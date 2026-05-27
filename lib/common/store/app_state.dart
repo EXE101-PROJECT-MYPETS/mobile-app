@@ -442,7 +442,10 @@ class AppState extends ChangeNotifier {
     int quantity = 1,
   }) {
     final index = _cartItems.indexWhere(
-      (i) => !i.isService && i.productId == _parseId(product.id) && i.shopName == shopName,
+      (i) =>
+          !i.isService &&
+          i.productId == _parseId(product.id) &&
+          i.shopName == shopName,
     );
     if (index >= 0) {
       _cartItems[index].quantity += quantity;
@@ -452,7 +455,8 @@ class AppState extends ChangeNotifier {
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           shopId: shopId ?? 0,
           shopName: shopName,
-          productId: _parseId(product.id) ?? DateTime.now().millisecondsSinceEpoch,
+          productId:
+              _parseId(product.id) ?? DateTime.now().millisecondsSinceEpoch,
           name: product.name,
           imageUrl: product.image,
           unitPrice: _parsePrice(product.price),
@@ -466,10 +470,7 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addServiceToCart(
-    ServicePublicDTO service,
-    {int quantity = 1}
-  ) {
+  void addServiceToCart(ServicePublicDTO service, {int quantity = 1}) {
     final serviceId = service.id ?? DateTime.now().millisecondsSinceEpoch;
     final index = _cartItems.indexWhere(
       (item) => item.isService && item.serviceId == serviceId,
@@ -510,7 +511,10 @@ class AppState extends ChangeNotifier {
     }
 
     final index = _cartItems.indexWhere(
-      (i) => !i.isService && i.productId == _parseId(product.id) && i.shopName == shopName,
+      (i) =>
+          !i.isService &&
+          i.productId == _parseId(product.id) &&
+          i.shopName == shopName,
     );
     if (index >= 0) {
       _cartItems[index].quantity = quantity;
@@ -521,7 +525,8 @@ class AppState extends ChangeNotifier {
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           shopId: shopId ?? 0,
           shopName: shopName,
-          productId: _parseId(product.id) ?? DateTime.now().millisecondsSinceEpoch,
+          productId:
+              _parseId(product.id) ?? DateTime.now().millisecondsSinceEpoch,
           name: product.name,
           imageUrl: product.image,
           unitPrice: _parsePrice(product.price),
@@ -536,10 +541,7 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void prepareBuyNowService(
-    ServicePublicDTO service, {
-    int quantity = 1,
-  }) {
+  void prepareBuyNowService(ServicePublicDTO service, {int quantity = 1}) {
     for (final item in _cartItems) {
       item.isSelected = false;
     }
@@ -848,5 +850,4 @@ class AppState extends ChangeNotifier {
       notifyListeners();
     }
   }
-
 }
