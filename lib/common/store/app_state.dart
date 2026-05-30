@@ -338,6 +338,7 @@ class AppState extends ChangeNotifier {
       'type': product.type,
       'category': product.category,
       'description': product.description,
+      'weightKg': product.weightKg,
       'shopProvince': product.shopProvince,
       'timestamp': DateTime.now().toIso8601String(),
     };
@@ -448,7 +449,10 @@ class AppState extends ChangeNotifier {
           i.shopName == shopName,
     );
     if (index >= 0) {
-      _cartItems[index].quantity += quantity;
+      _cartItems[index] = _cartItems[index].copyWith(
+        quantity: _cartItems[index].quantity + quantity,
+        weightKg: product.weightKg,
+      );
     } else {
       _cartItems.add(
         CartItemModel.product(
@@ -460,6 +464,7 @@ class AppState extends ChangeNotifier {
           name: product.name,
           imageUrl: product.image,
           unitPrice: _parsePrice(product.price),
+          weightKg: product.weightKg,
           quantity: quantity,
           isSelected: true,
           description: product.description,
@@ -517,8 +522,11 @@ class AppState extends ChangeNotifier {
           i.shopName == shopName,
     );
     if (index >= 0) {
-      _cartItems[index].quantity = quantity;
-      _cartItems[index].isSelected = true;
+      _cartItems[index] = _cartItems[index].copyWith(
+        quantity: quantity,
+        isSelected: true,
+        weightKg: product.weightKg,
+      );
     } else {
       _cartItems.add(
         CartItemModel.product(
@@ -530,6 +538,7 @@ class AppState extends ChangeNotifier {
           name: product.name,
           imageUrl: product.image,
           unitPrice: _parsePrice(product.price),
+          weightKg: product.weightKg,
           quantity: quantity,
           isSelected: true,
           description: product.description,

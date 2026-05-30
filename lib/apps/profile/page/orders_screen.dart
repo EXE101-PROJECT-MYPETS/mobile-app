@@ -20,7 +20,7 @@ class OrdersScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 8,
-      initialIndex: initialTabIndex,
+      initialIndex: initialTabIndex.clamp(0, 7),
       child: Scaffold(
         backgroundColor: const Color(0xFFF1F5F9),
         appBar: AppBar(

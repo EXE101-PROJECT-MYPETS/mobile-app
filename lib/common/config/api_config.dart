@@ -7,7 +7,7 @@ class ApiConfig {
     'API_BASE_URL',
     // Mặc định sử dụng IP nội bộ hiện tại của máy chạy backend.
     // Nếu dùng Android emulator, chạy app với --dart-define=API_BASE_URL="http://10.0.2.2:8080/api"
-    defaultValue: 'http://192.168.110.56:8080/api',
+    defaultValue: 'http://192.168.1.26:8080/api',
   );
 
   static const String authUrl = '$baseUrl/auth';

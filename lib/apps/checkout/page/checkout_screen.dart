@@ -10,6 +10,7 @@ import 'package:petpee_mobile/apps/checkout/model/checkout_request_model.dart';
 import 'package:petpee_mobile/apps/checkout/model/ghtk_fee_model.dart';
 import 'package:petpee_mobile/apps/checkout/page/address_selection_screen.dart';
 import 'package:petpee_mobile/apps/checkout/page/checkout_success_screen.dart';
+import 'package:petpee_mobile/apps/product/api/product_service.dart';
 import 'package:petpee_mobile/apps/profile/page/add_pet_screen.dart';
 import 'package:petpee_mobile/apps/shop/page/shop_detail_screen.dart';
 import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
@@ -31,6 +32,7 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   final ShippingService _shippingService = ShippingService();
   final CheckoutService _checkoutService = CheckoutService();
+  final ProductService _productService = ProductService();
   final TextEditingController _noteController = TextEditingController();
   static const int _pickupFeeValue = 50000;
 
@@ -115,6 +117,33 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return _productSubtotal(state) + _serviceSubtotal(state);
   }
 
+  Future<int> _productWeight(AppState state) async {
+    double totalWeight = 0;
+    final productItems = _getCheckoutItems(
+      state,
+    ).where((item) => !item.isService);
+
+    for (final item in productItems) {
+      var weightKg = item.weightKg;
+      if ((weightKg == null || weightKg <= 0) && item.productId != null) {
+        try {
+          final detail = await _productService.getProductDetail(
+            item.productId.toString(),
+          );
+          weightKg = detail.weightKg;
+        } catch (_) {
+          weightKg = null;
+        }
+      }
+
+      if (weightKg != null && weightKg > 0) {
+        totalWeight += weightKg * item.quantity;
+      }
+    }
+
+    return totalWeight.ceil().clamp(1, 1000000000).toInt();
+  }
+
   Future<void> _refreshShippingFee() async {
     final appState = context.read<AppState>();
     if (!_hasProductItems(appState)) {
@@ -141,11 +170,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     });
 
     try {
-      final int weight = _getCheckoutItems(appState)
-          .where((item) => !item.isService)
-          .fold<int>(0, (sum, item) => sum + item.quantity * 500)
-          .clamp(500, 5000)
-          .toInt();
+      final int weight = await _productWeight(appState);
 
       final feeResponse = await _shippingService.getShippingFee(
         GhtkFeeRequest(

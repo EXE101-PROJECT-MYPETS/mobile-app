@@ -114,6 +114,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     return ApiConfig.formatImageUrl(_asString(item['productImageUrl']));
   }
 
+  bool _canCancelOrder(Map<String, dynamic> order) {
+    final status = _asString(order['status']).toUpperCase();
+    return !{'SHIPPING', 'COMPLETED', 'CANCELLED'}.contains(status);
+  }
+
   Future<void> _openChat(Map<String, dynamic> order) async {
     final shopId = _asInt(order['shopId']);
     if (shopId == null || shopId <= 0) {
@@ -204,6 +209,15 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }
 
   Future<void> _showCancelDialog(Map<String, dynamic> order) async {
+    if (!_canCancelOrder(order)) {
+      showAppToast(
+        context,
+        message: 'Đơn hàng ở trạng thái này không thể hủy',
+        type: AppToastType.error,
+      );
+      return;
+    }
+
     final orderId = _asInt(order['id']);
     if (orderId == null || orderId <= 0) {
       showAppToast(
@@ -429,6 +443,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           onCancel: () => _showCancelDialog(order),
           onChat: () => _openChat(order),
           isCancelling: _isCancelling,
+          canCancel: _canCancelOrder(order),
         ),
       ],
     );
@@ -859,6 +874,7 @@ class _OrderDetailBottomBar extends StatelessWidget {
     required this.onCancel,
     required this.onChat,
     required this.isCancelling,
+    required this.canCancel,
   });
 
   final String orderCode;
@@ -866,6 +882,7 @@ class _OrderDetailBottomBar extends StatelessWidget {
   final VoidCallback onCancel;
   final VoidCallback onChat;
   final bool isCancelling;
+  final bool canCancel;
 
   @override
   Widget build(BuildContext context) {
@@ -909,20 +926,24 @@ class _OrderDetailBottomBar extends StatelessWidget {
             ),
             Row(
               children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: isCancelling ? null : onCancel,
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF111827),
-                      side: const BorderSide(color: Color(0xFFD1D5DB)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
+                if (canCancel) ...[
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: isCancelling ? null : onCancel,
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFF111827),
+                        side: const BorderSide(color: Color(0xFFD1D5DB)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      child: Text(
+                        isCancelling ? 'Đang hủy...' : 'Hủy đơn hàng',
                       ),
                     ),
-                    child: Text(isCancelling ? 'Đang hủy...' : 'Hủy đơn hàng'),
                   ),
-                ),
-                const SizedBox(width: 8),
+                  const SizedBox(width: 8),
+                ],
                 Expanded(
                   child: OutlinedButton(
                     onPressed: onChat,
