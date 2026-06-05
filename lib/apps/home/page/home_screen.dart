@@ -4,20 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/apps/home/page/notifications_screen.dart';
 import 'package:petpee_mobile/apps/home/page/map_screen.dart';
-import 'package:petpee_mobile/apps/product/page/spa_service_screen.dart';
-import 'package:petpee_mobile/apps/profile/page/profile_screen.dart';
-import 'package:petpee_mobile/features/chat/screens/pet_ai_selection_screen.dart';
 import 'package:petpee_mobile/features/chat/screens/chat_list_screen.dart';
 import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
 import 'package:petpee_mobile/apps/search/page/search_screen.dart';
-import 'package:petpee_mobile/apps/cart/page/cart_screen.dart';
 import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
 import 'package:petpee_mobile/common/component/product_card.dart';
 import 'package:petpee_mobile/common/component/service_card.dart';
+import 'package:petpee_mobile/common/navigation/main_tab_navigation.dart';
 import 'package:petpee_mobile/common/store/app_state.dart';
-import 'package:petpee_mobile/common/user/dto/service_public_dto.dart';
 import 'package:provider/provider.dart';
 
 const Color _homeHeaderBackground = Color(0xFFD5F4FF);
@@ -206,34 +201,8 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: const _FloatingGiftButton(),
       bottomNavigationBar: CommonBottomNavBar(
         currentIndex: 0,
-        onTap: (index) {
-          if (index == 1) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const PetAiSelectionScreen(),
-              ),
-              (route) => false,
-            );
-          } else if (index == 2) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const CartScreen()),
-            );
-          } else if (index == 3) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => NotificationsScreen()),
-              (route) => false,
-            );
-          } else if (index == 4) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => ProfileScreen()),
-              (route) => false,
-            );
-          }
-        },
+        onTap: (index) =>
+            MainTabNavigation.open(context, index, currentIndex: 0),
       ),
     );
   }
@@ -755,7 +724,7 @@ class _ServiceSection extends StatelessWidget {
           ),
           Consumer<AppState>(
             builder: (context, state, child) {
-              final services = state.allServices ?? <ServicePublicDTO>[];
+              final services = state.allServices;
 
               if (state.isLoadingServices && services.length == 0) {
                 return const SizedBox(
@@ -860,8 +829,7 @@ class _VeterinarySection extends StatelessWidget {
           Consumer<AppState>(
             builder: (context, state, child) {
               try {
-                final vetList =
-                    state.veterinaryServices ?? <ServicePublicDTO>[];
+                final vetList = state.veterinaryServices;
 
                 if (state.isLoadingVeterinary && vetList.length == 0) {
                   return const SizedBox(

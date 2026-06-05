@@ -86,6 +86,7 @@ class AppState extends ChangeNotifier {
   List<ServicePublicDTO> get veterinaryServices => _veterinaryServices;
   bool get isLoadingVeterinary => _isLoadingVeterinary;
   String? get veterinaryError => _veterinaryError;
+  int? get veterinaryCursor => _veterinaryCursor;
   bool get hasMoreVeterinary => _hasMoreVeterinary;
   double? get serviceUserLat => _serviceUserLat;
   double? get serviceUserLng => _serviceUserLng;

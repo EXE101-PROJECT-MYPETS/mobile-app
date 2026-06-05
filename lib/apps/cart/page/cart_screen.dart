@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:petpee_mobile/apps/cart/model/cart_item_model.dart';
 import 'package:petpee_mobile/apps/checkout/page/checkout_screen.dart';
+import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
+import 'package:petpee_mobile/common/navigation/main_tab_navigation.dart';
 import 'package:petpee_mobile/common/store/app_state.dart';
 import 'package:petpee_mobile/common/toast/app_toast.dart';
 import 'package:petpee_mobile/common/utils/price_formatter.dart';
@@ -32,7 +34,7 @@ class CartScreen extends StatelessWidget {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(LucideIcons.arrowLeft, color: Color(0xFF111827)),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => MainTabNavigation.backToPreviousOrHome(context),
         ),
         title: Text(
           'Giỏ hàng',
@@ -142,6 +144,11 @@ class CartScreen extends StatelessWidget {
               },
             ),
         ],
+      ),
+      bottomNavigationBar: CommonBottomNavBar(
+        currentIndex: 2,
+        onTap: (index) =>
+            MainTabNavigation.open(context, index, currentIndex: 2),
       ),
     );
   }
