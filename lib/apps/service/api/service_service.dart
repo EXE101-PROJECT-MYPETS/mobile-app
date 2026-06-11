@@ -180,6 +180,40 @@ class ServicePublicService {
       rethrow;
     }
   }
+
+  Future<ScrollResponse<ServicePublicDTO>> getRelatedForScroll({
+    required int serviceId,
+    int? cursor,
+    int size = 10,
+  }) async {
+    final queryParams = <String, String>{'size': size.clamp(1, 20).toString()};
+
+    if (cursor != null) {
+      queryParams['cursor'] = cursor.toString();
+    }
+
+    final uri = Uri.parse(
+      '${ApiConfig.baseUrl}/public/services/$serviceId/related',
+    ).replace(queryParameters: queryParams);
+
+    final response = await _client.get(
+      uri,
+      headers: const {'ngrok-skip-browser-warning': 'true'},
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(utf8.decode(response.bodyBytes));
+      if (json is Map<String, dynamic>) {
+        return ScrollResponse<ServicePublicDTO>.fromJson(
+          json,
+          (item) => ServicePublicDTO.fromJson(item),
+        );
+      }
+      throw Exception('Dữ liệu dịch vụ liên quan không hợp lệ');
+    }
+
+    throw Exception('Không thể tải dịch vụ liên quan (${response.statusCode})');
+  }
 }
 
 class ServiceBookingService {

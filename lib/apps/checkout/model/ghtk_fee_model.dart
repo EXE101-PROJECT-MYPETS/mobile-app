@@ -1,7 +1,7 @@
 /// Request body gửi lên BE để tính phí GHTK.
 class GhtkFeeRequest {
   final int userAddressId;
-  final int weight; // gram
+  final int weight;
   final int value; // VNĐ
   final String transport; // "road" | "fly"
 

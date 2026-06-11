@@ -5,9 +5,12 @@ import 'package:petpee_mobile/apps/home/page/home_screen.dart';
 import 'package:petpee_mobile/apps/home/page/notifications_screen.dart';
 import 'package:petpee_mobile/apps/product/page/product_list_screen.dart';
 import 'package:petpee_mobile/apps/profile/page/my_pets_screen.dart';
+import 'package:petpee_mobile/apps/profile/page/profile_screen.dart';
 import 'package:petpee_mobile/common/auth/page/login_screen.dart';
 import 'package:petpee_mobile/common/auth/page/register_screen.dart';
+import 'package:petpee_mobile/common/navigation/main_tab_navigation.dart';
 import 'package:petpee_mobile/common/store/app_state.dart';
+import 'package:petpee_mobile/features/chat/screens/pet_ai_selection_screen.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -41,12 +44,14 @@ class _MyAppState extends State<MyApp> {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => const HomeScreen(),
+        MainTabRoutes.home: (context) => const HomeScreen(),
+        MainTabRoutes.ai: (context) => const PetAiSelectionScreen(),
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/products': (context) => const ProductListScreen(),
-        '/cart': (context) => const CartScreen(),
-        '/notifications': (context) => const NotificationsScreen(),
+        MainTabRoutes.cart: (context) => const CartScreen(),
+        MainTabRoutes.notifications: (context) => const NotificationsScreen(),
+        MainTabRoutes.profile: (context) => const ProfileScreen(),
         '/pets': (context) => const MyPetsScreen(),
         '/bookings': (context) =>
             const HomeScreen(), // TODO: Create BookingsScreen

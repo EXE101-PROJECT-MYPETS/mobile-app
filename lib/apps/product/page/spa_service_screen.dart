@@ -1,22 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/apps/home/page/home_screen.dart';
-import 'package:petpee_mobile/apps/home/page/notifications_screen.dart';
-import 'package:petpee_mobile/apps/profile/page/profile_screen.dart';
 import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
 import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
 import 'package:petpee_mobile/common/component/login_required_sheet.dart';
+import 'package:petpee_mobile/common/navigation/main_tab_navigation.dart';
 import 'package:petpee_mobile/common/store/app_state.dart';
 import 'package:petpee_mobile/common/user/dto/service_public_dto.dart';
 import 'package:petpee_mobile/common/utils/external_url_launcher.dart';
 import 'package:petpee_mobile/common/utils/price_formatter.dart';
 import 'package:petpee_mobile/apps/profile/page/add_pet_screen.dart';
-import 'package:petpee_mobile/features/chat/screens/pet_ai_selection_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:petpee_mobile/apps/cart/model/cart_item_model.dart';
 import 'package:petpee_mobile/apps/checkout/page/checkout_screen.dart';
-import 'package:petpee_mobile/apps/cart/page/cart_screen.dart';
 import 'spa_booking_confirmation_screen.dart';
 
 class SpaServiceScreen extends StatefulWidget {
@@ -150,41 +146,8 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
       ),
       bottomNavigationBar: CommonBottomNavBar(
         currentIndex: 2,
-        onTap: (index) {
-          if (index == 0) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const HomeScreen()),
-              (route) => false,
-            );
-          } else if (index == 1) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const PetAiSelectionScreen(),
-              ),
-            );
-          } else if (index == 2) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const CartScreen()),
-            );
-          } else if (index == 3) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const NotificationsScreen(),
-              ),
-              (route) => false,
-            );
-          } else if (index == 4) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const ProfileScreen()),
-              (route) => false,
-            );
-          }
-        },
+        onTap: (index) =>
+            MainTabNavigation.open(context, index, currentIndex: 2),
       ),
     );
   }
@@ -339,12 +302,15 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
 
                 final appState = context.read<AppState>();
                 appState.prepareBuyNowService(service);
-                final selectedItems = List<CartItem>.from(appState.selectedCartItems);
+                final selectedItems = List<CartItem>.from(
+                  appState.selectedCartItems,
+                );
 
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => CheckoutScreen(selectedItems: selectedItems),
+                    builder: (context) =>
+                        CheckoutScreen(selectedItems: selectedItems),
                   ),
                 );
               },
@@ -780,7 +746,8 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
                             ),
                             image: DecorationImage(
                               image: NetworkImage(
-                                pet.avatarUrl ?? 'https://picsum.photos/seed/pet${pet.id ?? index}/200',
+                                pet.avatarUrl ??
+                                    'https://picsum.photos/seed/pet${pet.id ?? index}/200',
                               ),
                               fit: BoxFit.cover,
                             ),
@@ -813,9 +780,7 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
               onPressed: () async {
                 final result = await Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const AddPetScreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const AddPetScreen()),
                 );
                 if (result == true && mounted) {
                   await context.read<AppState>().loadMyPets();
@@ -853,12 +818,15 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
           } else if (widget.service != null) {
             final appState = context.read<AppState>();
             appState.prepareBuyNowService(widget.service!);
-            final selectedItems = List<CartItem>.from(appState.selectedCartItems);
+            final selectedItems = List<CartItem>.from(
+              appState.selectedCartItems,
+            );
 
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => CheckoutScreen(selectedItems: selectedItems),
+                builder: (context) =>
+                    CheckoutScreen(selectedItems: selectedItems),
               ),
             );
           } else {

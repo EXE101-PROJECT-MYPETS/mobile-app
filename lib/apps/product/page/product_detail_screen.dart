@@ -1390,6 +1390,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       type: 'product',
       category: detail.categoryName ?? 'Tất cả',
       description: detail.description ?? 'Chưa có thông tin mô tả chi tiết.',
+      weightKg: detail.weightKg,
     );
   }
 
@@ -1417,6 +1418,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         image: detail.imageUrls.isNotEmpty ? detail.imageUrls[0] : '',
         type: 'product',
         category: detail.categoryName ?? 'Khác',
+        weightKg: detail.weightKg,
       );
       appState.logProductViewed(product);
     }

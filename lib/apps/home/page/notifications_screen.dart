@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
+import 'package:petpee_mobile/common/navigation/main_tab_navigation.dart';
 import 'package:petpee_mobile/common/toast/app_toast.dart';
 
 class NotificationsScreen extends StatelessWidget {
@@ -59,7 +61,7 @@ class NotificationsScreen extends StatelessWidget {
         elevation: 0.5,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => MainTabNavigation.backToPreviousOrHome(context),
         ),
         title: Text(
           'Thông Báo',
@@ -198,6 +200,11 @@ class NotificationsScreen extends StatelessWidget {
             ),
           );
         },
+      ),
+      bottomNavigationBar: CommonBottomNavBar(
+        currentIndex: 3,
+        onTap: (index) =>
+            MainTabNavigation.open(context, index, currentIndex: 3),
       ),
     );
   }

@@ -12,29 +12,39 @@ class CheckoutService {
 
   Future<CheckoutResponseModel> checkout(CheckoutRequestModel request) async {
     final uri = Uri.parse(ApiConfig.ordersUrl);
-    
-    // Map CheckoutRequestModel to OrderDTO expected by backend
+
+    // Backend expects product items under `items`, while service bookings stay
+    // in the checkout payload so spa services can be booked from the cart.
     final payload = {
       'shopId': request.shopId,
       'userId': request.userId,
       if (request.customerId != null) 'customerId': request.customerId,
+      if (request.userAddressId != null) 'userAddressId': request.userAddressId,
+      'source': request.source,
       'receiverName': request.receiverName,
       'receiverPhone': request.receiverPhone,
       'shippingAddress': request.shippingAddress,
       'shippingFee': request.shippingFee,
+      if (request.pickupFee > 0) 'pickupFee': request.pickupFee,
       'discountAmount': request.discountAmount,
-      if (request.note != null && request.note!.trim().isNotEmpty) 'note': request.note!.trim(),
-      'items': request.productOrders.map((item) => {
-        'productId': item.productId,
-        'qty': item.qty,
-        'unitPrice': item.unitPrice,
-      }).toList(),
+      if (request.note != null && request.note!.trim().isNotEmpty)
+        'note': request.note!.trim(),
+      'items': request.productOrders
+          .map(
+            (item) => {
+              'productId': item.productId,
+              'qty': item.qty,
+              'unitPrice': item.unitPrice,
+            },
+          )
+          .toList(),
+      if (request.serviceBookings.isNotEmpty)
+        'serviceBookings': request.serviceBookings
+            .map((item) => item.toJson())
+            .toList(),
     };
 
-    final response = await _client.post(
-      uri,
-      body: jsonEncode(payload),
-    );
+    final response = await _client.post(uri, body: jsonEncode(payload));
 
     final body = utf8.decode(response.bodyBytes);
     if (response.statusCode >= 200 && response.statusCode < 300) {
