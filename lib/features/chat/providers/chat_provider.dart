@@ -79,12 +79,22 @@ class ChatProvider with ChangeNotifier {
 
   Future<void> openConversation(String conversationId, {String? shopId}) async {
     _activeConversationId = conversationId;
+    await _chatSocketService.disconnect();
     await fetchMessages(conversationId);
     await _chatSocketService.listenToConversation(
       conversationId,
       _handleIncomingMessage,
       shopId: shopId,
     );
+  }
+
+  Future<void> refreshActiveConversation() async {
+    final conversationId = _activeConversationId;
+    if (conversationId == null) {
+      return;
+    }
+
+    await fetchMessages(conversationId);
   }
 
   Future<ConversationModel> openConversationForShop(String shopId) async {
@@ -96,12 +106,21 @@ class ChatProvider with ChangeNotifier {
   }
 
   void _handleIncomingMessage(MessageModel message) {
+    debugPrint(
+      '[ChatProvider] _handleIncomingMessage: msgId=${message.id}, body=${message.body}, msgConvId=${message.conversationId}, activeConvId=$_activeConversationId',
+    );
     if (_activeConversationId != message.conversationId) {
+      debugPrint(
+        '[ChatProvider] activeConvId mismatch, calling fetchConversations and returning',
+      );
       fetchConversations();
       return;
     }
 
     _upsertCurrentMessage(message);
+    debugPrint(
+      '[ChatProvider] Message upserted, current count=${_currentMessages.length}, notifying listeners',
+    );
     notifyListeners();
     fetchConversations();
   }

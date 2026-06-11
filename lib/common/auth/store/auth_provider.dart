@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -5,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:petpee_mobile/common/auth/api/auth_service.dart';
 import 'package:petpee_mobile/common/auth/model/auth_dto.dart';
 import 'package:petpee_mobile/common/config/api_client.dart';
+import 'package:petpee_mobile/common/config/firebase_notification_service.dart';
 import 'package:petpee_mobile/common/user/model/user_model.dart';
 
 class AuthProvider extends ChangeNotifier {
@@ -33,6 +35,9 @@ class AuthProvider extends ChangeNotifier {
 
   AuthProvider() {
     _loadToken();
+    if (_token != null && _token!.isNotEmpty) {
+      unawaited(FirebaseNotificationService().sendTokenToServer());
+    }
   }
 
   void _loadToken() {
@@ -90,6 +95,8 @@ class AuthProvider extends ChangeNotifier {
       customerId: response.user.id,
     );
     notifyListeners();
+
+    unawaited(FirebaseNotificationService().sendTokenToServer());
   }
 
   Future<void> _saveCurrentUser(UserModel user) async {

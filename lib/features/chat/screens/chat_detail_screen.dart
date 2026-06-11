@@ -21,9 +21,11 @@ class ChatDetailScreen extends StatefulWidget {
   State<ChatDetailScreen> createState() => _ChatDetailScreenState();
 }
 
-class _ChatDetailScreenState extends State<ChatDetailScreen> {
+class _ChatDetailScreenState extends State<ChatDetailScreen>
+    with WidgetsBindingObserver {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  late ChatProvider _chatProvider;
   late String _currentConversationId;
   int _lastRenderedMessageCount = 0;
 
@@ -45,20 +47,40 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _chatProvider = context.read<ChatProvider>();
+  }
+
+  @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _currentConversationId = widget.conversationId;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ChatProvider>().openConversation(
-        _currentConversationId,
-        shopId: widget.shopId,
-      );
+      if (mounted) {
+        _chatProvider.openConversation(
+          _currentConversationId,
+          shopId: widget.shopId,
+        );
+      }
     });
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && mounted) {
+      _chatProvider.openConversation(
+        _currentConversationId,
+        shopId: widget.shopId,
+      );
+    }
+  }
+
+  @override
   void dispose() {
-    context.read<ChatProvider>().stopListening();
+    WidgetsBinding.instance.removeObserver(this);
+    _chatProvider.stopListening();
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -78,22 +100,18 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     final text = _messageController.text;
     if (text.trim().isEmpty) return;
 
-    context
-        .read<ChatProvider>()
-        .sendMessage(_currentConversationId, widget.shopId, text)
-        .then((newId) {
-          if (newId != null && newId != _currentConversationId) {
-            if (mounted) {
-              setState(() {
-                _currentConversationId = newId;
-              });
-              context.read<ChatProvider>().openConversation(
-                newId,
-                shopId: widget.shopId,
-              );
-            }
+    _chatProvider.sendMessage(_currentConversationId, widget.shopId, text).then(
+      (newId) {
+        if (newId != null && newId != _currentConversationId) {
+          if (mounted) {
+            setState(() {
+              _currentConversationId = newId;
+            });
+            _chatProvider.openConversation(newId, shopId: widget.shopId);
           }
-        });
+        }
+      },
+    );
 
     _messageController.clear();
     _scrollToBottom();

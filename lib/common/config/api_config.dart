@@ -1,30 +1,100 @@
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+
 class ApiConfig {
   static const Duration requestTimeout = Duration(seconds: 15);
 
-  // Thay đổi IP này thành IP của máy tính bạn trong mạng LAN (IPv4)
-  // Nếu dùng máy ảo Android (Emulator), dùng 10.0.2.2
-  static const String baseUrl = String.fromEnvironment(
+  static const String _androidEmulatorBaseUrl = 'http://10.0.2.2:8080/api';
+  static const String _iosSimulatorBaseUrl = 'http://localhost:8080/api';
+  static const List<String> _physicalDeviceBaseUrls = [
+    'http://192.168.16.103:8080/api',
+    'http://192.168.16.102:8080/api',
+  ];
+
+  static String _baseUrl = const String.fromEnvironment(
     'API_BASE_URL',
-    // Mặc định sử dụng IP nội bộ hiện tại của máy chạy backend.
-    // Nếu dùng Android emulator, chạy app với --dart-define=API_BASE_URL="http://10.0.2.2:8080/api"
-    defaultValue: 'http://192.168.1.10:8080/api',
+    defaultValue: '',
   );
 
-  static const String authUrl = '$baseUrl/auth';
-  static const String registerUrl = '$authUrl/register';
-  static const String registerEmailVerificationUrl =
+  static Future<void> initialize() async {
+    final configuredBaseUrl = const String.fromEnvironment(
+      'API_BASE_URL',
+      defaultValue: '',
+    );
+    if (configuredBaseUrl.isNotEmpty) {
+      _baseUrl = configuredBaseUrl;
+      return;
+    }
+
+    if (kIsWeb) {
+      _baseUrl = _physicalDeviceBaseUrls.first;
+      return;
+    }
+
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      _baseUrl = androidInfo.isPhysicalDevice
+          ? await _resolvePhysicalDeviceBaseUrl()
+          : _androidEmulatorBaseUrl;
+      return;
+    }
+
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      final iosInfo = await DeviceInfoPlugin().iosInfo;
+      _baseUrl = iosInfo.isPhysicalDevice
+          ? await _resolvePhysicalDeviceBaseUrl()
+          : _iosSimulatorBaseUrl;
+      return;
+    }
+
+    _baseUrl = await _resolvePhysicalDeviceBaseUrl();
+  }
+
+  // Thay đổi IP này thành IP của máy tính bạn trong mạng LAN (IPv4)
+  // Nếu dùng máy ảo Android (Emulator), dùng 10.0.2.2
+  static String get baseUrl => _baseUrl;
+
+  static Future<String> _resolvePhysicalDeviceBaseUrl() async {
+    for (final candidateBaseUrl in _physicalDeviceBaseUrls) {
+      if (await _isReachable(candidateBaseUrl)) {
+        return candidateBaseUrl;
+      }
+    }
+
+    return _physicalDeviceBaseUrls.first;
+  }
+
+  static Future<bool> _isReachable(String baseUrl) async {
+    final uri = Uri.parse('$baseUrl/public/products/mobile?size=1');
+    final client = http.Client();
+    try {
+      final response = await client
+          .get(uri)
+          .timeout(const Duration(seconds: 3));
+      return response.statusCode >= 200 && response.statusCode < 500;
+    } catch (_) {
+      return false;
+    } finally {
+      client.close();
+    }
+  }
+
+  static String get authUrl => '$baseUrl/auth';
+  static String get registerUrl => '$authUrl/register';
+  static String get registerEmailVerificationUrl =>
       '$registerUrl/email-verification';
-  static const String registerEmailSendCodeUrl =
+  static String get registerEmailSendCodeUrl =>
       '$registerEmailVerificationUrl/send-code';
-  static const String registerEmailVerifyCodeUrl =
+  static String get registerEmailVerifyCodeUrl =>
       '$registerEmailVerificationUrl/verify-code';
-  static const String customerLoginUrl = '$authUrl/customer/login';
-  static const String customerGoogleLoginUrl = '$authUrl/customer/google-login';
-  static const String customerFacebookLoginUrl =
+  static String get customerLoginUrl => '$authUrl/customer/login';
+  static String get customerGoogleLoginUrl => '$authUrl/customer/google-login';
+  static String get customerFacebookLoginUrl =>
       '$authUrl/customer/facebook-login';
-  static const String shopLoginUrl = '$authUrl/shop/login';
-  static const String currentUserProfileUrl = '$baseUrl/users/me';
-  static const String currentUserAddressUrl = '$baseUrl/users/me/address';
+  static String get shopLoginUrl => '$authUrl/shop/login';
+  static String get currentUserProfileUrl => '$baseUrl/users/me';
+  static String get currentUserAddressUrl => '$baseUrl/users/me/address';
 
   static const String googleWebClientId = String.fromEnvironment(
     'GOOGLE_WEB_CLIENT_ID',
@@ -33,30 +103,30 @@ class ApiConfig {
   );
 
   // Product endpoints (Public)
-  static const String productPublicUrl = '$baseUrl/public/products';
-  static const String productMobileUrl = '$productPublicUrl/mobile';
-  static const String shopPublicUrl = '$baseUrl/public/shops';
-  static const String shopMarkersUrl = '$shopPublicUrl/markers';
+  static String get productPublicUrl => '$baseUrl/public/products';
+  static String get productMobileUrl => '$productPublicUrl/mobile';
+  static String get shopPublicUrl => '$baseUrl/public/shops';
+  static String get shopMarkersUrl => '$shopPublicUrl/markers';
   static String serviceDetailUrl(int id) => '$baseUrl/services/$id';
   static String shopBookingsUrl(int shopId) =>
       '$baseUrl/shops/$shopId/bookings';
 
   // Shipping endpoints
-  static const String ghtkOrdersFeeUrl = '$baseUrl/ghtk/orders/fee';
+  static String get ghtkOrdersFeeUrl => '$baseUrl/ghtk/orders/fee';
 
   // Order endpoints
-  static const String ordersUrl = '$baseUrl/orders';
-  static const String checkoutUrl = '$baseUrl/v1/checkout';
+  static String get ordersUrl => '$baseUrl/orders';
+  static String get checkoutUrl => '$baseUrl/v1/checkout';
 
   // Chat endpoints
-  static const String chatUrl = '$baseUrl/customer/conversations';
-  static const String chatConversationsUrl = chatUrl;
-  static const String aiPetHealthUrl = '$baseUrl/ai/pet-health';
-  static const String aiPetHealthConversationsUrl =
+  static String get chatUrl => '$baseUrl/customer/conversations';
+  static String get chatConversationsUrl => chatUrl;
+  static String get aiPetHealthUrl => '$baseUrl/ai/pet-health';
+  static String get aiPetHealthConversationsUrl =>
       '$aiPetHealthUrl/conversations';
-  static const String aiPetHealthGetOrCreateConversationUrl =
+  static String get aiPetHealthGetOrCreateConversationUrl =>
       '$aiPetHealthConversationsUrl/get-or-create';
-  static const String aiPetHealthChatUrl = '$aiPetHealthUrl/chat';
+  static String get aiPetHealthChatUrl => '$aiPetHealthUrl/chat';
 
   static String get chatWebSocketUrl {
     final uri = Uri.parse(baseUrl);

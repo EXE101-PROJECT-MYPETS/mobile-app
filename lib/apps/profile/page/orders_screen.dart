@@ -84,7 +84,7 @@ class _OrdersList extends StatefulWidget {
 class _OrdersListState extends State<_OrdersList> {
   final OrderService _orderService = OrderService();
   final ScrollController _scrollController = ScrollController();
-  
+
   List<dynamic> _orders = [];
   bool _isLoading = false;
   bool _hasMore = true;
@@ -97,7 +97,7 @@ class _OrdersListState extends State<_OrdersList> {
     super.initState();
     _loadInitialData();
     _scrollController.addListener(_onScroll);
-    
+
     // Auto refresh every 10 seconds to keep data fresh
     _refreshTimer = Timer.periodic(const Duration(seconds: 10), (_) {
       _silentlyRefresh();
@@ -112,7 +112,8 @@ class _OrdersListState extends State<_OrdersList> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
       _loadMoreData();
     }
   }
@@ -130,7 +131,7 @@ class _OrdersListState extends State<_OrdersList> {
         status: widget.status,
         token: token,
       );
-      
+
       setState(() {
         _orders = response['content'] ?? [];
         _cursor = response['nextCursor'];
@@ -160,7 +161,7 @@ class _OrdersListState extends State<_OrdersList> {
         cursor: _cursor,
         token: token,
       );
-      
+
       setState(() {
         _orders.addAll(response['content'] ?? []);
         _cursor = response['nextCursor'];
@@ -185,14 +186,15 @@ class _OrdersListState extends State<_OrdersList> {
         status: widget.status,
         token: token,
       );
-      
+
       if (mounted) {
         // Compare first items to see if we should update
         final newOrders = response['content'] ?? [];
         if (newOrders.isNotEmpty) {
           // If the list changed or is empty, just replace it (only for the first page)
           // To prevent jumping, we only replace if we are near the top, or we can just replace
-          if (_scrollController.hasClients && _scrollController.position.pixels < 100) {
+          if (_scrollController.hasClients &&
+              _scrollController.position.pixels < 100) {
             setState(() {
               _orders = newOrders;
               _cursor = response['nextCursor'];
@@ -255,10 +257,12 @@ class _OrdersListState extends State<_OrdersList> {
       return isoDate;
     }
   }
-  
+
   String _getProductsNames(List<dynamic>? items) {
     if (items == null || items.isEmpty) return 'Không có sản phẩm';
-    final names = items.map((i) => i['productName']?.toString() ?? 'Sản phẩm').toList();
+    final names = items
+        .map((i) => i['productName']?.toString() ?? 'Sản phẩm')
+        .toList();
     if (names.length == 1) return names.first;
     return '${names.first} và ${names.length - 1} sản phẩm khác';
   }
@@ -266,7 +270,9 @@ class _OrdersListState extends State<_OrdersList> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading && _orders.isEmpty) {
-      return const Center(child: CircularProgressIndicator(color: Color(0xFFFB7185)));
+      return const Center(
+        child: CircularProgressIndicator(color: Color(0xFFFB7185)),
+      );
     }
 
     if (_error != null && _orders.isEmpty) {
@@ -315,7 +321,9 @@ class _OrdersListState extends State<_OrdersList> {
           if (index == _orders.length) {
             return const Padding(
               padding: EdgeInsets.symmetric(vertical: 16),
-              child: Center(child: CircularProgressIndicator(color: Color(0xFFFB7185))),
+              child: Center(
+                child: CircularProgressIndicator(color: Color(0xFFFB7185)),
+              ),
             );
           }
 

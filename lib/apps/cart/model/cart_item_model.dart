@@ -89,10 +89,7 @@ class CartItem {
 
   int get amount => unitPrice * quantity;
 
-  CartItem copyWith({
-    int? quantity,
-    bool? isSelected,
-  }) {
+  CartItem copyWith({int? quantity, bool? isSelected}) {
     return CartItem._(
       id: id,
       isService: isService,
@@ -109,6 +106,7 @@ class CartItem {
       durationMin: durationMin,
     );
   }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,

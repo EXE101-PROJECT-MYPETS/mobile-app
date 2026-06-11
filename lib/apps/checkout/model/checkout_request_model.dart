@@ -12,11 +12,7 @@ class CheckoutProductOrderRequest {
   });
 
   Map<String, dynamic> toJson() {
-    return {
-      'productId': productId,
-      'qty': qty,
-      'unitPrice': unitPrice,
-    };
+    return {'productId': productId, 'qty': qty, 'unitPrice': unitPrice};
   }
 }
 

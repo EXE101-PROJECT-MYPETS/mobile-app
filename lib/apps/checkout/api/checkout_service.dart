@@ -12,7 +12,7 @@ class CheckoutService {
 
   Future<CheckoutResponseModel> checkout(CheckoutRequestModel request) async {
     final uri = Uri.parse(ApiConfig.ordersUrl);
-    
+
     // Map CheckoutRequestModel to OrderDTO expected by backend
     final payload = {
       'shopId': request.shopId,
@@ -23,18 +23,20 @@ class CheckoutService {
       'shippingAddress': request.shippingAddress,
       'shippingFee': request.shippingFee,
       'discountAmount': request.discountAmount,
-      if (request.note != null && request.note!.trim().isNotEmpty) 'note': request.note!.trim(),
-      'items': request.productOrders.map((item) => {
-        'productId': item.productId,
-        'qty': item.qty,
-        'unitPrice': item.unitPrice,
-      }).toList(),
+      if (request.note != null && request.note!.trim().isNotEmpty)
+        'note': request.note!.trim(),
+      'items': request.productOrders
+          .map(
+            (item) => {
+              'productId': item.productId,
+              'qty': item.qty,
+              'unitPrice': item.unitPrice,
+            },
+          )
+          .toList(),
     };
 
-    final response = await _client.post(
-      uri,
-      body: jsonEncode(payload),
-    );
+    final response = await _client.post(uri, body: jsonEncode(payload));
 
     final body = utf8.decode(response.bodyBytes);
     if (response.statusCode >= 200 && response.statusCode < 300) {

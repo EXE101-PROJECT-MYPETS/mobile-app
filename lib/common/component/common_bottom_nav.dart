@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:petpee_mobile/common/store/app_state.dart';
+import 'package:petpee_mobile/common/notification/store/notification_provider.dart';
 
 class CommonBottomNavBar extends StatelessWidget {
   const CommonBottomNavBar({
@@ -17,6 +18,9 @@ class CommonBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cartItemCount = context.watch<AppState>().cartItems.length;
+    final unreadNotificationCount = context
+        .watch<NotificationProvider>()
+        .unreadCount;
 
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
@@ -49,8 +53,12 @@ class CommonBottomNavBar extends StatelessWidget {
           ),
           label: 'Giỏ hàng',
         ),
-        const BottomNavigationBarItem(
-          icon: Icon(LucideIcons.bell),
+        BottomNavigationBarItem(
+          icon: Badge(
+            isLabelVisible: unreadNotificationCount > 0,
+            label: Text(unreadNotificationCount.toString()),
+            child: const Icon(LucideIcons.bell),
+          ),
           label: 'Thông báo',
         ),
         const BottomNavigationBarItem(

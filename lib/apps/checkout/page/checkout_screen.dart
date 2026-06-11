@@ -105,9 +105,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   int _serviceSubtotal(AppState state) {
-    return _getCheckoutItems(state)
-        .where((item) => item.isService)
-        .fold(0, (sum, item) => sum + item.amount);
+    return _getCheckoutItems(
+      state,
+    ).where((item) => item.isService).fold(0, (sum, item) => sum + item.amount);
   }
 
   int _subtotalAmount(AppState state) {
@@ -140,11 +140,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     });
 
     try {
-          final int weight = _getCheckoutItems(appState)
+      final int weight = _getCheckoutItems(appState)
           .where((item) => !item.isService)
           .fold<int>(0, (sum, item) => sum + item.quantity * 500)
-            .clamp(500, 5000)
-            .toInt();
+          .clamp(500, 5000)
+          .toInt();
 
       final feeResponse = await _shippingService.getShippingFee(
         GhtkFeeRequest(
@@ -203,9 +203,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Future<void> _onSelectAddress() async {
     await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const AddressSelectionScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const AddressSelectionScreen()),
     );
 
     if (!mounted) return;
@@ -241,7 +239,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final items = _getCheckoutItems(appState);
     final user = authProvider.currentUser;
 
-    if (user == null || authProvider.token == null || authProvider.token!.isEmpty) {
+    if (user == null ||
+        authProvider.token == null ||
+        authProvider.token!.isEmpty) {
       _showMessage('Bạn cần đăng nhập để thực hiện thanh toán.');
       return;
     }
@@ -262,7 +262,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final hasProducts = items.any((item) => !item.isService);
     final hasServices = items.any((item) => item.isService);
 
-    if (hasProducts && _selectedAddress == null && appState.defaultAddress == null) {
+    if (hasProducts &&
+        _selectedAddress == null &&
+        appState.defaultAddress == null) {
       _showMessage('Vui lòng chọn địa chỉ giao hàng.');
       return;
     }
@@ -283,9 +285,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
 
     final address = _selectedAddress ?? appState.defaultAddress;
-    final shippingAddressText = address != null ? _buildShippingAddressText(address, user) : '';
+    final shippingAddressText = address != null
+        ? _buildShippingAddressText(address, user)
+        : '';
     final shippingFeeValue = hasProducts ? (_shippingFee ?? 0).round() : 0;
-    final pickupFeeValue = hasServices && _transportOption == 1 ? _pickupFeeValue : 0;
+    final pickupFeeValue = hasServices && _transportOption == 1
+        ? _pickupFeeValue
+        : 0;
 
     final selectedShopId = items.first.shopId;
     final productOrders = items
@@ -317,7 +323,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             petId: _selectedPetId!,
             bookingDate: bookingDateTime,
             bookingTime: bookingDateTime,
-            note: _noteController.text.trim().isEmpty ? null : _noteController.text.trim(),
+            note: _noteController.text.trim().isEmpty
+                ? null
+                : _noteController.text.trim(),
           ),
         )
         .toList();
@@ -331,7 +339,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       shippingFee: shippingFeeValue,
       pickupFee: pickupFeeValue,
       discountAmount: 0,
-      note: _noteController.text.trim().isEmpty ? null : _noteController.text.trim(),
+      note: _noteController.text.trim().isEmpty
+          ? null
+          : _noteController.text.trim(),
       productOrders: productOrders,
       serviceBookings: serviceBookings,
     );
@@ -377,7 +387,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final hasServices = items.any((item) => item.isService);
     final address = _selectedAddress ?? state.defaultAddress;
     final shippingFee = _shippingFee ?? 0;
-    final pickupFee = hasServices && _transportOption == 1 ? _pickupFeeValue : 0;
+    final pickupFee = hasServices && _transportOption == 1
+        ? _pickupFeeValue
+        : 0;
     final subtotalAmount = _subtotalAmount(state);
     final totalAmount = subtotalAmount + shippingFee + pickupFee - 0;
 
@@ -426,19 +438,28 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               decoration: BoxDecoration(
                                 color: const Color(0xFFF8FAFC),
                                 borderRadius: BorderRadius.circular(14),
-                                border: Border.all(color: const Color(0xFFE2E8F0)),
+                                border: Border.all(
+                                  color: const Color(0xFFE2E8F0),
+                                ),
                               ),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(LucideIcons.mapPin, color: Color(0xFFFB7185), size: 18),
+                                  const Icon(
+                                    LucideIcons.mapPin,
+                                    color: Color(0xFFFB7185),
+                                    size: 18,
+                                  ),
                                   const SizedBox(width: 10),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          address != null ? address.name : 'Chọn địa chỉ nhận hàng',
+                                          address != null
+                                              ? address.name
+                                              : 'Chọn địa chỉ nhận hàng',
                                           style: GoogleFonts.inter(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w700,
@@ -448,7 +469,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                         const SizedBox(height: 4),
                                         Text(
                                           address != null
-                                              ? _buildShippingAddressText(address, authProvider.currentUser)
+                                              ? _buildShippingAddressText(
+                                                  address,
+                                                  authProvider.currentUser,
+                                                )
                                               : 'Nhấn để chọn hoặc thêm địa chỉ giao hàng',
                                           style: GoogleFonts.inter(
                                             fontSize: 12,
@@ -460,7 +484,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  const Icon(LucideIcons.chevronRight, color: Color(0xFF94A3B8), size: 18),
+                                  const Icon(
+                                    LucideIcons.chevronRight,
+                                    color: Color(0xFF94A3B8),
+                                    size: 18,
+                                  ),
                                 ],
                               ),
                             ),
@@ -471,8 +499,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             value: _isLoadingFee
                                 ? 'Đang tính...'
                                 : _shippingFeeError != null
-                                    ? _shippingFeeError!
-                                    : PriceFormatter.formatVnd(_shippingFee ?? 0),
+                                ? _shippingFeeError!
+                                : PriceFormatter.formatVnd(_shippingFee ?? 0),
                             valueColor: _shippingFeeError != null
                                 ? const Color(0xFFDC2626)
                                 : const Color(0xFF111827),
@@ -505,7 +533,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               decoration: BoxDecoration(
                                 color: const Color(0xFFF8FAFC),
                                 borderRadius: BorderRadius.circular(14),
-                                border: Border.all(color: const Color(0xFFE2E8F0)),
+                                border: Border.all(
+                                  color: const Color(0xFFE2E8F0),
+                                ),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -531,18 +561,23 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                     width: double.infinity,
                                     child: OutlinedButton.icon(
                                       onPressed: () async {
-                                        final appState = context.read<AppState>();
+                                        final appState = context
+                                            .read<AppState>();
                                         final result = await Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => const AddPetScreen(),
+                                            builder: (context) =>
+                                                const AddPetScreen(),
                                           ),
                                         );
                                         if (result == true && mounted) {
                                           await appState.loadMyPets();
                                         }
                                       },
-                                      icon: const Icon(LucideIcons.plus, size: 18),
+                                      icon: const Icon(
+                                        LucideIcons.plus,
+                                        size: 18,
+                                      ),
                                       label: const Text('Thêm thú cưng'),
                                     ),
                                   ),
@@ -589,7 +624,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   final result = await Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const AddPetScreen(),
+                                      builder: (context) =>
+                                          const AddPetScreen(),
                                     ),
                                   );
                                   if (result == true && mounted) {
@@ -607,15 +643,23 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               Expanded(
                                 child: OutlinedButton.icon(
                                   onPressed: _pickBookingDate,
-                                  icon: const Icon(LucideIcons.calendarDays, size: 18),
+                                  icon: const Icon(
+                                    LucideIcons.calendarDays,
+                                    size: 18,
+                                  ),
                                   label: Text(
                                     _selectedBookingDate == null
                                         ? 'Chọn ngày'
-                                        : DateFormat('dd/MM/yyyy').format(_selectedBookingDate!),
+                                        : DateFormat(
+                                            'dd/MM/yyyy',
+                                          ).format(_selectedBookingDate!),
                                     style: GoogleFonts.inter(),
                                   ),
                                   style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
+                                      horizontal: 12,
+                                    ),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(14),
                                     ),
@@ -626,7 +670,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               Expanded(
                                 child: OutlinedButton.icon(
                                   onPressed: _pickBookingTime,
-                                  icon: const Icon(LucideIcons.clock3, size: 18),
+                                  icon: const Icon(
+                                    LucideIcons.clock3,
+                                    size: 18,
+                                  ),
                                   label: Text(
                                     _selectedBookingTime == null
                                         ? 'Chọn giờ'
@@ -634,7 +681,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                     style: GoogleFonts.inter(),
                                   ),
                                   style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
+                                      horizontal: 12,
+                                    ),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(14),
                                     ),
@@ -681,11 +731,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       children: [
                         _SummaryRow(
                           label: 'Tổng sản phẩm',
-                          value: PriceFormatter.formatVnd(_productSubtotal(state)),
+                          value: PriceFormatter.formatVnd(
+                            _productSubtotal(state),
+                          ),
                         ),
                         _SummaryRow(
                           label: 'Tổng dịch vụ',
-                          value: PriceFormatter.formatVnd(_serviceSubtotal(state)),
+                          value: PriceFormatter.formatVnd(
+                            _serviceSubtotal(state),
+                          ),
                         ),
                         _SummaryRow(
                           label: 'Phí vận chuyển',
@@ -776,7 +830,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     ? const SizedBox(
                         width: 22,
                         height: 22,
-                        child: CircularProgressIndicator(strokeWidth: 2.4, color: Colors.white),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.4,
+                          color: Colors.white,
+                        ),
                       )
                     : Text(
                         'Xác nhận đặt hàng',
@@ -872,7 +929,9 @@ class _TransportOptionCard extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: selected ? const Color(0xFFFB7185) : const Color(0xFF94A3B8),
+                  color: selected
+                      ? const Color(0xFFFB7185)
+                      : const Color(0xFF94A3B8),
                   width: 2,
                 ),
               ),
@@ -944,14 +1003,20 @@ class _SummaryRow extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style: labelStyle ?? GoogleFonts.inter(fontSize: 13, color: const Color(0xFF64748B)),
+              style:
+                  labelStyle ??
+                  GoogleFonts.inter(
+                    fontSize: 13,
+                    color: const Color(0xFF64748B),
+                  ),
             ),
           ),
           const SizedBox(width: 12),
           Text(
             value,
             textAlign: TextAlign.right,
-            style: valueStyle ??
+            style:
+                valueStyle ??
                 GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -993,7 +1058,11 @@ class _CompactCheckoutItem extends StatelessWidget {
                   width: 46,
                   height: 46,
                   color: const Color(0xFFE2E8F0),
-                  child: const Icon(Icons.pets, size: 18, color: Color(0xFF94A3B8)),
+                  child: const Icon(
+                    Icons.pets,
+                    size: 18,
+                    color: Color(0xFF94A3B8),
+                  ),
                 );
               },
             ),
