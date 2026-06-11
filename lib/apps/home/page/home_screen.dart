@@ -17,7 +17,6 @@ import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
 import 'package:petpee_mobile/common/component/product_card.dart';
 import 'package:petpee_mobile/common/component/service_card.dart';
 import 'package:petpee_mobile/common/store/app_state.dart';
-import 'package:petpee_mobile/common/user/dto/service_public_dto.dart';
 import 'package:provider/provider.dart';
 
 const Color _homeHeaderBackground = Color(0xFFD5F4FF);
@@ -130,16 +129,15 @@ class _HomeScreenState extends State<HomeScreen> {
             titleSpacing: 0,
             title: _StickySearchHeader(),
           ),
-          const SliverToBoxAdapter(child: _BenefitSection()),
-          const SliverToBoxAdapter(child: _PromoTicker()),
-          const SliverToBoxAdapter(child: _QuickShortcutGrid()),
+          const SliverToBoxAdapter(child: _HeroSection()),
+          const SliverToBoxAdapter(child: _QuickUtilitySection()),
+          const SliverToBoxAdapter(child: _VaccinationReminderSection()),
           const SliverToBoxAdapter(child: _ServiceSection()),
           const SliverToBoxAdapter(child: _VeterinarySection()),
           const SliverToBoxAdapter(child: _FeedHeader()),
           Consumer<AppState>(
             builder: (context, state, child) {
-              if (state.productsError != null &&
-                  state.allProducts.length == 0) {
+              if (state.productsError != null && state.allProducts.isEmpty) {
                 return SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
@@ -161,7 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               }
 
-              if (state.allProducts.length == 0) {
+              if (state.allProducts.isEmpty) {
                 return const SliverToBoxAdapter(
                   child: Padding(
                     padding: EdgeInsets.all(16.0),
@@ -319,16 +317,6 @@ class _StickySearchHeader extends StatelessWidget {
             ),
             const SizedBox(width: 10),
             if (isLoggedIn) ...[
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => MapScreen()),
-                  );
-                },
-                child: const _TopIcon(icon: LucideIcons.map, badge: null),
-              ),
-              const SizedBox(width: 8),
               const _TopIcon(icon: LucideIcons.bell, badge: '36'),
               const SizedBox(width: 8),
               GestureDetector(
@@ -377,15 +365,143 @@ class _StickySearchHeader extends StatelessWidget {
   }
 }
 
-class _BenefitSection extends StatelessWidget {
-  const _BenefitSection();
+class _HeroSection extends StatelessWidget {
+  const _HeroSection();
 
   @override
   Widget build(BuildContext context) {
     return Container(
       color: _homeHeaderBackground,
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 14),
-      child: const _BenefitBar(),
+      padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final imageWidth = (constraints.maxWidth * 0.4).clamp(122.0, 168.0);
+
+          return Container(
+            constraints: const BoxConstraints(minHeight: 166),
+            padding: const EdgeInsets.fromLTRB(18, 16, 10, 0),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE9F8FF),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.82)),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF78C8E8).withValues(alpha: 0.16),
+                  blurRadius: 14,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 14),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Hôm nay boss cần gì?',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            color: const Color(0xFF1F2A44),
+                            fontSize: 19,
+                            fontWeight: FontWeight.w900,
+                            height: 1.16,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Tìm spa, thú y và cửa hàng thú cưng gần bạn',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            color: const Color(0xFF667085),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            height: 1.25,
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        _HeroActionButton(
+                          label: 'Tìm gần tôi',
+                          icon: LucideIcons.mapPin,
+                          backgroundColor: const Color(0xFFFF4F8B),
+                          foregroundColor: Colors.white,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const MapScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 8),
+                        _HeroActionButton(
+                          label: 'Đặt lịch nhanh',
+                          icon: LucideIcons.activity,
+                          backgroundColor: Colors.white,
+                          foregroundColor: const Color(0xFFFF4F8B),
+                          borderColor: const Color(0xFFFFB6C9),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SpaServiceScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: imageWidth,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Positioned(
+                        top: 16,
+                        right: imageWidth * 0.28,
+                        child: Icon(
+                          Icons.favorite,
+                          color: const Color(
+                            0xFFFF6F9F,
+                          ).withValues(alpha: 0.72),
+                          size: 18,
+                        ),
+                      ),
+                      Positioned(
+                        top: 2,
+                        right: 0,
+                        child: Icon(
+                          Icons.pets,
+                          color: Colors.white.withValues(alpha: 0.56),
+                          size: 30,
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: Image.asset(
+                          'assets/pet_dog_cat_illustration.png',
+                          width: imageWidth,
+                          height: 146,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -436,197 +552,153 @@ class _TopIcon extends StatelessWidget {
   }
 }
 
-class _BenefitBar extends StatelessWidget {
-  const _BenefitBar();
-
-  @override
-  Widget build(BuildContext context) {
-    final items = [
-      (LucideIcons.wallet, 'Ví PetPee', 'Giảm 90.000đ cho đơn đầu'),
-      (LucideIcons.coins, 'Điểm danh', 'Nhận xu thưởng mỗi ngày'),
-      (LucideIcons.badgePercent, 'Trả sau', 'Mở ưu đãi voucher 150.000đ'),
-    ];
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Row(
-        children: items
-            .map(
-              (item) => Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 28,
-                        height: 28,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFF1F2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          item.$1,
-                          color: const Color(0xFFFF5F57),
-                          size: 15,
-                        ),
-                      ),
-                      const SizedBox(width: 7),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              item.$2,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.inter(
-                                color: const Color(0xFF384252),
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            Text(
-                              item.$3,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.inter(
-                                color: const Color(0xFF8B98A7),
-                                fontSize: 9,
-                                fontWeight: FontWeight.w500,
-                                height: 1.2,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            )
-            .toList(),
-      ),
-    );
-  }
-}
-
-class _PromoTicker extends StatelessWidget {
-  const _PromoTicker();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: _homeHeaderBackground,
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-      child: Column(
-        children: [
-          SizedBox(
-            height: 92,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: const [
-                _PromoCard(
-                  title: 'Tự do sắm đồ cho boss',
-                  subtitle: 'Giảm đến 50% cho khách mới',
-                  color: Color(0xFFFFF1E8),
-                ),
-                SizedBox(width: 10),
-                _PromoCard(
-                  title: 'Spa tại nhà 0đ ship',
-                  subtitle: 'Đặt lịch nhanh trong 30 giây',
-                  color: Color(0xFFFFF6DA),
-                ),
-                SizedBox(width: 10),
-                _PromoCard(
-                  title: 'Deal thú y cuối tuần',
-                  subtitle: 'Voucher tiêm phòng và khám tổng quát',
-                  color: Color(0xFFE9F7FF),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            width: 18,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(99),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PromoCard extends StatelessWidget {
-  const _PromoCard({
-    required this.title,
-    required this.subtitle,
-    required this.color,
+class _HeroActionButton extends StatelessWidget {
+  const _HeroActionButton({
+    required this.label,
+    required this.icon,
+    required this.backgroundColor,
+    required this.foregroundColor,
+    required this.onTap,
+    this.borderColor,
   });
 
-  final String title;
-  final String subtitle;
-  final Color color;
+  final String label;
+  final IconData icon;
+  final Color backgroundColor;
+  final Color foregroundColor;
+  final Color? borderColor;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 268,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return SizedBox(
+      width: 140,
+      height: 36,
+      child: Material(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(9),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(9),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(9),
+              border: borderColor == null
+                  ? null
+                  : Border.all(color: borderColor!),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(
-                    color: const Color(0xFF2E3440),
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    height: 1.15,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  subtitle,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(
-                    color: const Color(0xFF697586),
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
+                Icon(icon, color: foregroundColor, size: 15),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      color: foregroundColor,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          Container(
-            width: 62,
-            height: 62,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
+        ),
+      ),
+    );
+  }
+}
+
+class _QuickUtilitySection extends StatelessWidget {
+  const _QuickUtilitySection();
+
+  @override
+  Widget build(BuildContext context) {
+    final items = [
+      (
+        icon: LucideIcons.bath,
+        title: 'Spa và grooming',
+        subtitle: 'Tắm, cắt tỉa, vệ sinh',
+        color: const Color(0xFFFF4F8B),
+        background: const Color(0xFFFFF0F6),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const SpaServiceScreen()),
+          );
+        },
+      ),
+      (
+        icon: LucideIcons.stethoscope,
+        title: 'Thú y',
+        subtitle: 'Khám bệnh, tiêm phòng',
+        color: const Color(0xFF4AA6FF),
+        background: const Color(0xFFEFF7FF),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => MapScreen()),
+          );
+        },
+      ),
+      (
+        icon: LucideIcons.shoppingBag,
+        title: 'Pet Shop',
+        subtitle: 'Thức ăn, phụ kiện',
+        color: const Color(0xFF34C77B),
+        background: const Color(0xFFEFFBF5),
+        onTap: () {
+          Navigator.pushNamed(context, '/products');
+        },
+      ),
+      (
+        icon: LucideIcons.calendarDays,
+        title: 'Lịch của boss',
+        subtitle: 'Quản lý lịch chăm sóc',
+        color: const Color(0xFF8D6BFF),
+        background: const Color(0xFFF4F0FF),
+        onTap: () {
+          Navigator.pushNamed(context, '/pets');
+        },
+      ),
+    ];
+
+    return Container(
+      color: _homeHeaderBackground,
+      padding: const EdgeInsets.fromLTRB(12, 2, 12, 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(2, 0, 2, 10),
+            child: Text(
+              'Tiện ích nhanh',
+              style: GoogleFonts.inter(
+                color: const Color(0xFF1F2937),
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+              ),
             ),
-            child: const Icon(
-              LucideIcons.badgeDollarSign,
-              color: Color(0xFFFF6B57),
-            ),
+          ),
+          Row(
+            children: [
+              Expanded(child: _QuickUtilityTile(item: items[0])),
+              const SizedBox(width: 8),
+              Expanded(child: _QuickUtilityTile(item: items[1])),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(child: _QuickUtilityTile(item: items[2])),
+              const SizedBox(width: 8),
+              Expanded(child: _QuickUtilityTile(item: items[3])),
+            ],
           ),
         ],
       ),
@@ -634,70 +706,303 @@ class _PromoCard extends StatelessWidget {
   }
 }
 
-class _QuickShortcutGrid extends StatelessWidget {
-  const _QuickShortcutGrid();
+class _QuickUtilityTile extends StatelessWidget {
+  const _QuickUtilityTile({required this.item});
+
+  final ({
+    IconData icon,
+    String title,
+    String subtitle,
+    Color color,
+    Color background,
+    VoidCallback onTap,
+  })
+  item;
 
   @override
   Widget build(BuildContext context) {
-    final items = [
-      (LucideIcons.utensilsCrossed, 'Pet Food'),
-      (LucideIcons.crown, 'VIP'),
-      (LucideIcons.badgeDollarSign, 'Deal 1.000d'),
-      (LucideIcons.ticket, 'Xử lý đơn'),
-      (LucideIcons.gift, 'Voucher'),
-    ];
-
-    return Container(
-      color: _homeHeaderBackground,
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 14),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: items
-            .map(
-              (item) => SizedBox(
-                width: 68,
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: item.onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 66),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF7EC8E8).withValues(alpha: 0.1),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: item.background,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(item.icon, color: item.color, size: 24),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(14),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(
-                              0xFF76C6E8,
-                            ).withValues(alpha: 0.12),
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        item.$1,
-                        color: const Color(0xFFFF5A4E),
-                        size: 21,
+                    Text(
+                      item.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        color: const Color(0xFF263244),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 2),
                     Text(
-                      item.$2,
-                      textAlign: TextAlign.center,
+                      item.subtitle,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.inter(
-                        color: const Color(0xFF334155),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        height: 1.15,
+                        color: const Color(0xFF7A8796),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        height: 1.2,
                       ),
                     ),
                   ],
                 ),
               ),
-            )
-            .toList(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ReminderActionButton extends StatelessWidget {
+  const _ReminderActionButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 30,
+      child: ElevatedButton(
+        onPressed: onTap,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFFFF746E),
+          foregroundColor: Colors.white,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+        child: Text(
+          'Xem lịch chăm sóc',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w800),
+        ),
+      ),
+    );
+  }
+}
+
+class _ReminderPetAvatar extends StatelessWidget {
+  const _ReminderPetAvatar();
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          width: 74,
+          height: 74,
+          padding: const EdgeInsets.all(4),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+          child: ClipOval(
+            child: Image.asset(
+              'assets/pet_dog_cat_illustration.png',
+              fit: BoxFit.cover,
+              alignment: Alignment.centerLeft,
+            ),
+          ),
+        ),
+        Positioned(
+          right: -1,
+          bottom: 4,
+          child: Container(
+            width: 27,
+            height: 27,
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFF1F4),
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 3),
+            ),
+            child: const Icon(
+              LucideIcons.bell,
+              size: 13,
+              color: Color(0xFFFF4F8B),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _VaccinationReminderSection extends StatelessWidget {
+  const _VaccinationReminderSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: _homeHeaderBackground,
+      padding: const EdgeInsets.fromLTRB(12, 2, 12, 12),
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 96),
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFFFFF4DD), Color(0xFFE9F8FF)],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.75)),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF8ECDE7).withValues(alpha: 0.14),
+              blurRadius: 16,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            const _ReminderPetAvatar(),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Nhắc lịch cho boss',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      color: const Color(0xFF1F2937),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    'Milo sắp đến lịch tiêm phòng',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      color: const Color(0xFF697586),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Row(
+                    children: [
+                      const Icon(
+                        LucideIcons.calendar,
+                        size: 13,
+                        color: Color(0xFF8B98A7),
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          'Ngày dự kiến: 25/06/2026',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            color: const Color(0xFF7A8796),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 7),
+                  _ReminderActionButton(
+                    onTap: () => Navigator.pushNamed(context, '/pets'),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            SizedBox(
+              width: 58,
+              height: 74,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Positioned(
+                    bottom: 4,
+                    left: 2,
+                    child: Container(
+                      width: 34,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE5F4FF),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                      child: const Icon(
+                        LucideIcons.cross,
+                        color: Color(0xFF4AA6FF),
+                        size: 18,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    top: 4,
+                    child: Transform.rotate(
+                      angle: 0.36,
+                      child: Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.85),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          LucideIcons.syringe,
+                          color: Color(0xFF3A9DF5),
+                          size: 28,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -727,6 +1032,142 @@ class _FeedHeader extends StatelessWidget {
   }
 }
 
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({required this.title, required this.onViewAll});
+
+  final String title;
+  final VoidCallback onViewAll;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.inter(
+                color: const Color(0xFF1F2937),
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          InkWell(
+            onTap: onViewAll,
+            borderRadius: BorderRadius.circular(999),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Xem tất cả',
+                    style: GoogleFonts.inter(
+                      color: const Color(0xFF3A9DF5),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(width: 2),
+                  const Icon(
+                    LucideIcons.chevronRight,
+                    color: Color(0xFF3A9DF5),
+                    size: 13,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ServiceStateCard extends StatelessWidget {
+  const _ServiceStateCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    this.isError = false,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final bool isError;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = isError ? const Color(0xFFE11D48) : const Color(0xFFB6DDF2);
+
+    return Container(
+      constraints: const BoxConstraints(minHeight: 78),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(13),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF7EC8E8).withValues(alpha: 0.1),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+              border: Border.all(color: color.withValues(alpha: 0.35)),
+            ),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    color: isError ? color : const Color(0xFF5A6573),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFF98A4B3),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    height: 1.25,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _ServiceSection extends StatelessWidget {
   const _ServiceSection();
 
@@ -734,53 +1175,46 @@ class _ServiceSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: _homeContentBackground,
-      padding: const EdgeInsets.fromLTRB(12, 16, 12, 8),
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Row(
-              children: [
-                Text(
-                  'Dịch vụ spa nổi bật gần bạn',
-                  style: GoogleFonts.inter(
-                    color: const Color(0xFF1F2937),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w900,
-                  ),
+          _SectionHeader(
+            title: 'Dịch vụ spa nổi bật gần bạn',
+            onViewAll: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SpaServiceScreen(),
                 ),
-              ],
-            ),
+              );
+            },
           ),
           Consumer<AppState>(
             builder: (context, state, child) {
-              final services = state.allServices ?? <ServicePublicDTO>[];
+              final services = state.allServices;
 
-              if (state.isLoadingServices && services.length == 0) {
+              if (state.isLoadingServices && services.isEmpty) {
                 return const SizedBox(
                   height: 188,
                   child: Center(child: CircularProgressIndicator()),
                 );
               }
 
-              if (state.servicesError != null && services.length == 0) {
-                return SizedBox(
-                  height: 188,
-                  child: Center(
-                    child: Text(
-                      state.servicesError ?? 'Lỗi tải dịch vụ',
-                      style: const TextStyle(color: Colors.red),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
+              if (state.servicesError != null && services.isEmpty) {
+                return _ServiceStateCard(
+                  icon: LucideIcons.alertCircle,
+                  title: 'Không tải được dịch vụ',
+                  subtitle: state.servicesError ?? 'Vui lòng thử lại sau.',
+                  isError: true,
                 );
               }
 
-              if (services.length == 0) {
-                return const SizedBox(
-                  height: 188,
-                  child: Center(child: Text('Chưa có dịch vụ nào')),
+              if (services.isEmpty) {
+                return const _ServiceStateCard(
+                  icon: LucideIcons.store,
+                  title: 'Chưa có dịch vụ nào',
+                  subtitle: 'Các spa uy tín sẽ hiển thị tại đây',
                 );
               }
 
@@ -838,55 +1272,45 @@ class _VeterinarySection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: _homeContentBackground,
-      padding: const EdgeInsets.fromLTRB(12, 16, 12, 8),
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Row(
-              children: [
-                Text(
-                  'Dịch vụ thú y gần bạn',
-                  style: GoogleFonts.inter(
-                    color: const Color(0xFF1F2937),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ],
-            ),
+          _SectionHeader(
+            title: 'Dịch vụ thú y gần bạn',
+            onViewAll: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MapScreen()),
+              );
+            },
           ),
           Consumer<AppState>(
             builder: (context, state, child) {
               try {
-                final vetList =
-                    state.veterinaryServices ?? <ServicePublicDTO>[];
+                final vetList = state.veterinaryServices;
 
-                if (state.isLoadingVeterinary && vetList.length == 0) {
+                if (state.isLoadingVeterinary && vetList.isEmpty) {
                   return const SizedBox(
                     height: 188,
                     child: Center(child: CircularProgressIndicator()),
                   );
                 }
 
-                if (state.veterinaryError != null && vetList.length == 0) {
-                  return SizedBox(
-                    height: 188,
-                    child: Center(
-                      child: Text(
-                        state.veterinaryError ?? 'Lỗi tải dịch vụ thú y',
-                        style: const TextStyle(color: Colors.red),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
+                if (state.veterinaryError != null && vetList.isEmpty) {
+                  return _ServiceStateCard(
+                    icon: LucideIcons.alertCircle,
+                    title: 'Không tải được dịch vụ thú y',
+                    subtitle: state.veterinaryError ?? 'Vui lòng thử lại sau.',
+                    isError: true,
                   );
                 }
 
-                if (vetList.length == 0) {
-                  return const SizedBox(
-                    height: 188,
-                    child: Center(child: Text('Chưa có dịch vụ thú y')),
+                if (vetList.isEmpty) {
+                  return const _ServiceStateCard(
+                    icon: LucideIcons.building2,
+                    title: 'Chưa có dịch vụ nào',
+                    subtitle: 'Các phòng khám uy tín sẽ hiển thị tại đây',
                   );
                 }
 
