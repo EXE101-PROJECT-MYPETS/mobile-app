@@ -30,8 +30,10 @@ class CheckoutResponseModel {
       bookingIds: (json['bookingIds'] as List<dynamic>? ?? const [])
           .map((value) => (value as num).toInt())
           .toList(),
-      productSubtotalAmount: (json['productSubtotalAmount'] as num?)?.toInt() ?? 0,
-      serviceSubtotalAmount: (json['serviceSubtotalAmount'] as num?)?.toInt() ?? 0,
+      productSubtotalAmount:
+          (json['productSubtotalAmount'] as num?)?.toInt() ?? 0,
+      serviceSubtotalAmount:
+          (json['serviceSubtotalAmount'] as num?)?.toInt() ?? 0,
       subtotalAmount: (json['subtotalAmount'] as num?)?.toInt() ?? 0,
       shippingFee: (json['shippingFee'] as num?)?.toInt() ?? 0,
       pickupFee: (json['pickupFee'] as num?)?.toInt() ?? 0,

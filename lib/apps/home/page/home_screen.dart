@@ -4,20 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/apps/home/page/notifications_screen.dart';
 import 'package:petpee_mobile/apps/home/page/map_screen.dart';
-import 'package:petpee_mobile/apps/product/page/spa_service_screen.dart';
-import 'package:petpee_mobile/apps/profile/page/profile_screen.dart';
-import 'package:petpee_mobile/features/chat/screens/pet_ai_selection_screen.dart';
 import 'package:petpee_mobile/features/chat/screens/chat_list_screen.dart';
 import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
 import 'package:petpee_mobile/apps/search/page/search_screen.dart';
-import 'package:petpee_mobile/apps/cart/page/cart_screen.dart';
 import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
 import 'package:petpee_mobile/common/component/product_card.dart';
 import 'package:petpee_mobile/common/component/service_card.dart';
+import 'package:petpee_mobile/common/navigation/main_tab_navigation.dart';
 import 'package:petpee_mobile/common/store/app_state.dart';
-import 'package:petpee_mobile/common/user/dto/service_public_dto.dart';
 import 'package:provider/provider.dart';
 
 const Color _homeHeaderBackground = Color(0xFFD5F4FF);
@@ -138,8 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SliverToBoxAdapter(child: _FeedHeader()),
           Consumer<AppState>(
             builder: (context, state, child) {
-              if (state.productsError != null &&
-                  state.allProducts.length == 0) {
+              if (state.productsError != null && state.allProducts.isEmpty) {
                 return SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
@@ -161,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               }
 
-              if (state.allProducts.length == 0) {
+              if (state.allProducts.isEmpty) {
                 return const SliverToBoxAdapter(
                   child: Padding(
                     padding: EdgeInsets.all(16.0),
@@ -203,37 +197,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: const _FloatingGiftButton(),
       bottomNavigationBar: CommonBottomNavBar(
         currentIndex: 0,
-        onTap: (index) {
-          if (index == 1) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const PetAiSelectionScreen(),
-              ),
-              (route) => false,
-            );
-          } else if (index == 2) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const CartScreen()),
-            );
-          } else if (index == 3) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => NotificationsScreen()),
-              (route) => false,
-            );
-          } else if (index == 4) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => ProfileScreen()),
-              (route) => false,
-            );
-          }
-        },
+        onTap: (index) =>
+            MainTabNavigation.open(context, index, currentIndex: 0),
       ),
     );
   }
@@ -755,16 +722,16 @@ class _ServiceSection extends StatelessWidget {
           ),
           Consumer<AppState>(
             builder: (context, state, child) {
-              final services = state.allServices ?? <ServicePublicDTO>[];
+              final services = state.allServices;
 
-              if (state.isLoadingServices && services.length == 0) {
+              if (state.isLoadingServices && services.isEmpty) {
                 return const SizedBox(
                   height: 188,
                   child: Center(child: CircularProgressIndicator()),
                 );
               }
 
-              if (state.servicesError != null && services.length == 0) {
+              if (state.servicesError != null && services.isEmpty) {
                 return SizedBox(
                   height: 188,
                   child: Center(
@@ -777,7 +744,7 @@ class _ServiceSection extends StatelessWidget {
                 );
               }
 
-              if (services.length == 0) {
+              if (services.isEmpty) {
                 return const SizedBox(
                   height: 188,
                   child: Center(child: Text('Chưa có dịch vụ nào')),
@@ -860,17 +827,16 @@ class _VeterinarySection extends StatelessWidget {
           Consumer<AppState>(
             builder: (context, state, child) {
               try {
-                final vetList =
-                    state.veterinaryServices ?? <ServicePublicDTO>[];
+                final vetList = state.veterinaryServices;
 
-                if (state.isLoadingVeterinary && vetList.length == 0) {
+                if (state.isLoadingVeterinary && vetList.isEmpty) {
                   return const SizedBox(
                     height: 188,
                     child: Center(child: CircularProgressIndicator()),
                   );
                 }
 
-                if (state.veterinaryError != null && vetList.length == 0) {
+                if (state.veterinaryError != null && vetList.isEmpty) {
                   return SizedBox(
                     height: 188,
                     child: Center(
@@ -883,7 +849,7 @@ class _VeterinarySection extends StatelessWidget {
                   );
                 }
 
-                if (vetList.length == 0) {
+                if (vetList.isEmpty) {
                   return const SizedBox(
                     height: 188,
                     child: Center(child: Text('Chưa có dịch vụ thú y')),
@@ -949,62 +915,6 @@ class _VeterinarySection extends StatelessWidget {
                 );
               }
             },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FloatingGiftButton extends StatelessWidget {
-  const _FloatingGiftButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 62,
-      height: 62,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFFC54D), Color(0xFFFF8A34)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFFF9A3D).withValues(alpha: 0.35),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          const Center(
-            child: Icon(LucideIcons.gift, color: Colors.white, size: 28),
-          ),
-          Positioned(
-            top: -2,
-            right: -2,
-            child: Container(
-              width: 22,
-              height: 22,
-              decoration: const BoxDecoration(
-                color: Color(0xFFFF314D),
-                shape: BoxShape.circle,
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                '1',
-                style: GoogleFonts.inter(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
           ),
         ],
       ),

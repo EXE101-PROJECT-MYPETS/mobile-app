@@ -9,6 +9,7 @@ class CartItem {
   final String imageUrl;
   final String? description;
   final int unitPrice;
+  final double? weightKg;
   final int? durationMin;
   int quantity;
   bool isSelected;
@@ -23,6 +24,7 @@ class CartItem {
     required this.name,
     required this.imageUrl,
     required this.unitPrice,
+    this.weightKg,
     required this.quantity,
     required this.isSelected,
     this.description,
@@ -40,6 +42,7 @@ class CartItem {
     int quantity = 1,
     bool isSelected = false,
     String? description,
+    double? weightKg,
   }) {
     return CartItem._(
       id: id,
@@ -51,6 +54,7 @@ class CartItem {
       name: name,
       imageUrl: imageUrl,
       unitPrice: unitPrice,
+      weightKg: weightKg,
       quantity: quantity,
       isSelected: isSelected,
       description: description,
@@ -80,6 +84,7 @@ class CartItem {
       name: name,
       imageUrl: imageUrl,
       unitPrice: unitPrice,
+      weightKg: null,
       quantity: quantity,
       isSelected: isSelected,
       description: description,
@@ -89,10 +94,7 @@ class CartItem {
 
   int get amount => unitPrice * quantity;
 
-  CartItem copyWith({
-    int? quantity,
-    bool? isSelected,
-  }) {
+  CartItem copyWith({int? quantity, bool? isSelected, double? weightKg}) {
     return CartItem._(
       id: id,
       isService: isService,
@@ -103,12 +105,14 @@ class CartItem {
       name: name,
       imageUrl: imageUrl,
       unitPrice: unitPrice,
+      weightKg: weightKg ?? this.weightKg,
       quantity: quantity ?? this.quantity,
       isSelected: isSelected ?? this.isSelected,
       description: description,
       durationMin: durationMin,
     );
   }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -120,6 +124,7 @@ class CartItem {
       'name': name,
       'imageUrl': imageUrl,
       'unitPrice': unitPrice,
+      'weightKg': weightKg,
       'quantity': quantity,
       'isSelected': isSelected,
       'description': description,
@@ -138,6 +143,7 @@ class CartItem {
       name: map['name'] ?? '',
       imageUrl: map['imageUrl'] ?? '',
       unitPrice: map['unitPrice'] ?? 0,
+      weightKg: _parseDouble(map['weightKg']),
       quantity: map['quantity'] ?? 1,
       isSelected: map['isSelected'] ?? false,
       description: map['description'],
@@ -147,3 +153,9 @@ class CartItem {
 }
 
 typedef CartItemModel = CartItem;
+
+double? _parseDouble(dynamic value) {
+  if (value == null) return null;
+  if (value is num) return value.toDouble();
+  return double.tryParse(value.toString());
+}

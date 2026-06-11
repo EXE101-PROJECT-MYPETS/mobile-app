@@ -86,6 +86,7 @@ class AppState extends ChangeNotifier {
   List<ServicePublicDTO> get veterinaryServices => _veterinaryServices;
   bool get isLoadingVeterinary => _isLoadingVeterinary;
   String? get veterinaryError => _veterinaryError;
+  int? get veterinaryCursor => _veterinaryCursor;
   bool get hasMoreVeterinary => _hasMoreVeterinary;
   double? get serviceUserLat => _serviceUserLat;
   double? get serviceUserLng => _serviceUserLng;
@@ -338,6 +339,7 @@ class AppState extends ChangeNotifier {
       'type': product.type,
       'category': product.category,
       'description': product.description,
+      'weightKg': product.weightKg,
       'shopProvince': product.shopProvince,
       'timestamp': DateTime.now().toIso8601String(),
     };
@@ -442,20 +444,28 @@ class AppState extends ChangeNotifier {
     int quantity = 1,
   }) {
     final index = _cartItems.indexWhere(
-      (i) => !i.isService && i.productId == _parseId(product.id) && i.shopName == shopName,
+      (i) =>
+          !i.isService &&
+          i.productId == _parseId(product.id) &&
+          i.shopName == shopName,
     );
     if (index >= 0) {
-      _cartItems[index].quantity += quantity;
+      _cartItems[index] = _cartItems[index].copyWith(
+        quantity: _cartItems[index].quantity + quantity,
+        weightKg: product.weightKg,
+      );
     } else {
       _cartItems.add(
         CartItemModel.product(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           shopId: shopId ?? 0,
           shopName: shopName,
-          productId: _parseId(product.id) ?? DateTime.now().millisecondsSinceEpoch,
+          productId:
+              _parseId(product.id) ?? DateTime.now().millisecondsSinceEpoch,
           name: product.name,
           imageUrl: product.image,
           unitPrice: _parsePrice(product.price),
+          weightKg: product.weightKg,
           quantity: quantity,
           isSelected: true,
           description: product.description,
@@ -466,10 +476,7 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addServiceToCart(
-    ServicePublicDTO service,
-    {int quantity = 1}
-  ) {
+  void addServiceToCart(ServicePublicDTO service, {int quantity = 1}) {
     final serviceId = service.id ?? DateTime.now().millisecondsSinceEpoch;
     final index = _cartItems.indexWhere(
       (item) => item.isService && item.serviceId == serviceId,
@@ -510,21 +517,29 @@ class AppState extends ChangeNotifier {
     }
 
     final index = _cartItems.indexWhere(
-      (i) => !i.isService && i.productId == _parseId(product.id) && i.shopName == shopName,
+      (i) =>
+          !i.isService &&
+          i.productId == _parseId(product.id) &&
+          i.shopName == shopName,
     );
     if (index >= 0) {
-      _cartItems[index].quantity = quantity;
-      _cartItems[index].isSelected = true;
+      _cartItems[index] = _cartItems[index].copyWith(
+        quantity: quantity,
+        isSelected: true,
+        weightKg: product.weightKg,
+      );
     } else {
       _cartItems.add(
         CartItemModel.product(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           shopId: shopId ?? 0,
           shopName: shopName,
-          productId: _parseId(product.id) ?? DateTime.now().millisecondsSinceEpoch,
+          productId:
+              _parseId(product.id) ?? DateTime.now().millisecondsSinceEpoch,
           name: product.name,
           imageUrl: product.image,
           unitPrice: _parsePrice(product.price),
+          weightKg: product.weightKg,
           quantity: quantity,
           isSelected: true,
           description: product.description,
@@ -536,10 +551,7 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void prepareBuyNowService(
-    ServicePublicDTO service, {
-    int quantity = 1,
-  }) {
+  void prepareBuyNowService(ServicePublicDTO service, {int quantity = 1}) {
     for (final item in _cartItems) {
       item.isSelected = false;
     }
@@ -848,5 +860,4 @@ class AppState extends ChangeNotifier {
       notifyListeners();
     }
   }
-
 }

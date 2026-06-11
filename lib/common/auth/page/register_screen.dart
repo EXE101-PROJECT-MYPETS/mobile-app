@@ -30,7 +30,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _provinceController = TextEditingController();
   final _districtController = TextEditingController();
   final _wardController = TextEditingController();
-  final _hamletController = TextEditingController();
   final _ageController = TextEditingController();
   final _otpController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -57,7 +56,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _provinceController.dispose();
     _districtController.dispose();
     _wardController.dispose();
-    _hamletController.dispose();
     _ageController.dispose();
     _otpController.dispose();
     _passwordController.dispose();
@@ -299,7 +297,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         province: _provinceController.text.trim(),
         district: _districtController.text.trim(),
         ward: _wardController.text.trim(),
-        hamlet: _hamletController.text.trim(),
+        hamlet: _addressController.text.trim(),
         age: int.tryParse(_ageController.text.trim()),
         avatar: _avatar,
       );
@@ -548,12 +546,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
       const SizedBox(height: 16),
       CustomTextField(
         controller: _addressController,
-        label: 'Địa chỉ',
-        hintText: 'Nhập địa chỉ',
+        label: 'Số nhà và tên đường',
+        hintText: 'Nhập số nhà và tên đường',
         prefixIcon: LucideIcons.mapPin,
         textInputAction: TextInputAction.next,
         validator: (value) {
-          return _requiredField(value, 'địa chỉ');
+          return _requiredField(value, 'số nhà và tên đường');
         },
       ),
       const SizedBox(height: 16),
@@ -571,51 +569,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
         },
       ),
       const SizedBox(height: 16),
-      Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: CustomTextField(
-              controller: _districtController,
-              label: 'Quận/huyện',
-              hintText: 'Chọn quận/huyện',
-              prefixIcon: LucideIcons.building2,
-              suffixIcon: LucideIcons.chevronDown,
-              readOnly: true,
-              onTap: _selectDistrict,
-              textInputAction: TextInputAction.next,
-              validator: (value) {
-                return _requiredField(value, 'quận/huyện');
-              },
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: CustomTextField(
-              controller: _wardController,
-              label: 'Phường/xã',
-              hintText: 'Chọn phường/xã',
-              prefixIcon: LucideIcons.mapPin,
-              suffixIcon: LucideIcons.chevronDown,
-              readOnly: true,
-              onTap: _selectWard,
-              textInputAction: TextInputAction.next,
-              validator: (value) {
-                return _requiredField(value, 'phường/xã');
-              },
-            ),
-          ),
-        ],
+      CustomTextField(
+        controller: _districtController,
+        label: 'Quận/huyện',
+        hintText: 'Chọn quận/huyện',
+        prefixIcon: LucideIcons.building2,
+        suffixIcon: LucideIcons.chevronDown,
+        readOnly: true,
+        onTap: _selectDistrict,
+        textInputAction: TextInputAction.next,
+        validator: (value) {
+          return _requiredField(value, 'quận/huyện');
+        },
       ),
       const SizedBox(height: 16),
       CustomTextField(
-        controller: _hamletController,
-        label: 'Thôn/xóm',
-        hintText: 'Nhập thôn/xóm',
-        prefixIcon: LucideIcons.home,
+        controller: _wardController,
+        label: 'Phường/xã',
+        hintText: 'Chọn phường/xã',
+        prefixIcon: LucideIcons.mapPin,
+        suffixIcon: LucideIcons.chevronDown,
+        readOnly: true,
+        onTap: _selectWard,
         textInputAction: TextInputAction.done,
         validator: (value) {
-          return _requiredField(value, 'thôn/xóm');
+          return _requiredField(value, 'phường/xã');
         },
       ),
       const SizedBox(height: 24),

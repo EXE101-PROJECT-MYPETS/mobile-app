@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:petpee_mobile/apps/cart/model/cart_item_model.dart';
 import 'package:petpee_mobile/apps/checkout/page/checkout_screen.dart';
+import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
+import 'package:petpee_mobile/common/navigation/main_tab_navigation.dart';
 import 'package:petpee_mobile/common/store/app_state.dart';
 import 'package:petpee_mobile/common/toast/app_toast.dart';
 import 'package:petpee_mobile/common/utils/price_formatter.dart';
@@ -16,8 +18,12 @@ class CartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = context.watch<AppState>();
     final selectedItems = state.selectedCartItems;
-    final productItems = state.cartItems.where((item) => !item.isService).toList();
-    final serviceItems = state.cartItems.where((item) => item.isService).toList();
+    final productItems = state.cartItems
+        .where((item) => !item.isService)
+        .toList();
+    final serviceItems = state.cartItems
+        .where((item) => item.isService)
+        .toList();
     final currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
 
     return Scaffold(
@@ -28,7 +34,7 @@ class CartScreen extends StatelessWidget {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(LucideIcons.arrowLeft, color: Color(0xFF111827)),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => MainTabNavigation.backToPreviousOrHome(context),
         ),
         title: Text(
           'Giỏ hàng',
@@ -61,10 +67,18 @@ class CartScreen extends StatelessWidget {
                           (item) => _ProductCartItemCard(
                             item: item,
                             currencyFormat: currencyFormat,
-                            onIncrease: () => context.read<AppState>().updateCartQuantity(item.id, 1),
-                            onDecrease: () => context.read<AppState>().updateCartQuantity(item.id, -1),
-                            onToggleSelected: (value) => context.read<AppState>().toggleCartSelection(item.id, value),
-                            onDelete: () => context.read<AppState>().removeFromCart(item.id),
+                            onIncrease: () => context
+                                .read<AppState>()
+                                .updateCartQuantity(item.id, 1),
+                            onDecrease: () => context
+                                .read<AppState>()
+                                .updateCartQuantity(item.id, -1),
+                            onToggleSelected: (value) => context
+                                .read<AppState>()
+                                .toggleCartSelection(item.id, value),
+                            onDelete: () => context
+                                .read<AppState>()
+                                .removeFromCart(item.id),
                           ),
                         ),
                       const SizedBox(height: 20),
@@ -82,8 +96,12 @@ class CartScreen extends StatelessWidget {
                           (item) => _ServiceCartItemCard(
                             item: item,
                             currencyFormat: currencyFormat,
-                            onToggleSelected: (value) => context.read<AppState>().toggleCartSelection(item.id, value),
-                            onDelete: () => context.read<AppState>().removeFromCart(item.id),
+                            onToggleSelected: (value) => context
+                                .read<AppState>()
+                                .toggleCartSelection(item.id, value),
+                            onDelete: () => context
+                                .read<AppState>()
+                                .removeFromCart(item.id),
                           ),
                         ),
                     ],
@@ -103,11 +121,14 @@ class CartScreen extends StatelessWidget {
                   return;
                 }
 
-                final shopIds = selectedItems.map((item) => item.shopId).toSet();
+                final shopIds = selectedItems
+                    .map((item) => item.shopId)
+                    .toSet();
                 if (shopIds.length > 1) {
                   showAppToast(
                     context,
-                    message: 'Chỉ hỗ trợ thanh toán các mục trong cùng một shop.',
+                    message:
+                        'Chỉ hỗ trợ thanh toán các mục trong cùng một shop.',
                     type: AppToastType.warning,
                   );
                   return;
@@ -116,12 +137,18 @@ class CartScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => CheckoutScreen(selectedItems: selectedItems),
+                    builder: (context) =>
+                        CheckoutScreen(selectedItems: selectedItems),
                   ),
                 );
               },
             ),
         ],
+      ),
+      bottomNavigationBar: CommonBottomNavBar(
+        currentIndex: 2,
+        onTap: (index) =>
+            MainTabNavigation.open(context, index, currentIndex: 2),
       ),
     );
   }
@@ -174,10 +201,7 @@ class _SectionEmptyState extends StatelessWidget {
       ),
       child: Text(
         message,
-        style: GoogleFonts.inter(
-          fontSize: 13,
-          color: const Color(0xFF64748B),
-        ),
+        style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF64748B)),
       ),
     );
   }
@@ -404,7 +428,10 @@ class _ServiceCartItemCard extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFFDF2F8),
                         borderRadius: BorderRadius.circular(999),
@@ -640,7 +667,11 @@ class _EmptyCartState extends StatelessWidget {
               color: const Color(0xFFFDF2F8),
               borderRadius: BorderRadius.circular(24),
             ),
-            child: const Icon(LucideIcons.shoppingCart, size: 38, color: Color(0xFFFB7185)),
+            child: const Icon(
+              LucideIcons.shoppingCart,
+              size: 38,
+              color: Color(0xFFFB7185),
+            ),
           ),
           const SizedBox(height: 16),
           Text(
