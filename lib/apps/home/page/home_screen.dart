@@ -133,8 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SliverToBoxAdapter(child: _FeedHeader()),
           Consumer<AppState>(
             builder: (context, state, child) {
-              if (state.productsError != null &&
-                  state.allProducts.length == 0) {
+              if (state.productsError != null && state.allProducts.isEmpty) {
                 return SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
@@ -156,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               }
 
-              if (state.allProducts.length == 0) {
+              if (state.allProducts.isEmpty) {
                 return const SliverToBoxAdapter(
                   child: Padding(
                     padding: EdgeInsets.all(16.0),
@@ -198,7 +197,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: const _FloatingGiftButton(),
       bottomNavigationBar: CommonBottomNavBar(
         currentIndex: 0,
         onTap: (index) =>
@@ -726,14 +724,14 @@ class _ServiceSection extends StatelessWidget {
             builder: (context, state, child) {
               final services = state.allServices;
 
-              if (state.isLoadingServices && services.length == 0) {
+              if (state.isLoadingServices && services.isEmpty) {
                 return const SizedBox(
                   height: 188,
                   child: Center(child: CircularProgressIndicator()),
                 );
               }
 
-              if (state.servicesError != null && services.length == 0) {
+              if (state.servicesError != null && services.isEmpty) {
                 return SizedBox(
                   height: 188,
                   child: Center(
@@ -746,7 +744,7 @@ class _ServiceSection extends StatelessWidget {
                 );
               }
 
-              if (services.length == 0) {
+              if (services.isEmpty) {
                 return const SizedBox(
                   height: 188,
                   child: Center(child: Text('Chưa có dịch vụ nào')),
@@ -831,14 +829,14 @@ class _VeterinarySection extends StatelessWidget {
               try {
                 final vetList = state.veterinaryServices;
 
-                if (state.isLoadingVeterinary && vetList.length == 0) {
+                if (state.isLoadingVeterinary && vetList.isEmpty) {
                   return const SizedBox(
                     height: 188,
                     child: Center(child: CircularProgressIndicator()),
                   );
                 }
 
-                if (state.veterinaryError != null && vetList.length == 0) {
+                if (state.veterinaryError != null && vetList.isEmpty) {
                   return SizedBox(
                     height: 188,
                     child: Center(
@@ -851,7 +849,7 @@ class _VeterinarySection extends StatelessWidget {
                   );
                 }
 
-                if (vetList.length == 0) {
+                if (vetList.isEmpty) {
                   return const SizedBox(
                     height: 188,
                     child: Center(child: Text('Chưa có dịch vụ thú y')),
@@ -917,62 +915,6 @@ class _VeterinarySection extends StatelessWidget {
                 );
               }
             },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FloatingGiftButton extends StatelessWidget {
-  const _FloatingGiftButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 62,
-      height: 62,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFFC54D), Color(0xFFFF8A34)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFFF9A3D).withValues(alpha: 0.35),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          const Center(
-            child: Icon(LucideIcons.gift, color: Colors.white, size: 28),
-          ),
-          Positioned(
-            top: -2,
-            right: -2,
-            child: Container(
-              width: 22,
-              height: 22,
-              decoration: const BoxDecoration(
-                color: Color(0xFFFF314D),
-                shape: BoxShape.circle,
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                '1',
-                style: GoogleFonts.inter(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
           ),
         ],
       ),
