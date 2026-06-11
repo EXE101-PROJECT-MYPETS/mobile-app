@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/apps/profile/model/pet_dto.dart';
-import 'package:petpee_mobile/apps/profile/model/pet_model.dart';
-import 'package:petpee_mobile/apps/profile/api/pet_service.dart';
-import 'package:petpee_mobile/common/toast/app_toast.dart';
-import 'package:petpee_mobile/apps/profile/model/pet_species_dto.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/apps/profile/model/pet_dto.dart';
+import 'package:pawly_mobile/apps/profile/model/pet_model.dart';
+import 'package:pawly_mobile/apps/profile/api/pet_service.dart';
+import 'package:pawly_mobile/common/toast/app_toast.dart';
+import 'package:pawly_mobile/apps/profile/model/pet_species_dto.dart';
 import 'dart:io';
 
 class AddPetScreen extends StatefulWidget {
@@ -86,7 +86,7 @@ class _AddPetScreenState extends State<AddPetScreen> {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: Colors.black87),
+          icon: const Icon(LucideIcons.arrow_left, color: Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(

@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
-import 'package:petpee_mobile/common/config/api_config.dart';
-import 'package:petpee_mobile/common/toast/app_toast.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
+import 'package:pawly_mobile/common/config/api_config.dart';
+import 'package:pawly_mobile/common/toast/app_toast.dart';
 import 'package:provider/provider.dart';
 
 class EditProfileScreen extends StatefulWidget {

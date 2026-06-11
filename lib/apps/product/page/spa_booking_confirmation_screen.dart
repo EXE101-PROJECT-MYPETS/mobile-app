@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/common/store/app_state.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/common/store/app_state.dart';
 import 'package:provider/provider.dart';
 import 'spa_booking_success_screen.dart';
 
@@ -100,7 +100,7 @@ class _SpaBookingConfirmationScreenState
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
-                          LucideIcons.calendarCheck,
+                          LucideIcons.calendar_check,
                           color: Colors.pink,
                         ),
                       ),
@@ -175,7 +175,7 @@ class _SpaBookingConfirmationScreenState
                   GestureDetector(
                     onTap: () => setState(() => _transportOption = 0),
                     child: _buildTransportOption(
-                      icon: LucideIcons.mapPin,
+                      icon: LucideIcons.map_pin,
                       title: 'Đến tận nơi',
                       subtitle: 'Bạn sẽ đem bé trực tiếp đến Spa',
                       isSelected: _transportOption == 0,
@@ -208,7 +208,7 @@ class _SpaBookingConfirmationScreenState
                       child: Row(
                         children: [
                           const Icon(
-                            LucideIcons.mapPin,
+                            LucideIcons.map_pin,
                             color: Colors.grey,
                             size: 16,
                           ),

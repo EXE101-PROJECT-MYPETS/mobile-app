@@ -5,10 +5,10 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = petpee_mobile
+PRODUCT_NAME = pawly_mobile
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.petpee.app.petpeeMobile
+PRODUCT_BUNDLE_IDENTIFIER = com.pawly.app.pawlyMobile
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2026 com.petpee.app. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2026 com.pawly.app. All rights reserved.

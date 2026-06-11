@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:petpee_mobile/common/auth/api/auth_service.dart';
-import 'package:petpee_mobile/common/auth/model/auth_dto.dart';
-import 'package:petpee_mobile/common/config/api_client.dart';
-import 'package:petpee_mobile/common/user/model/user_model.dart';
+import 'package:pawly_mobile/common/auth/api/auth_service.dart';
+import 'package:pawly_mobile/common/auth/model/auth_dto.dart';
+import 'package:pawly_mobile/common/config/api_client.dart';
+import 'package:pawly_mobile/common/user/model/user_model.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();

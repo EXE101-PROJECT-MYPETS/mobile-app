@@ -3,10 +3,10 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/apps/home/api/shop_marker_service.dart';
-import 'package:petpee_mobile/common/utils/external_url_launcher.dart';
-import 'package:petpee_mobile/common/user/dto/shop_marker_dto.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/apps/home/api/shop_marker_service.dart';
+import 'package:pawly_mobile/common/utils/external_url_launcher.dart';
+import 'package:pawly_mobile/common/user/dto/shop_marker_dto.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -174,7 +174,7 @@ class _MapScreenState extends State<MapScreen> {
               ],
             ),
             child: const Icon(
-              LucideIcons.mapPin,
+              LucideIcons.map_pin,
               color: Colors.white,
               size: 18,
             ),
@@ -305,7 +305,7 @@ class _MapScreenState extends State<MapScreen> {
                     const Padding(
                       padding: EdgeInsets.only(top: 2),
                       child: Icon(
-                        LucideIcons.mapPin,
+                        LucideIcons.map_pin,
                         size: 16,
                         color: Color(0xFFFF5A4E),
                       ),
@@ -360,7 +360,7 @@ class _MapScreenState extends State<MapScreen> {
       ),
       alignment: Alignment.center,
       child: const Icon(
-        LucideIcons.imageOff,
+        LucideIcons.image_off,
         color: Color(0xFFFF5A4E),
         size: 32,
       ),
@@ -375,7 +375,7 @@ class _MapScreenState extends State<MapScreen> {
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(LucideIcons.chevronLeft, color: Color(0xFF1F2937)),
+          icon: const Icon(LucideIcons.chevron_left, color: Color(0xFF1F2937)),
         ),
         title: Text(
           'Bản đồ vị trí',
@@ -413,7 +413,7 @@ class _MapScreenState extends State<MapScreen> {
               children: [
                 TileLayer(
                   urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  userAgentPackageName: 'com.petpee.mobile',
+                  userAgentPackageName: 'com.pawly.mobile',
                   maxZoom: 18,
                 ),
                 MarkerLayer(markers: _buildMarkers()),
@@ -429,7 +429,7 @@ class _MapScreenState extends State<MapScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Icon(
-                      LucideIcons.alertCircle,
+                      LucideIcons.circle_alert,
                       color: Color(0xFFFF5A4E),
                       size: 48,
                     ),
@@ -445,7 +445,7 @@ class _MapScreenState extends State<MapScreen> {
                     const SizedBox(height: 24),
                     ElevatedButton.icon(
                       onPressed: _loadMapData,
-                      icon: const Icon(LucideIcons.rotateCw),
+                      icon: const Icon(LucideIcons.rotate_cw),
                       label: Text(
                         'Thử lại',
                         style: GoogleFonts.inter(fontWeight: FontWeight.w600),
@@ -470,7 +470,7 @@ class _MapScreenState extends State<MapScreen> {
               child: FloatingActionButton(
                 onPressed: _loadMapData,
                 backgroundColor: const Color(0xFFFF5A4E),
-                child: const Icon(LucideIcons.rotateCw, color: Colors.white),
+                child: const Icon(LucideIcons.rotate_cw, color: Colors.white),
               ),
             ),
         ],
@@ -532,7 +532,7 @@ class _ShopMapMarkerCard extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             const Icon(
-                              LucideIcons.mapPin,
+                              LucideIcons.map_pin,
                               size: 12,
                               color: Colors.white,
                             ),
@@ -588,7 +588,7 @@ class _ShopMapMarkerCard extends StatelessWidget {
                     Row(
                       children: [
                         const Icon(
-                          LucideIcons.mapPin,
+                          LucideIcons.map_pin,
                           size: 13,
                           color: Color(0xFF94A3B8),
                         ),

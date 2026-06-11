@@ -4,22 +4,22 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/apps/home/page/home_screen.dart';
-import 'package:petpee_mobile/common/auth/page/forgot_password_screen.dart';
-import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
-import 'package:petpee_mobile/common/component/auth_text_field.dart';
-import 'package:petpee_mobile/common/config/api_config.dart';
-import 'package:petpee_mobile/common/toast/app_toast.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/apps/home/page/home_screen.dart';
+import 'package:pawly_mobile/common/auth/page/forgot_password_screen.dart';
+import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
+import 'package:pawly_mobile/common/component/auth_text_field.dart';
+import 'package:pawly_mobile/common/config/api_config.dart';
+import 'package:pawly_mobile/common/toast/app_toast.dart';
 import 'package:provider/provider.dart';
 
-class PetpeesApp extends StatelessWidget {
-  const PetpeesApp({super.key});
+class PawlyApp extends StatelessWidget {
+  const PawlyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Petpee Login',
+      title: 'Pawly Login',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
@@ -565,20 +565,11 @@ class _LoginHero extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'PETPEE',
+                  'PAWLY',
                   style: GoogleFonts.inter(
                     color: const Color(0xFFFF4F8B),
                     fontSize: 28,
                     fontWeight: FontWeight.w900,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  'Sàn thú cưng',
-                  style: GoogleFonts.inter(
-                    color: const Color(0xFF7A8391),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],

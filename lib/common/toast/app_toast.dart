@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 
 enum AppToastType { success, error, info, warning }
 
@@ -127,9 +127,9 @@ class _AppToastOverlay extends StatelessWidget {
 
   IconData get _icon {
     return switch (type) {
-      AppToastType.success => LucideIcons.checkCircle2,
-      AppToastType.error => LucideIcons.alertCircle,
-      AppToastType.warning => LucideIcons.alertTriangle,
+      AppToastType.success => LucideIcons.circle_check_big,
+      AppToastType.error => LucideIcons.circle_alert,
+      AppToastType.warning => LucideIcons.triangle_alert,
       AppToastType.info => LucideIcons.info,
     };
   }

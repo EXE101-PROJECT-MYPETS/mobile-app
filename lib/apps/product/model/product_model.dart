@@ -1,6 +1,6 @@
-import 'package:petpee_mobile/common/user/dto/product_dto.dart';
-import 'package:petpee_mobile/common/utils/image_url_util.dart';
-import 'package:petpee_mobile/common/utils/price_formatter.dart';
+import 'package:pawly_mobile/common/user/dto/product_dto.dart';
+import 'package:pawly_mobile/common/utils/image_url_util.dart';
+import 'package:pawly_mobile/common/utils/price_formatter.dart';
 
 class ProductModel {
   final String id;

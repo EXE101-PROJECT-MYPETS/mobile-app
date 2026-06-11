@@ -1,5 +1,5 @@
-import 'package:petpee_mobile/common/utils/image_url_util.dart';
-import 'package:petpee_mobile/common/utils/price_formatter.dart';
+import 'package:pawly_mobile/common/utils/image_url_util.dart';
+import 'package:pawly_mobile/common/utils/price_formatter.dart';
 
 class ProductPublicDetailDTO {
   final int? id;

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
-import 'package:petpee_mobile/common/store/app_state.dart';
-import 'package:petpee_mobile/common/component/product_card.dart';
+import 'package:pawly_mobile/common/store/app_state.dart';
+import 'package:pawly_mobile/common/component/product_card.dart';
 
 class ProductListScreen extends StatefulWidget {
   const ProductListScreen({super.key});
@@ -163,13 +163,13 @@ class _ProductListHeader extends StatelessWidget
       color: Colors.white,
       child: Row(
         children: [
-          // Logo Petpees
+          // Logo Pawly
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'PETPEES',
+                'PAWLYS',
                 style: GoogleFonts.inter(
                   color: const Color(0xFFFB7185),
                   fontWeight: FontWeight.bold,
@@ -216,7 +216,7 @@ class _ProductListHeader extends StatelessWidget
             clipBehavior: Clip.none,
             children: [
               const Icon(
-                LucideIcons.shoppingCart,
+                LucideIcons.shopping_cart,
                 color: Colors.grey,
                 size: 24,
               ),

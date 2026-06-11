@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.petpee.app" "\0"
-            VALUE "FileDescription", "petpee_mobile" "\0"
+            VALUE "CompanyName", "com.pawly.app" "\0"
+            VALUE "FileDescription", "pawly_mobile" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "petpee_mobile" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.petpee.app. All rights reserved." "\0"
-            VALUE "OriginalFilename", "petpee_mobile.exe" "\0"
-            VALUE "ProductName", "petpee_mobile" "\0"
+            VALUE "InternalName", "pawly_mobile" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 com.pawly.app. All rights reserved." "\0"
+            VALUE "OriginalFilename", "pawly_mobile.exe" "\0"
+            VALUE "ProductName", "pawly_mobile" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

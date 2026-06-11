@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:petpee_mobile/common/config/api_client.dart';
-import 'package:petpee_mobile/common/config/api_config.dart';
-import 'package:petpee_mobile/common/user/dto/shop_marker_dto.dart';
+import 'package:pawly_mobile/common/config/api_client.dart';
+import 'package:pawly_mobile/common/config/api_config.dart';
+import 'package:pawly_mobile/common/user/dto/shop_marker_dto.dart';
 
 class ShopMarkerService {
   const ShopMarkerService();

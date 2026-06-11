@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:petpee_mobile/apps/service/model/booking_create_request.dart';
-import 'package:petpee_mobile/apps/service/model/service_detail_dto.dart';
-import 'package:petpee_mobile/common/config/api_client.dart';
-import 'package:petpee_mobile/common/config/api_config.dart';
-import 'package:petpee_mobile/common/user/dto/service_public_dto.dart';
-import 'package:petpee_mobile/common/user/dto/scroll_response.dart';
+import 'package:pawly_mobile/apps/service/model/booking_create_request.dart';
+import 'package:pawly_mobile/apps/service/model/service_detail_dto.dart';
+import 'package:pawly_mobile/common/config/api_client.dart';
+import 'package:pawly_mobile/common/config/api_config.dart';
+import 'package:pawly_mobile/common/user/dto/service_public_dto.dart';
+import 'package:pawly_mobile/common/user/dto/scroll_response.dart';
 
 class ServiceNotFoundException implements Exception {
   const ServiceNotFoundException();

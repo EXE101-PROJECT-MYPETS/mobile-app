@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
-import 'package:petpee_mobile/apps/checkout/api/address_service.dart';
-import 'package:petpee_mobile/common/store/app_state.dart';
-import 'package:petpee_mobile/apps/checkout/model/address_model.dart';
-import 'package:petpee_mobile/common/address/vietnam_address_service.dart';
-import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
-import 'package:petpee_mobile/common/toast/app_toast.dart';
+import 'package:pawly_mobile/apps/checkout/api/address_service.dart';
+import 'package:pawly_mobile/common/store/app_state.dart';
+import 'package:pawly_mobile/apps/checkout/model/address_model.dart';
+import 'package:pawly_mobile/common/address/vietnam_address_service.dart';
+import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
+import 'package:pawly_mobile/common/toast/app_toast.dart';
 
 class AddAddressScreen extends StatefulWidget {
   const AddAddressScreen({super.key, this.address});
@@ -203,7 +203,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: Colors.black87),
+          icon: const Icon(LucideIcons.arrow_left, color: Colors.black87),
           onPressed: _isSaving ? null : () => Navigator.pop(context),
         ),
         title: Text(
@@ -242,7 +242,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                         _buildTextField(
                           'Tỉnh/Thành phố, Quận/Huyện, Phường/Xã',
                           _regionController,
-                          suffixIcon: LucideIcons.chevronRight,
+                          suffixIcon: LucideIcons.chevron_right,
                           readOnly: true,
                           onTap: _selectRegion,
                         ),
@@ -579,7 +579,7 @@ class _AddressRegionScreenState extends State<_AddressRegionScreen> {
     final response = await http.get(
       uri,
       headers: const {
-        'User-Agent': 'PetPee mobile address picker',
+        'User-Agent': 'Pawly mobile address picker',
         'Accept': 'application/json',
       },
     );
@@ -663,7 +663,7 @@ class _AddressRegionScreenState extends State<_AddressRegionScreen> {
                   IconButton(
                     onPressed: _goBack,
                     icon: const Icon(
-                      LucideIcons.arrowLeft,
+                      LucideIcons.arrow_left,
                       color: Color(0xFFFF4F3A),
                     ),
                   ),
@@ -726,7 +726,7 @@ class _AddressRegionScreenState extends State<_AddressRegionScreen> {
                                 ),
                               )
                             : const Icon(
-                                LucideIcons.mapPin,
+                                LucideIcons.map_pin,
                                 color: Color(0xFFFF4F3A),
                                 size: 20,
                               ),

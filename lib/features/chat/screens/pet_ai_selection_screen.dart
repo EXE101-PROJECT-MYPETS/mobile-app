@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/apps/profile/api/pet_service.dart';
-import 'package:petpee_mobile/apps/profile/model/pet_model.dart';
-import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
-import 'package:petpee_mobile/common/navigation/main_tab_navigation.dart';
-import 'package:petpee_mobile/common/utils/image_url_util.dart';
-import 'package:petpee_mobile/features/chat/services/ai_pet_health_service.dart';
-import 'package:petpee_mobile/features/chat/screens/ai_assistant_chat_screen.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/apps/profile/api/pet_service.dart';
+import 'package:pawly_mobile/apps/profile/model/pet_model.dart';
+import 'package:pawly_mobile/common/component/common_bottom_nav.dart';
+import 'package:pawly_mobile/common/navigation/main_tab_navigation.dart';
+import 'package:pawly_mobile/common/utils/image_url_util.dart';
+import 'package:pawly_mobile/features/chat/services/ai_pet_health_service.dart';
+import 'package:pawly_mobile/features/chat/screens/ai_assistant_chat_screen.dart';
 
 class PetAiSelectionScreen extends StatefulWidget {
   const PetAiSelectionScreen({super.key});
@@ -87,14 +87,14 @@ class _PetAiSelectionScreenState extends State<PetAiSelectionScreen> {
             ? IconButton(
                 tooltip: 'Quay lại',
                 icon: const Icon(
-                  LucideIcons.arrowLeft,
+                  LucideIcons.arrow_left,
                   color: Color(0xFF3F3128),
                 ),
                 onPressed: () => Navigator.pop(context),
               )
             : null,
         title: Text(
-          'PetPee AI',
+          'Pawly AI',
           style: GoogleFonts.inter(
             color: const Color(0xFF2E251F),
             fontSize: 20,
@@ -253,7 +253,7 @@ class _PetChatCard extends StatelessWidget {
                                 ),
                               )
                             : const Icon(
-                                LucideIcons.chevronRight,
+                                LucideIcons.chevron_right,
                                 color: Color(0xFFB79884),
                                 size: 18,
                               ),
@@ -291,7 +291,7 @@ class _PetChatCard extends StatelessWidget {
                     Row(
                       children: [
                         const Icon(
-                          LucideIcons.messagesSquare,
+                          LucideIcons.messages_square,
                           size: 13,
                           color: Color(0xFFE76F51),
                         ),
@@ -486,7 +486,7 @@ class _PetLoadErrorState extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: const Icon(
-                LucideIcons.alertCircle,
+                LucideIcons.circle_alert,
                 color: Color(0xFFE76F51),
                 size: 30,
               ),
@@ -503,7 +503,7 @@ class _PetLoadErrorState extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Đăng nhập để PetPee AI tải hồ sơ thú cưng và tư vấn chính xác hơn.',
+              'Đăng nhập để Pawly AI tải hồ sơ thú cưng và tư vấn chính xác hơn.',
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 color: const Color(0xFF7B685B),
@@ -533,7 +533,7 @@ class _PetLoadErrorState extends StatelessWidget {
                 ),
                 child: ElevatedButton.icon(
                   onPressed: () => Navigator.pushNamed(context, '/login'),
-                  icon: const Icon(LucideIcons.logIn, size: 18),
+                  icon: const Icon(LucideIcons.log_in, size: 18),
                   label: const Text('Đăng nhập'),
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
@@ -580,7 +580,7 @@ class _EmptyPetState extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         Text(
-          'Tạo hồ sơ giúp PetPee AI tư vấn chính xác hơn cho từng bé.',
+          'Tạo hồ sơ giúp Pawly AI tư vấn chính xác hơn cho từng bé.',
           textAlign: TextAlign.center,
           style: GoogleFonts.inter(
             color: const Color(0xFF7B685B),

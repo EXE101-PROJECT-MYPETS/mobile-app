@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
-import 'package:petpee_mobile/common/store/app_state.dart';
+import 'package:pawly_mobile/common/store/app_state.dart';
 
 class CommonBottomNavBar extends StatelessWidget {
   const CommonBottomNavBar({
@@ -34,7 +34,7 @@ class CommonBottomNavBar extends StatelessWidget {
       onTap: onTap,
       items: [
         const BottomNavigationBarItem(
-          icon: Icon(LucideIcons.home),
+          icon: Icon(LucideIcons.house),
           label: 'Trang chủ',
         ),
         const BottomNavigationBarItem(
@@ -45,7 +45,7 @@ class CommonBottomNavBar extends StatelessWidget {
           icon: Badge(
             isLabelVisible: cartItemCount > 0,
             label: Text(cartItemCount.toString()),
-            child: const Icon(LucideIcons.shoppingCart),
+            child: const Icon(LucideIcons.shopping_cart),
           ),
           label: 'Giỏ hàng',
         ),

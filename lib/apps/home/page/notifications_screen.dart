@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
-import 'package:petpee_mobile/common/navigation/main_tab_navigation.dart';
-import 'package:petpee_mobile/common/toast/app_toast.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/common/component/common_bottom_nav.dart';
+import 'package:pawly_mobile/common/navigation/main_tab_navigation.dart';
+import 'package:pawly_mobile/common/toast/app_toast.dart';
 
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
@@ -18,7 +18,7 @@ class NotificationsScreen extends StatelessWidget {
             'Lịch spa của Buddy vào 10:00 AM, 22/04/2026 đã được xác nhận. Vui lòng mang bé đến đúng giờ nhé!',
         'time': 'Vừa xong',
         'isRead': false,
-        'icon': LucideIcons.calendarCheck,
+        'icon': LucideIcons.calendar_check,
         'color': Colors.pink,
         'bgColor': Colors.pink.shade50,
       },
@@ -45,7 +45,7 @@ class NotificationsScreen extends StatelessWidget {
       {
         'title': 'Nhắc nhở tiêm phòng',
         'body':
-            'Bé Lucy đã đến hạn tiêm phòng dại định kỳ hàng năm. Đặt lịch thú y để PetPee hỗ trợ nhé.',
+            'Bé Lucy đã đến hạn tiêm phòng dại định kỳ hàng năm. Đặt lịch thú y để Pawly hỗ trợ nhé.',
         'time': '3 ngày trước',
         'isRead': true,
         'icon': LucideIcons.activity,
@@ -75,7 +75,7 @@ class NotificationsScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(
-              LucideIcons.checkCheck,
+              LucideIcons.check_check,
               color: Colors.pink,
               size: 22,
             ),

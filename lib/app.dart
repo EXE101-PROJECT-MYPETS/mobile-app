@@ -1,16 +1,17 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:petpee_mobile/apps/cart/page/cart_screen.dart';
-import 'package:petpee_mobile/apps/home/page/home_screen.dart';
-import 'package:petpee_mobile/apps/home/page/notifications_screen.dart';
-import 'package:petpee_mobile/apps/product/page/product_list_screen.dart';
-import 'package:petpee_mobile/apps/profile/page/my_pets_screen.dart';
-import 'package:petpee_mobile/apps/profile/page/profile_screen.dart';
-import 'package:petpee_mobile/common/auth/page/login_screen.dart';
-import 'package:petpee_mobile/common/auth/page/register_screen.dart';
-import 'package:petpee_mobile/common/navigation/main_tab_navigation.dart';
-import 'package:petpee_mobile/common/store/app_state.dart';
-import 'package:petpee_mobile/features/chat/screens/pet_ai_selection_screen.dart';
+import 'package:pawly_mobile/apps/cart/page/cart_screen.dart';
+import 'package:pawly_mobile/apps/home/page/home_screen.dart';
+import 'package:pawly_mobile/apps/home/page/notifications_screen.dart';
+import 'package:pawly_mobile/apps/product/page/product_list_screen.dart';
+import 'package:pawly_mobile/apps/profile/page/my_pets_screen.dart';
+import 'package:pawly_mobile/apps/profile/page/profile_screen.dart';
+import 'package:pawly_mobile/common/auth/page/login_screen.dart';
+import 'package:pawly_mobile/common/auth/page/register_screen.dart';
+import 'package:pawly_mobile/common/navigation/main_tab_navigation.dart';
+import 'package:pawly_mobile/common/store/app_state.dart';
+import 'package:pawly_mobile/features/chat/screens/pet_ai_selection_screen.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -33,7 +34,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'PetPeese',
+      title: 'Pawly',
       theme: ThemeData(
         pageTransitionsTheme: const PageTransitionsTheme(
           builders: {

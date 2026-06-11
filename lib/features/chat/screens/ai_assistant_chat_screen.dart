@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/apps/product/page/spa_service_screen.dart';
-import 'package:petpee_mobile/apps/profile/model/pet_model.dart';
-import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
-import 'package:petpee_mobile/common/navigation/main_tab_navigation.dart';
-import 'package:petpee_mobile/features/chat/models/ai_pet_health_models.dart';
-import 'package:petpee_mobile/features/chat/services/ai_pet_health_service.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/apps/product/page/spa_service_screen.dart';
+import 'package:pawly_mobile/apps/profile/model/pet_model.dart';
+import 'package:pawly_mobile/common/component/common_bottom_nav.dart';
+import 'package:pawly_mobile/common/navigation/main_tab_navigation.dart';
+import 'package:pawly_mobile/features/chat/models/ai_pet_health_models.dart';
+import 'package:pawly_mobile/features/chat/services/ai_pet_health_service.dart';
 
 class AiAssistantChatScreen extends StatefulWidget {
   const AiAssistantChatScreen({super.key, this.selectedPet, this.conversation});
@@ -154,7 +154,7 @@ class _AiAssistantChatScreenState extends State<AiAssistantChatScreen> {
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: Color(0xFF27313F)),
+          icon: const Icon(LucideIcons.arrow_left, color: Color(0xFF27313F)),
           tooltip: 'Quay lại',
           onPressed: () => Navigator.pop(context),
         ),
@@ -297,7 +297,7 @@ class _WelcomeBubble extends StatelessWidget {
               ],
             ),
             child: Text(
-              'Bạn muốn hỏi gì về $petName? PetPee AI sẽ tư vấn dựa trên hồ sơ của bé.',
+              'Bạn muốn hỏi gì về $petName? Pawly AI sẽ tư vấn dựa trên hồ sơ của bé.',
               style: GoogleFonts.inter(
                 color: const Color(0xFF2D3648),
                 fontSize: 13,
@@ -518,7 +518,7 @@ class AiBookingActionCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             isVetRecommendation
-                ? 'PetPee AI gợi ý bạn đặt lịch khám để được bác sĩ kiểm tra kỹ hơn.'
+                ? 'Pawly AI gợi ý bạn đặt lịch khám để được bác sĩ kiểm tra kỹ hơn.'
                 : 'Mình sẽ mở màn đặt lịch để bạn chọn shop, dịch vụ và khung giờ phù hợp.',
             style: GoogleFonts.inter(
               color: const Color(0xFF6D5B4F),

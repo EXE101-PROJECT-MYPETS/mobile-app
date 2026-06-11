@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-import 'package:petpee_mobile/apps/profile/model/pet_dto.dart';
-import 'package:petpee_mobile/apps/profile/model/pet_species_dto.dart';
-import 'package:petpee_mobile/common/config/api_client.dart';
-import 'package:petpee_mobile/common/config/api_config.dart';
+import 'package:pawly_mobile/apps/profile/model/pet_dto.dart';
+import 'package:pawly_mobile/apps/profile/model/pet_species_dto.dart';
+import 'package:pawly_mobile/common/config/api_client.dart';
+import 'package:pawly_mobile/common/config/api_config.dart';
 
 class PetService {
   final ApiClient _client;

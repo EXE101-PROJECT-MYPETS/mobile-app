@@ -1,12 +1,12 @@
 import 'dart:convert';
-import 'package:petpee_mobile/common/config/api_client.dart';
-import 'package:petpee_mobile/common/config/public_api_client.dart';
-import 'package:petpee_mobile/common/config/api_config.dart';
-import 'package:petpee_mobile/common/user/dto/product_dto.dart';
-import 'package:petpee_mobile/common/user/dto/product_public_detail_dto.dart';
-import 'package:petpee_mobile/common/user/dto/product_public_review_dto.dart';
-import 'package:petpee_mobile/common/user/dto/shop_public_dto.dart';
-import 'package:petpee_mobile/common/user/dto/scroll_response.dart';
+import 'package:pawly_mobile/common/config/api_client.dart';
+import 'package:pawly_mobile/common/config/public_api_client.dart';
+import 'package:pawly_mobile/common/config/api_config.dart';
+import 'package:pawly_mobile/common/user/dto/product_dto.dart';
+import 'package:pawly_mobile/common/user/dto/product_public_detail_dto.dart';
+import 'package:pawly_mobile/common/user/dto/product_public_review_dto.dart';
+import 'package:pawly_mobile/common/user/dto/shop_public_dto.dart';
+import 'package:pawly_mobile/common/user/dto/scroll_response.dart';
 
 class ProductService {
   final ApiClient _client;

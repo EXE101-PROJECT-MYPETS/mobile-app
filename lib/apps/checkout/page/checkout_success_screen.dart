@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/apps/checkout/model/checkout_response_model.dart';
-import 'package:petpee_mobile/apps/home/page/home_screen.dart';
-import 'package:petpee_mobile/apps/profile/page/orders_screen.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/apps/checkout/model/checkout_response_model.dart';
+import 'package:pawly_mobile/apps/home/page/home_screen.dart';
+import 'package:pawly_mobile/apps/profile/page/orders_screen.dart';
 
 class CheckoutSuccessScreen extends StatelessWidget {
   const CheckoutSuccessScreen({super.key, required this.response});
@@ -14,8 +14,8 @@ class CheckoutSuccessScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final hasOrder = response.orderId != null || response.orderCode != null;
     final message = hasOrder
-        ? 'Đơn hàng của bạn đang chờ shop xác nhận. PetPee sẽ cập nhật trạng thái đơn trong mục Đơn mua.'
-        : 'Lịch dịch vụ của bạn đang chờ shop xác nhận. PetPee sẽ cập nhật trạng thái trong mục Đơn mua.';
+        ? 'Đơn hàng của bạn đang chờ shop xác nhận. Pawly sẽ cập nhật trạng thái đơn trong mục Đơn mua.'
+        : 'Lịch dịch vụ của bạn đang chờ shop xác nhận. Pawly sẽ cập nhật trạng thái trong mục Đơn mua.';
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6F8),
@@ -90,7 +90,7 @@ class _ShopeeLikeHeader extends StatelessWidget {
                 tooltip: 'Quay lại',
                 onPressed: onBack,
                 icon: const Icon(
-                  LucideIcons.arrowLeft,
+                  LucideIcons.arrow_left,
                   color: Colors.white,
                   size: 22,
                 ),
@@ -104,7 +104,7 @@ class _ShopeeLikeHeader extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
-                  LucideIcons.messageCircle,
+                  LucideIcons.message_circle,
                   color: Colors.white,
                   size: 15,
                 ),
@@ -112,7 +112,7 @@ class _ShopeeLikeHeader extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          const Icon(LucideIcons.alertCircle, color: Colors.white, size: 24),
+          const Icon(LucideIcons.circle_alert, color: Colors.white, size: 24),
           const SizedBox(height: 8),
           Text(
             'Đang chờ xác nhận',

@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
-import 'package:petpee_mobile/apps/profile/api/pet_service.dart';
-import 'package:petpee_mobile/apps/profile/model/pet_dto.dart';
-import 'package:petpee_mobile/apps/service/api/service_service.dart';
-import 'package:petpee_mobile/apps/service/model/booking_create_request.dart';
-import 'package:petpee_mobile/apps/service/model/service_detail_dto.dart';
-import 'package:petpee_mobile/apps/shop/page/shop_detail_screen.dart';
-import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
-import 'package:petpee_mobile/common/component/login_required_sheet.dart';
-import 'package:petpee_mobile/common/component/service_card.dart';
-import 'package:petpee_mobile/common/user/dto/service_public_dto.dart';
-import 'package:petpee_mobile/common/utils/image_url_util.dart';
-import 'package:petpee_mobile/common/utils/price_formatter.dart';
+import 'package:pawly_mobile/apps/profile/api/pet_service.dart';
+import 'package:pawly_mobile/apps/profile/model/pet_dto.dart';
+import 'package:pawly_mobile/apps/service/api/service_service.dart';
+import 'package:pawly_mobile/apps/service/model/booking_create_request.dart';
+import 'package:pawly_mobile/apps/service/model/service_detail_dto.dart';
+import 'package:pawly_mobile/apps/shop/page/shop_detail_screen.dart';
+import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
+import 'package:pawly_mobile/common/component/login_required_sheet.dart';
+import 'package:pawly_mobile/common/component/service_card.dart';
+import 'package:pawly_mobile/common/user/dto/service_public_dto.dart';
+import 'package:pawly_mobile/common/utils/image_url_util.dart';
+import 'package:pawly_mobile/common/utils/price_formatter.dart';
 
 class ServiceDetailScreen extends StatefulWidget {
   const ServiceDetailScreen({
@@ -496,7 +496,7 @@ class _ServiceDetailContent extends StatelessWidget {
               backgroundColor: Colors.white.withValues(alpha: 0.92),
               foregroundColor: const Color(0xFF111827),
             ),
-            icon: const Icon(LucideIcons.arrowLeft, size: 20),
+            icon: const Icon(LucideIcons.arrow_left, size: 20),
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
@@ -612,8 +612,8 @@ class _HeroImage extends StatelessWidget {
                   if (detail.active != null)
                     _Pill(
                       icon: detail.active!
-                          ? LucideIcons.checkCircle2
-                          : LucideIcons.alertCircle,
+                          ? LucideIcons.circle_check_big
+                          : LucideIcons.circle_alert,
                       text: detail.active! ? 'Đang mở đặt lịch' : 'Tạm ngưng',
                       color: detail.active!
                           ? const Color(0xFFDCFCE7)
@@ -684,7 +684,7 @@ class _HeaderPanel extends StatelessWidget {
                 ),
               if (detail.distanceKm != null)
                 _Pill(
-                  icon: LucideIcons.mapPin,
+                  icon: LucideIcons.map_pin,
                   text: _formatDistance(detail.distanceKm!),
                   color: const Color(0xFFF0FDF4),
                   textColor: const Color(0xFF166534),
@@ -754,7 +754,7 @@ class _QuickInfoPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _PanelTitle(icon: LucideIcons.fileText, text: 'Thông tin dịch vụ'),
+          _PanelTitle(icon: LucideIcons.file_text, text: 'Thông tin dịch vụ'),
           const SizedBox(height: 12),
           ...rows.expand((row) sync* {
             yield row;
@@ -847,7 +847,7 @@ class _ShopPanel extends StatelessWidget {
                   const Padding(
                     padding: EdgeInsets.only(top: 2),
                     child: Icon(
-                      LucideIcons.chevronRight,
+                      LucideIcons.chevron_right,
                       color: Color(0xFFCBD5E1),
                       size: 18,
                     ),
@@ -858,7 +858,7 @@ class _ShopPanel extends StatelessWidget {
           ),
           if (detail.shopAddress?.isNotEmpty == true) ...[
             const SizedBox(height: 12),
-            _InlineInfo(icon: LucideIcons.mapPin, text: detail.shopAddress!),
+            _InlineInfo(icon: LucideIcons.map_pin, text: detail.shopAddress!),
           ],
         ],
       ),
@@ -912,7 +912,7 @@ class _SchedulePanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _PanelTitle(icon: LucideIcons.calendarCheck, text: 'Chọn lịch hẹn'),
+          _PanelTitle(icon: LucideIcons.calendar_check, text: 'Chọn lịch hẹn'),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -944,7 +944,7 @@ class _SchedulePanel extends StatelessWidget {
             maxLines: 4,
             textInputAction: TextInputAction.newline,
             decoration: _inputDecoration(
-              icon: LucideIcons.messageCircle,
+              icon: LucideIcons.message_circle,
               label: 'Ghi chú',
               hint: 'Ví dụ: Tiêm nhắc lại, bé hơi nhạy cảm...',
             ),
@@ -972,7 +972,7 @@ class _SchedulePanel extends StatelessWidget {
               )
             else if (petsError != null)
               _PanelPrompt(
-                icon: LucideIcons.alertCircle,
+                icon: LucideIcons.circle_alert,
                 title: 'Không thể tải thú cưng',
                 message: petsError.toString().replaceFirst('Exception: ', ''),
                 buttonText: 'Thử lại',
@@ -1043,7 +1043,7 @@ class _RelatedServicesPanel extends StatelessWidget {
           const _RelatedServicesLoading()
         else if (services.isEmpty && error != null)
           _PanelPrompt(
-            icon: LucideIcons.alertCircle,
+            icon: LucideIcons.circle_alert,
             title: 'Không thể tải dịch vụ liên quan',
             message: errorMessage ?? 'Vui lòng thử lại sau.',
             buttonText: 'Thử lại',
@@ -1174,7 +1174,7 @@ class _InlineRetry extends StatelessWidget {
       child: Row(
         children: [
           const Icon(
-            LucideIcons.alertCircle,
+            LucideIcons.circle_alert,
             color: Color(0xFFE11D48),
             size: 18,
           ),
@@ -1296,7 +1296,7 @@ class _PetSelectTile extends StatelessWidget {
             ),
             const SizedBox(width: 10),
             const Icon(
-              LucideIcons.chevronRight,
+              LucideIcons.chevron_right,
               color: Color(0xFFE11D48),
               size: 20,
             ),
@@ -1496,7 +1496,7 @@ class _PetChoiceTile extends StatelessWidget {
             const SizedBox(width: 10),
             Icon(
               isSelected
-                  ? LucideIcons.checkCircle2
+                  ? LucideIcons.circle_check_big
                   : Icons.radio_button_unchecked,
               color: isSelected
                   ? const Color(0xFFE11D48)
@@ -2033,7 +2033,7 @@ class _ErrorState extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
-                  LucideIcons.alertCircle,
+                  LucideIcons.circle_alert,
                   color: Color(0xFFE11D48),
                   size: 34,
                 ),
@@ -2063,7 +2063,7 @@ class _ErrorState extends StatelessWidget {
               const SizedBox(height: 18),
               FilledButton.icon(
                 onPressed: onRetry,
-                icon: const Icon(LucideIcons.refreshCw, size: 18),
+                icon: const Icon(LucideIcons.refresh_cw, size: 18),
                 label: const Text('Thử lại'),
                 style: FilledButton.styleFrom(
                   backgroundColor: const Color(0xFFE11D48),

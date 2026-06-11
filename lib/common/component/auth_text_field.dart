@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 
 class CustomTextField extends StatefulWidget {
   const CustomTextField({
@@ -98,7 +98,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                       });
                     },
                     icon: Icon(
-                      _obscureText ? LucideIcons.eyeOff : LucideIcons.eye,
+                      _obscureText ? LucideIcons.eye_off : LucideIcons.eye,
                       color: const Color(0xFF929AA5),
                       size: 18,
                     ),

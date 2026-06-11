@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/apps/cart/model/cart_item_model.dart';
-import 'package:petpee_mobile/apps/checkout/page/checkout_screen.dart';
-import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
-import 'package:petpee_mobile/common/navigation/main_tab_navigation.dart';
-import 'package:petpee_mobile/common/store/app_state.dart';
-import 'package:petpee_mobile/common/toast/app_toast.dart';
-import 'package:petpee_mobile/common/utils/price_formatter.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/apps/cart/model/cart_item_model.dart';
+import 'package:pawly_mobile/apps/checkout/page/checkout_screen.dart';
+import 'package:pawly_mobile/common/component/common_bottom_nav.dart';
+import 'package:pawly_mobile/common/navigation/main_tab_navigation.dart';
+import 'package:pawly_mobile/common/store/app_state.dart';
+import 'package:pawly_mobile/common/toast/app_toast.dart';
+import 'package:pawly_mobile/common/utils/price_formatter.dart';
 import 'package:provider/provider.dart';
 
 class CartScreen extends StatelessWidget {
@@ -33,7 +33,7 @@ class CartScreen extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: Color(0xFF111827)),
+          icon: const Icon(LucideIcons.arrow_left, color: Color(0xFF111827)),
           onPressed: () => MainTabNavigation.backToPreviousOrHome(context),
         ),
         title: Text(
@@ -317,7 +317,7 @@ class _ProductCartItemCard extends StatelessWidget {
                     const Spacer(),
                     IconButton(
                       onPressed: onDelete,
-                      icon: const Icon(LucideIcons.trash2, size: 18),
+                      icon: const Icon(LucideIcons.trash_2, size: 18),
                       color: const Color(0xFF94A3B8),
                       visualDensity: VisualDensity.compact,
                     ),
@@ -448,7 +448,7 @@ class _ServiceCartItemCard extends StatelessWidget {
                     const Spacer(),
                     IconButton(
                       onPressed: onDelete,
-                      icon: const Icon(LucideIcons.trash2, size: 18),
+                      icon: const Icon(LucideIcons.trash_2, size: 18),
                       color: const Color(0xFF94A3B8),
                       visualDensity: VisualDensity.compact,
                     ),
@@ -668,7 +668,7 @@ class _EmptyCartState extends StatelessWidget {
               borderRadius: BorderRadius.circular(24),
             ),
             child: const Icon(
-              LucideIcons.shoppingCart,
+              LucideIcons.shopping_cart,
               size: 38,
               color: Color(0xFFFB7185),
             ),

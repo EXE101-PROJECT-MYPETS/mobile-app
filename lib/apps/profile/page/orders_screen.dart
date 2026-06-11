@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:petpee_mobile/apps/checkout/api/order_service.dart';
-import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
-import 'package:petpee_mobile/common/config/api_config.dart';
-import 'package:petpee_mobile/common/toast/app_toast.dart';
-import 'package:petpee_mobile/apps/profile/page/order_detail_screen.dart';
-import 'package:petpee_mobile/features/chat/providers/chat_provider.dart';
-import 'package:petpee_mobile/features/chat/screens/chat_detail_screen.dart';
+import 'package:pawly_mobile/apps/checkout/api/order_service.dart';
+import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
+import 'package:pawly_mobile/common/config/api_config.dart';
+import 'package:pawly_mobile/common/toast/app_toast.dart';
+import 'package:pawly_mobile/apps/profile/page/order_detail_screen.dart';
+import 'package:pawly_mobile/features/chat/providers/chat_provider.dart';
+import 'package:pawly_mobile/features/chat/screens/chat_detail_screen.dart';
 
 class OrdersScreen extends StatelessWidget {
   const OrdersScreen({super.key, this.initialTabIndex = 0});

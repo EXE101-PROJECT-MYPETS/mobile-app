@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:petpee_mobile/apps/product/model/product_model.dart';
-import 'package:petpee_mobile/apps/product/page/product_detail_screen.dart';
-import 'package:petpee_mobile/apps/product/page/spa_service_screen.dart';
-import 'package:petpee_mobile/common/utils/category_badge_style.dart';
-import 'package:petpee_mobile/common/utils/price_formatter.dart';
+import 'package:pawly_mobile/apps/product/model/product_model.dart';
+import 'package:pawly_mobile/apps/product/page/product_detail_screen.dart';
+import 'package:pawly_mobile/apps/product/page/spa_service_screen.dart';
+import 'package:pawly_mobile/common/utils/category_badge_style.dart';
+import 'package:pawly_mobile/common/utils/price_formatter.dart';
 
 class ProductCard extends StatelessWidget {
   final ProductModel product;

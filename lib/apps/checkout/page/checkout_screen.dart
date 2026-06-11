@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/apps/cart/model/cart_item_model.dart';
-import 'package:petpee_mobile/apps/checkout/api/checkout_service.dart';
-import 'package:petpee_mobile/apps/checkout/api/shipping_service.dart';
-import 'package:petpee_mobile/apps/checkout/model/address_model.dart';
-import 'package:petpee_mobile/apps/checkout/model/checkout_request_model.dart';
-import 'package:petpee_mobile/apps/checkout/model/ghtk_fee_model.dart';
-import 'package:petpee_mobile/apps/checkout/page/address_selection_screen.dart';
-import 'package:petpee_mobile/apps/checkout/page/checkout_success_screen.dart';
-import 'package:petpee_mobile/apps/product/api/product_service.dart';
-import 'package:petpee_mobile/apps/profile/page/add_pet_screen.dart';
-import 'package:petpee_mobile/apps/shop/page/shop_detail_screen.dart';
-import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
-import 'package:petpee_mobile/common/store/app_state.dart';
-import 'package:petpee_mobile/common/toast/app_toast.dart';
-import 'package:petpee_mobile/common/user/model/user_model.dart';
-import 'package:petpee_mobile/common/utils/price_formatter.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/apps/cart/model/cart_item_model.dart';
+import 'package:pawly_mobile/apps/checkout/api/checkout_service.dart';
+import 'package:pawly_mobile/apps/checkout/api/shipping_service.dart';
+import 'package:pawly_mobile/apps/checkout/model/address_model.dart';
+import 'package:pawly_mobile/apps/checkout/model/checkout_request_model.dart';
+import 'package:pawly_mobile/apps/checkout/model/ghtk_fee_model.dart';
+import 'package:pawly_mobile/apps/checkout/page/address_selection_screen.dart';
+import 'package:pawly_mobile/apps/checkout/page/checkout_success_screen.dart';
+import 'package:pawly_mobile/apps/product/api/product_service.dart';
+import 'package:pawly_mobile/apps/profile/page/add_pet_screen.dart';
+import 'package:pawly_mobile/apps/shop/page/shop_detail_screen.dart';
+import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
+import 'package:pawly_mobile/common/store/app_state.dart';
+import 'package:pawly_mobile/common/toast/app_toast.dart';
+import 'package:pawly_mobile/common/user/model/user_model.dart';
+import 'package:pawly_mobile/common/utils/price_formatter.dart';
 import 'package:provider/provider.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -464,7 +464,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: Color(0xFFFF4D2D)),
+          icon: const Icon(LucideIcons.arrow_left, color: Color(0xFFFF4D2D)),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -501,7 +501,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   _ShopCheckoutBlock(
                     shopName: items.isNotEmpty
                         ? items.first.shopName
-                        : 'Cửa hàng PetPee',
+                        : 'Cửa hàng Pawly',
                     shopId: items.isNotEmpty ? items.first.shopId : null,
                     items: items,
                     noteController: _noteController,
@@ -643,7 +643,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 child: OutlinedButton.icon(
                                   onPressed: _pickBookingDate,
                                   icon: const Icon(
-                                    LucideIcons.calendarDays,
+                                    LucideIcons.calendar_days,
                                     size: 18,
                                   ),
                                   label: Text(
@@ -670,7 +670,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 child: OutlinedButton.icon(
                                   onPressed: _pickBookingTime,
                                   icon: const Icon(
-                                    LucideIcons.clock3,
+                                    LucideIcons.clock_3,
                                     size: 18,
                                   ),
                                   label: Text(
@@ -738,7 +738,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: Text(
-                      'Nhấn "Đặt hàng" đồng nghĩa với việc bạn đồng ý với điều khoản mua hàng và đặt lịch của PetPee.',
+                      'Nhấn "Đặt hàng" đồng nghĩa với việc bạn đồng ý với điều khoản mua hàng và đặt lịch của Pawly.',
                       style: GoogleFonts.inter(
                         color: const Color(0xFF64748B),
                         fontSize: 11,
@@ -790,7 +790,7 @@ class _AddressCheckoutBlock extends StatelessWidget {
               const Padding(
                 padding: EdgeInsets.only(top: 2),
                 child: Icon(
-                  LucideIcons.mapPin,
+                  LucideIcons.map_pin,
                   color: Color(0xFFFF4D2D),
                   size: 18,
                 ),
@@ -836,7 +836,7 @@ class _AddressCheckoutBlock extends StatelessWidget {
               const Padding(
                 padding: EdgeInsets.only(top: 16),
                 child: Icon(
-                  LucideIcons.chevronRight,
+                  LucideIcons.chevron_right,
                   color: Color(0xFFCBD5E1),
                   size: 18,
                 ),
@@ -902,7 +902,7 @@ class _ShopCheckoutBlock extends StatelessWidget {
                   if (canOpenShop) ...[
                     const SizedBox(width: 4),
                     const Icon(
-                      LucideIcons.chevronRight,
+                      LucideIcons.chevron_right,
                       color: Color(0xFFCBD5E1),
                       size: 16,
                     ),
@@ -1015,7 +1015,7 @@ class _ShippingMethodBlock extends StatelessWidget {
                 ),
                 const SizedBox(width: 2),
                 const Icon(
-                  LucideIcons.chevronRight,
+                  LucideIcons.chevron_right,
                   color: Color(0xFFCBD5E1),
                   size: 16,
                 ),
@@ -1113,7 +1113,7 @@ class _PaymentMethodBlock extends StatelessWidget {
             child: Row(
               children: [
                 const Icon(
-                  LucideIcons.badgeDollarSign,
+                  LucideIcons.badge_dollar_sign,
                   color: Color(0xFFFF4D2D),
                   size: 18,
                 ),
@@ -1129,7 +1129,7 @@ class _PaymentMethodBlock extends StatelessWidget {
                   ),
                 ),
                 const Icon(
-                  LucideIcons.checkCircle2,
+                  LucideIcons.circle_check_big,
                   color: Color(0xFFFF4D2D),
                   size: 18,
                 ),
@@ -1375,7 +1375,7 @@ class _CheckoutActionRow extends StatelessWidget {
             ),
             const SizedBox(width: 2),
             const Icon(
-              LucideIcons.chevronRight,
+              LucideIcons.chevron_right,
               color: Color(0xFFCBD5E1),
               size: 16,
             ),

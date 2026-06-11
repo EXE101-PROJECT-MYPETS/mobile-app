@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/apps/home/page/home_screen.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/apps/home/page/home_screen.dart';
 
 class SpaBookingSuccessScreen extends StatelessWidget {
   const SpaBookingSuccessScreen({super.key});
@@ -32,7 +32,7 @@ class SpaBookingSuccessScreen extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
-                        LucideIcons.checkCircle2,
+                        LucideIcons.circle_check_big,
                         color: Colors.green,
                         size: 60,
                       ),
@@ -56,7 +56,7 @@ class SpaBookingSuccessScreen extends StatelessWidget {
 
               // Mô tả
               Text(
-                'Cảm ơn bạn đã sử dụng dịch vụ của PetPee.\nChúng tôi đã gửi thông tin chi tiết vào thông báo của bạn.',
+                'Cảm ơn bạn đã sử dụng dịch vụ của Pawly.\nChúng tôi đã gửi thông tin chi tiết vào thông báo của bạn.',
                 style: TextStyle(
                   color: Colors.grey.shade600,
                   fontSize: 14,

@@ -1,14 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:petpee_mobile/apps/checkout/api/address_service.dart';
-import 'package:petpee_mobile/apps/product/model/product_model.dart';
-import 'package:petpee_mobile/apps/product/api/product_service.dart';
-import 'package:petpee_mobile/apps/service/api/service_service.dart';
-import 'package:petpee_mobile/common/user/dto/service_public_dto.dart';
-import 'package:petpee_mobile/apps/cart/model/cart_item_model.dart';
-import 'package:petpee_mobile/apps/profile/api/pet_service.dart';
-import 'package:petpee_mobile/apps/profile/model/pet_model.dart';
-import 'package:petpee_mobile/apps/checkout/model/address_model.dart';
+import 'package:pawly_mobile/apps/checkout/api/address_service.dart';
+import 'package:pawly_mobile/apps/product/model/product_model.dart';
+import 'package:pawly_mobile/apps/product/api/product_service.dart';
+import 'package:pawly_mobile/apps/service/api/service_service.dart';
+import 'package:pawly_mobile/common/user/dto/service_public_dto.dart';
+import 'package:pawly_mobile/apps/cart/model/cart_item_model.dart';
+import 'package:pawly_mobile/apps/profile/api/pet_service.dart';
+import 'package:pawly_mobile/apps/profile/model/pet_model.dart';
+import 'package:pawly_mobile/apps/checkout/model/address_model.dart';
 
 class AppState extends ChangeNotifier {
   final ProductService _productService = ProductService();

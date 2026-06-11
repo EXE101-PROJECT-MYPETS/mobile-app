@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:petpee_mobile/apps/checkout/page/add_address_screen.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/apps/checkout/api/address_service.dart';
-import 'package:petpee_mobile/apps/checkout/model/address_model.dart';
-import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
-import 'package:petpee_mobile/common/toast/app_toast.dart';
+import 'package:pawly_mobile/apps/checkout/page/add_address_screen.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/apps/checkout/api/address_service.dart';
+import 'package:pawly_mobile/apps/checkout/model/address_model.dart';
+import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
+import 'package:pawly_mobile/common/toast/app_toast.dart';
 import 'package:provider/provider.dart';
 
 class ProfileAddressesScreen extends StatefulWidget {
@@ -140,7 +140,7 @@ class _ProfileAddressesScreenState extends State<ProfileAddressesScreen> {
         centerTitle: true,
         leading: IconButton(
           tooltip: 'Quay lại',
-          icon: const Icon(LucideIcons.arrowLeft, color: Color(0xFFFF4F3A)),
+          icon: const Icon(LucideIcons.arrow_left, color: Color(0xFFFF4F3A)),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -161,7 +161,7 @@ class _ProfileAddressesScreenState extends State<ProfileAddressesScreen> {
 
           if (snapshot.hasError) {
             return _AddressMessage(
-              icon: LucideIcons.alertCircle,
+              icon: LucideIcons.circle_alert,
               title: 'Không thể tải địa chỉ',
               message: snapshot.error.toString().replaceFirst(
                 'Exception: ',
@@ -188,7 +188,7 @@ class _ProfileAddressesScreenState extends State<ProfileAddressesScreen> {
               Expanded(
                 child: addresses.isEmpty
                     ? _AddressMessage(
-                        icon: LucideIcons.mapPin,
+                        icon: LucideIcons.map_pin,
                         title: 'Chưa có địa chỉ nào',
                         message: 'Thêm địa chỉ để giao hàng nhanh hơn.',
                         actionLabel: 'Thêm địa chỉ mới',

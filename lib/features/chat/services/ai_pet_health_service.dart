@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:petpee_mobile/common/config/api_client.dart';
-import 'package:petpee_mobile/common/config/api_config.dart';
-import 'package:petpee_mobile/features/chat/models/ai_pet_health_models.dart';
+import 'package:pawly_mobile/common/config/api_client.dart';
+import 'package:pawly_mobile/common/config/api_config.dart';
+import 'package:pawly_mobile/features/chat/models/ai_pet_health_models.dart';
 
 class AiPetHealthService {
   AiPetHealthService({ApiClient? client})

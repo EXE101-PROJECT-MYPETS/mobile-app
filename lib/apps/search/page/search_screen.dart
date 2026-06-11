@@ -2,16 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/apps/product/page/product_detail_screen.dart';
-import 'package:petpee_mobile/apps/search/api/search_service.dart';
-import 'package:petpee_mobile/apps/search/model/search_models.dart';
-import 'package:petpee_mobile/apps/service/page/service_detail_screen.dart';
-import 'package:petpee_mobile/apps/shop/page/shop_detail_screen.dart';
-import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
-import 'package:petpee_mobile/common/store/app_state.dart';
-import 'package:petpee_mobile/common/utils/image_url_util.dart';
-import 'package:petpee_mobile/common/utils/price_formatter.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/apps/product/page/product_detail_screen.dart';
+import 'package:pawly_mobile/apps/search/api/search_service.dart';
+import 'package:pawly_mobile/apps/search/model/search_models.dart';
+import 'package:pawly_mobile/apps/service/page/service_detail_screen.dart';
+import 'package:pawly_mobile/apps/shop/page/shop_detail_screen.dart';
+import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
+import 'package:pawly_mobile/common/store/app_state.dart';
+import 'package:pawly_mobile/common/utils/image_url_util.dart';
+import 'package:pawly_mobile/common/utils/price_formatter.dart';
 import 'package:provider/provider.dart';
 
 const double _searchGridCardExtent = 248;
@@ -623,7 +623,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   visualDensity: VisualDensity.compact,
                   onPressed: () => _deleteHistory(),
                   icon: const Icon(
-                    LucideIcons.trash2,
+                    LucideIcons.trash_2,
                     size: 17,
                     color: Color(0xFF94A3B8),
                   ),
@@ -728,7 +728,7 @@ class _SearchScreenState extends State<SearchScreen> {
           _FilterBar(sort: _sort, onSortChanged: _changeSort),
           const Expanded(
             child: _EmptyState(
-              icon: LucideIcons.packageSearch,
+              icon: LucideIcons.package_search,
               title: 'Không tìm thấy kết quả',
               message: 'Thử từ khóa ngắn hơn hoặc đổi bộ lọc tìm kiếm.',
             ),
@@ -798,7 +798,7 @@ class _SearchHeader extends StatelessWidget {
             onPressed: onBack,
             visualDensity: VisualDensity.compact,
             icon: const Icon(
-              LucideIcons.arrowLeft,
+              LucideIcons.arrow_left,
               color: Color(0xFFFF4D33),
               size: 24,
             ),
@@ -1396,7 +1396,7 @@ class _SearchItemCard extends StatelessWidget {
                       Row(
                         children: [
                           const Icon(
-                            LucideIcons.mapPin,
+                            LucideIcons.map_pin,
                             size: 11,
                             color: Color(0xFF94A3B8),
                           ),
@@ -1552,7 +1552,11 @@ class _ErrorState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(LucideIcons.wifiOff, size: 42, color: Color(0xFF94A3B8)),
+            const Icon(
+              LucideIcons.wifi_off,
+              size: 42,
+              color: Color(0xFF94A3B8),
+            ),
             const SizedBox(height: 12),
             Text(
               message,

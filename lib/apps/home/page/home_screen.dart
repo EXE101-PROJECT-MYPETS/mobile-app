@@ -3,16 +3,17 @@ import 'dart:ui' show PointerDeviceKind;
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/apps/home/page/map_screen.dart';
-import 'package:petpee_mobile/features/chat/screens/chat_list_screen.dart';
-import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
-import 'package:petpee_mobile/apps/search/page/search_screen.dart';
-import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
-import 'package:petpee_mobile/common/component/product_card.dart';
-import 'package:petpee_mobile/common/component/service_card.dart';
-import 'package:petpee_mobile/common/navigation/main_tab_navigation.dart';
-import 'package:petpee_mobile/common/store/app_state.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/apps/home/page/map_screen.dart';
+import 'package:pawly_mobile/apps/product/page/spa_service_screen.dart';
+import 'package:pawly_mobile/features/chat/screens/chat_list_screen.dart';
+import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
+import 'package:pawly_mobile/apps/search/page/search_screen.dart';
+import 'package:pawly_mobile/common/component/common_bottom_nav.dart';
+import 'package:pawly_mobile/common/component/product_card.dart';
+import 'package:pawly_mobile/common/component/service_card.dart';
+import 'package:pawly_mobile/common/navigation/main_tab_navigation.dart';
+import 'package:pawly_mobile/common/store/app_state.dart';
 import 'package:provider/provider.dart';
 
 const Color _homeHeaderBackground = Color(0xFFD5F4FF);
@@ -298,7 +299,7 @@ class _StickySearchHeader extends StatelessWidget {
                   );
                 },
                 child: const _TopIcon(
-                  icon: LucideIcons.messageCircle,
+                  icon: LucideIcons.message_circle,
                   badge: '27',
                 ),
               ),
@@ -310,7 +311,7 @@ class _StickySearchHeader extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushNamed(context, '/login');
                   },
-                  icon: Icon(LucideIcons.logIn, size: 16),
+                  icon: Icon(LucideIcons.log_in, size: 16),
                   label: const Text(
                     'Đăng nhập',
                     style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
@@ -397,7 +398,7 @@ class _HeroSection extends StatelessWidget {
                         const SizedBox(height: 14),
                         _HeroActionButton(
                           label: 'Tìm gần tôi',
-                          icon: LucideIcons.mapPin,
+                          icon: LucideIcons.map_pin,
                           backgroundColor: const Color(0xFFFF4F8B),
                           foregroundColor: Colors.white,
                           onTap: () {
@@ -616,7 +617,7 @@ class _QuickUtilitySection extends StatelessWidget {
         },
       ),
       (
-        icon: LucideIcons.shoppingBag,
+        icon: LucideIcons.shopping_bag,
         title: 'Pet Shop',
         subtitle: 'Thức ăn, phụ kiện',
         color: const Color(0xFF34C77B),
@@ -626,7 +627,7 @@ class _QuickUtilitySection extends StatelessWidget {
         },
       ),
       (
-        icon: LucideIcons.calendarDays,
+        icon: LucideIcons.calendar_days,
         title: 'Lịch của boss',
         subtitle: 'Quản lý lịch chăm sóc',
         color: const Color(0xFF8D6BFF),
@@ -1043,7 +1044,7 @@ class _SectionHeader extends StatelessWidget {
                   ),
                   const SizedBox(width: 2),
                   const Icon(
-                    LucideIcons.chevronRight,
+                    LucideIcons.chevron_right,
                     color: Color(0xFF3A9DF5),
                     size: 13,
                   ),
@@ -1172,7 +1173,7 @@ class _ServiceSection extends StatelessWidget {
 
               if (state.servicesError != null && services.isEmpty) {
                 return _ServiceStateCard(
-                  icon: LucideIcons.alertCircle,
+                  icon: LucideIcons.circle_alert,
                   title: 'Không tải được dịch vụ',
                   subtitle: state.servicesError ?? 'Vui lòng thử lại sau.',
                   isError: true,
@@ -1268,7 +1269,7 @@ class _VeterinarySection extends StatelessWidget {
 
                 if (state.veterinaryError != null && vetList.isEmpty) {
                   return _ServiceStateCard(
-                    icon: LucideIcons.alertCircle,
+                    icon: LucideIcons.circle_alert,
                     title: 'Không tải được dịch vụ thú y',
                     subtitle: state.veterinaryError ?? 'Vui lòng thử lại sau.',
                     isError: true,
@@ -1277,7 +1278,7 @@ class _VeterinarySection extends StatelessWidget {
 
                 if (vetList.isEmpty) {
                   return const _ServiceStateCard(
-                    icon: LucideIcons.building2,
+                    icon: LucideIcons.building_2,
                     title: 'Chưa có dịch vụ nào',
                     subtitle: 'Các phòng khám uy tín sẽ hiển thị tại đây',
                   );

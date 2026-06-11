@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:petpee_mobile/apps/checkout/model/address_model.dart';
-import 'package:petpee_mobile/common/config/api_config.dart';
+import 'package:pawly_mobile/apps/checkout/model/address_model.dart';
+import 'package:pawly_mobile/common/config/api_config.dart';
 
 class AddressService {
   Future<List<AddressModel>> getCurrentUserAddresses(String accessToken) async {

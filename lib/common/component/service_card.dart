@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/apps/service/page/service_detail_screen.dart';
-import 'package:petpee_mobile/common/user/dto/service_public_dto.dart';
-import 'package:petpee_mobile/common/utils/price_formatter.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/apps/service/page/service_detail_screen.dart';
+import 'package:pawly_mobile/common/user/dto/service_public_dto.dart';
+import 'package:pawly_mobile/common/utils/price_formatter.dart';
 
 class ServiceCard extends StatelessWidget {
   final ServicePublicDTO service;
@@ -105,7 +105,7 @@ class ServiceCard extends StatelessWidget {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 const Icon(
-                                  LucideIcons.mapPin,
+                                  LucideIcons.map_pin,
                                   size: 12,
                                   color: Colors.white,
                                 ),

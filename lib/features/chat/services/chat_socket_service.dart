@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:petpee_mobile/common/config/api_config.dart';
+import 'package:pawly_mobile/common/config/api_config.dart';
 
 import '../models/message_model.dart';
 
