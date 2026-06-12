@@ -4,11 +4,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/common/address/vietnam_address_service.dart';
-import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
-import 'package:petpee_mobile/common/component/auth_text_field.dart';
-import 'package:petpee_mobile/common/toast/app_toast.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/common/address/vietnam_address_service.dart';
+import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
+import 'package:pawly_mobile/common/component/auth_text_field.dart';
+import 'package:pawly_mobile/common/toast/app_toast.dart';
 import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -30,7 +30,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _provinceController = TextEditingController();
   final _districtController = TextEditingController();
   final _wardController = TextEditingController();
-  final _hamletController = TextEditingController();
   final _ageController = TextEditingController();
   final _otpController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -57,7 +56,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _provinceController.dispose();
     _districtController.dispose();
     _wardController.dispose();
-    _hamletController.dispose();
     _ageController.dispose();
     _otpController.dispose();
     _passwordController.dispose();
@@ -299,7 +297,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         province: _provinceController.text.trim(),
         district: _districtController.text.trim(),
         ward: _wardController.text.trim(),
-        hamlet: _hamletController.text.trim(),
+        hamlet: _addressController.text.trim(),
         age: int.tryParse(_ageController.text.trim()),
         avatar: _avatar,
       );
@@ -548,12 +546,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
       const SizedBox(height: 16),
       CustomTextField(
         controller: _addressController,
-        label: 'Địa chỉ',
-        hintText: 'Nhập địa chỉ',
-        prefixIcon: LucideIcons.mapPin,
+        label: 'Số nhà và tên đường',
+        hintText: 'Nhập số nhà và tên đường',
+        prefixIcon: LucideIcons.map_pin,
         textInputAction: TextInputAction.next,
         validator: (value) {
-          return _requiredField(value, 'địa chỉ');
+          return _requiredField(value, 'số nhà và tên đường');
         },
       ),
       const SizedBox(height: 16),
@@ -562,7 +560,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         label: 'Tỉnh/thành phố',
         hintText: 'Chọn tỉnh/thành phố',
         prefixIcon: LucideIcons.map,
-        suffixIcon: LucideIcons.chevronDown,
+        suffixIcon: LucideIcons.chevron_down,
         readOnly: true,
         onTap: _selectProvince,
         textInputAction: TextInputAction.next,
@@ -571,51 +569,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
         },
       ),
       const SizedBox(height: 16),
-      Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: CustomTextField(
-              controller: _districtController,
-              label: 'Quận/huyện',
-              hintText: 'Chọn quận/huyện',
-              prefixIcon: LucideIcons.building2,
-              suffixIcon: LucideIcons.chevronDown,
-              readOnly: true,
-              onTap: _selectDistrict,
-              textInputAction: TextInputAction.next,
-              validator: (value) {
-                return _requiredField(value, 'quận/huyện');
-              },
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: CustomTextField(
-              controller: _wardController,
-              label: 'Phường/xã',
-              hintText: 'Chọn phường/xã',
-              prefixIcon: LucideIcons.mapPin,
-              suffixIcon: LucideIcons.chevronDown,
-              readOnly: true,
-              onTap: _selectWard,
-              textInputAction: TextInputAction.next,
-              validator: (value) {
-                return _requiredField(value, 'phường/xã');
-              },
-            ),
-          ),
-        ],
+      CustomTextField(
+        controller: _districtController,
+        label: 'Quận/huyện',
+        hintText: 'Chọn quận/huyện',
+        prefixIcon: LucideIcons.building_2,
+        suffixIcon: LucideIcons.chevron_down,
+        readOnly: true,
+        onTap: _selectDistrict,
+        textInputAction: TextInputAction.next,
+        validator: (value) {
+          return _requiredField(value, 'quận/huyện');
+        },
       ),
       const SizedBox(height: 16),
       CustomTextField(
-        controller: _hamletController,
-        label: 'Thôn/xóm',
-        hintText: 'Nhập thôn/xóm',
-        prefixIcon: LucideIcons.home,
+        controller: _wardController,
+        label: 'Phường/xã',
+        hintText: 'Chọn phường/xã',
+        prefixIcon: LucideIcons.map_pin,
+        suffixIcon: LucideIcons.chevron_down,
+        readOnly: true,
+        onTap: _selectWard,
         textInputAction: TextInputAction.done,
         validator: (value) {
-          return _requiredField(value, 'thôn/xóm');
+          return _requiredField(value, 'phường/xã');
         },
       ),
       const SizedBox(height: 24),
@@ -840,7 +818,11 @@ class _EmailVerificationNote extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(LucideIcons.mailCheck, color: Color(0xFFFF4F8B), size: 19),
+          const Icon(
+            LucideIcons.mail_check,
+            color: Color(0xFFFF4F8B),
+            size: 19,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -1046,7 +1028,7 @@ class _AddressSelectionSheetState extends State<_AddressSelectionSheet> {
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
-                            LucideIcons.mapPin,
+                            LucideIcons.map_pin,
                             color: Color(0xFFFF4F8B),
                             size: 17,
                           ),
@@ -1209,7 +1191,7 @@ class _RegisterHero extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'PETPEE',
+                  'PAWLY',
                   style: GoogleFonts.inter(
                     color: const Color(0xFFFF4F8B),
                     fontSize: 28,

@@ -1,22 +1,22 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:petpee_mobile/common/component/login_required_sheet.dart';
+import 'package:pawly_mobile/common/component/login_required_sheet.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
-import 'package:petpee_mobile/apps/checkout/page/checkout_screen.dart';
-import 'package:petpee_mobile/apps/product/model/product_model.dart';
-import 'package:petpee_mobile/common/component/product_card.dart';
-import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
-import 'package:petpee_mobile/common/store/app_state.dart';
-import 'package:petpee_mobile/apps/shop/page/shop_detail_screen.dart';
-import 'package:petpee_mobile/common/toast/app_toast.dart';
-import 'package:petpee_mobile/features/chat/providers/chat_provider.dart';
-import 'package:petpee_mobile/features/chat/screens/chat_detail_screen.dart';
-import 'package:petpee_mobile/apps/product/api/product_service.dart';
-import 'package:petpee_mobile/common/user/dto/product_public_detail_dto.dart';
-import 'package:petpee_mobile/common/user/dto/product_public_review_dto.dart';
-import 'package:petpee_mobile/common/user/dto/shop_public_dto.dart';
+import 'package:pawly_mobile/apps/checkout/page/checkout_screen.dart';
+import 'package:pawly_mobile/apps/product/model/product_model.dart';
+import 'package:pawly_mobile/common/component/product_card.dart';
+import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
+import 'package:pawly_mobile/common/store/app_state.dart';
+import 'package:pawly_mobile/apps/shop/page/shop_detail_screen.dart';
+import 'package:pawly_mobile/common/toast/app_toast.dart';
+import 'package:pawly_mobile/features/chat/providers/chat_provider.dart';
+import 'package:pawly_mobile/features/chat/screens/chat_detail_screen.dart';
+import 'package:pawly_mobile/apps/product/api/product_service.dart';
+import 'package:pawly_mobile/common/user/dto/product_public_detail_dto.dart';
+import 'package:pawly_mobile/common/user/dto/product_public_review_dto.dart';
+import 'package:pawly_mobile/common/user/dto/shop_public_dto.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final String? productId;
@@ -328,12 +328,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 child: Row(
                   children: [
                     _buildOverlayIcon(
-                      icon: LucideIcons.arrowLeft,
+                      icon: LucideIcons.arrow_left,
                       onTap: () => Navigator.pop(context),
                     ),
                     const Spacer(),
                     _buildOverlayIcon(
-                      icon: LucideIcons.share2,
+                      icon: LucideIcons.share_2,
                       onTap: () => showAppToast(
                         context,
                         message: 'Chia sẻ sản phẩm',
@@ -342,7 +342,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ),
                     const SizedBox(width: 10),
                     _buildOverlayIcon(
-                      icon: LucideIcons.moreVertical,
+                      icon: LucideIcons.ellipsis_vertical,
                       onTap: () => showAppToast(
                         context,
                         message: 'Thêm tuỳ chọn',
@@ -1217,7 +1217,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 children: [
                   Expanded(
                     child: _buildBottomNavAction(
-                      icon: LucideIcons.messageCircle,
+                      icon: LucideIcons.message_circle,
                       label: 'Chat ngay',
                       onTap: () =>
                           _onTapBottomAction('Chat ngay', detail, shop),
@@ -1225,7 +1225,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                   Expanded(
                     child: _buildBottomNavAction(
-                      icon: LucideIcons.shoppingCart,
+                      icon: LucideIcons.shopping_cart,
                       label: 'Thêm vào giỏ',
                       onTap: () =>
                           _onTapBottomAction('Thêm vào giỏ', detail, shop),
@@ -1390,6 +1390,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       type: 'product',
       category: detail.categoryName ?? 'Tất cả',
       description: detail.description ?? 'Chưa có thông tin mô tả chi tiết.',
+      weightKg: detail.weightKg,
     );
   }
 
@@ -1417,6 +1418,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         image: detail.imageUrls.isNotEmpty ? detail.imageUrls[0] : '',
         type: 'product',
         category: detail.categoryName ?? 'Khác',
+        weightKg: detail.weightKg,
       );
       appState.logProductViewed(product);
     }

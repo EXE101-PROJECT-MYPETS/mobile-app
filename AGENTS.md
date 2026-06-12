@@ -1,10 +1,10 @@
 # AGENTS.md
 
-Huong dan cho cac agent lam viec trong repo `petpee_mobile`.
+Huong dan cho cac agent lam viec trong repo `pawly_mobile`.
 
 ## Tong quan
 
-Day la ung dung Flutter mobile cho PetPee. App hien co cac luong chinh: home,
+Day la ung dung Flutter mobile cho Pawly. App hien co cac luong chinh: home,
 auth, product, spa booking, cart, checkout, profile, pets va shop detail.
 Backend moi duoc tich hop cho auth; phan con lai dang dung mock data trong
 `AppState`.
@@ -76,7 +76,7 @@ dart run flutter_launcher_icons
   `AuthShopDTO`, `AuthenticationRequest`, `RegisterRequest`, `accessToken`,
   `refreshToken`, `currentShopId`, `avatarUrlPreview`.
 - UI hien dung Material, `GoogleFonts.inter`, `lucide_icons` va tone hong
-  PetPee. Khi them man hinh, uu tien style gan voi cac screen hien co.
+  Pawly. Khi them man hinh, uu tien style gan voi cac screen hien co.
 - Chuoi hien thi trong app la tieng Viet. Giu file o UTF-8 va tranh sua nham
   cac chuoi tieng Viet thanh text loi ma hoa.
 - Neu them asset runtime, khai bao trong `flutter/assets` cua `pubspec.yaml`.

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
-import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
-import 'package:petpee_mobile/common/auth/page/login_screen.dart';
+import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
+import 'package:pawly_mobile/common/auth/page/login_screen.dart';
 import 'profile_addresses_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -63,7 +63,7 @@ class SettingsScreen extends StatelessWidget {
             children: [
               IconButton(
                 icon: const Icon(
-                  LucideIcons.messageCircle,
+                  LucideIcons.message_circle,
                   color: Color(0xFFFB7185),
                 ),
                 onPressed: () {},
@@ -103,7 +103,7 @@ class SettingsScreen extends StatelessWidget {
               _buildMenuCard([
                 _buildMenuItem(
                   'Tài khoản & Bảo mật',
-                  LucideIcons.shieldCheck,
+                  LucideIcons.shield_check,
                   onTap: () {
                     final authProvider = context.read<AuthProvider>();
                     if (!_isLoggedIn(authProvider)) {
@@ -120,7 +120,7 @@ class SettingsScreen extends StatelessWidget {
                 const Divider(height: 1, indent: 48),
                 _buildMenuItem(
                   'Địa chỉ',
-                  LucideIcons.mapPin,
+                  LucideIcons.map_pin,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -133,20 +133,20 @@ class SettingsScreen extends StatelessWidget {
                 const Divider(height: 1, indent: 48),
                 _buildMenuItem(
                   'Tài khoản / Thẻ ngân hàng',
-                  LucideIcons.creditCard,
+                  LucideIcons.credit_card,
                 ),
               ]),
 
               const SizedBox(height: 16),
               _buildSectionHeader('Cài đặt'),
               _buildMenuCard([
-                _buildMenuItem('Cài đặt Chat', LucideIcons.messageSquare),
+                _buildMenuItem('Cài đặt Chat', LucideIcons.message_square),
                 const Divider(height: 1, indent: 48),
                 _buildMenuItem('Cài đặt Thông báo', LucideIcons.bell),
                 const Divider(height: 1, indent: 48),
                 _buildMenuItem('Cài đặt riêng tư', LucideIcons.lock),
                 const Divider(height: 1, indent: 48),
-                _buildMenuItem('Người dùng đã bị chặn', LucideIcons.userX),
+                _buildMenuItem('Người dùng đã bị chặn', LucideIcons.user_x),
                 const Divider(height: 1, indent: 48),
                 _buildMenuItem(
                   'Ngôn ngữ / Language',
@@ -158,17 +158,20 @@ class SettingsScreen extends StatelessWidget {
               const SizedBox(height: 16),
               _buildSectionHeader('Hỗ trợ'),
               _buildMenuCard([
-                _buildMenuItem('Trung tâm hỗ trợ', LucideIcons.helpCircle),
+                _buildMenuItem(
+                  'Trung tâm hỗ trợ',
+                  LucideIcons.circle_question_mark,
+                ),
                 const Divider(height: 1, indent: 48),
                 _buildMenuItem('Tiêu chuẩn cộng đồng', LucideIcons.users),
                 const Divider(height: 1, indent: 48),
-                _buildMenuItem('Điều khoản Petpees', LucideIcons.fileText),
+                _buildMenuItem('Điều khoản Pawly', LucideIcons.file_text),
                 const Divider(height: 1, indent: 48),
                 _buildMenuItem('Giới thiệu', LucideIcons.info),
                 const Divider(height: 1, indent: 48),
                 _buildMenuItem(
                   'Yêu cầu hủy tài khoản',
-                  LucideIcons.trash2,
+                  LucideIcons.trash_2,
                   isDestructive: true,
                 ),
               ]),
@@ -304,7 +307,7 @@ class _SettingsLoginRequiredScreen extends StatelessWidget {
         centerTitle: true,
         leading: IconButton(
           tooltip: 'Quay lại',
-          icon: const Icon(LucideIcons.arrowLeft, color: Colors.black87),
+          icon: const Icon(LucideIcons.arrow_left, color: Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -330,7 +333,7 @@ class _SettingsLoginRequiredScreen extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
-                  LucideIcons.alertCircle,
+                  LucideIcons.circle_alert,
                   color: Color(0xFFE76F51),
                   size: 30,
                 ),
@@ -347,7 +350,7 @@ class _SettingsLoginRequiredScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Đăng nhập để PetPee tải hồ sơ và đồng bộ thông tin tài khoản của bạn.',
+                'Đăng nhập để Pawly tải hồ sơ và đồng bộ thông tin tài khoản của bạn.',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   color: const Color(0xFF7B685B),
@@ -377,7 +380,7 @@ class _SettingsLoginRequiredScreen extends StatelessWidget {
                   ),
                   child: ElevatedButton.icon(
                     onPressed: () => Navigator.pushNamed(context, '/login'),
-                    icon: const Icon(LucideIcons.logIn, size: 18),
+                    icon: const Icon(LucideIcons.log_in, size: 18),
                     label: const Text('Đăng nhập'),
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,

@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:petpee_mobile/apps/checkout/model/order_request_model.dart';
-import 'package:petpee_mobile/common/config/api_client.dart';
-import 'package:petpee_mobile/common/config/api_config.dart';
+import 'package:pawly_mobile/apps/checkout/model/order_request_model.dart';
+import 'package:pawly_mobile/common/config/api_client.dart';
+import 'package:pawly_mobile/common/config/api_config.dart';
 
 class OrderService {
   final ApiClient _client;
@@ -57,5 +57,61 @@ class OrderService {
       return jsonDecode(body) as Map<String, dynamic>;
     }
     throw Exception('Lỗi lấy đơn hàng (${response.statusCode}): $body');
+  }
+
+  Future<Map<String, dynamic>> getCustomerOrderDetail({
+    required int id,
+    String? token,
+  }) async {
+    final uri = Uri.parse('${ApiConfig.ordersUrl}/customer/$id');
+
+    final headers = <String, String>{};
+    if (token != null) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+
+    final response = await _client.get(uri, headers: headers);
+    final body = utf8.decode(response.bodyBytes);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      if (body.trim().isEmpty) return <String, dynamic>{};
+      return jsonDecode(body) as Map<String, dynamic>;
+    }
+
+    throw Exception(
+      'Lỗi lấy chi tiết đơn hàng (${response.statusCode}): $body',
+    );
+  }
+
+  Future<Map<String, dynamic>> cancelCustomerOrder({
+    required int id,
+    String? reason,
+    String? token,
+  }) async {
+    final uri = Uri.parse('${ApiConfig.ordersUrl}/customer/$id/cancel');
+    final trimmedReason = reason?.trim();
+    final payload = <String, dynamic>{
+      if (trimmedReason != null && trimmedReason.isNotEmpty)
+        'reason': trimmedReason,
+    };
+
+    final headers = <String, String>{};
+    if (token != null) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+
+    final response = await _client.post(
+      uri,
+      headers: headers,
+      body: jsonEncode(payload),
+    );
+    final body = utf8.decode(response.bodyBytes);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      if (body.trim().isEmpty) return <String, dynamic>{};
+      return jsonDecode(body) as Map<String, dynamic>;
+    }
+
+    throw Exception('Hủy đơn thất bại (${response.statusCode}): $body');
   }
 }

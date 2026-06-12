@@ -1,6 +1,6 @@
-import 'package:petpee_mobile/common/user/dto/product_dto.dart';
-import 'package:petpee_mobile/common/utils/image_url_util.dart';
-import 'package:petpee_mobile/common/utils/price_formatter.dart';
+import 'package:pawly_mobile/common/user/dto/product_dto.dart';
+import 'package:pawly_mobile/common/utils/image_url_util.dart';
+import 'package:pawly_mobile/common/utils/price_formatter.dart';
 
 class ProductModel {
   final String id;
@@ -13,6 +13,7 @@ class ProductModel {
   final String
   category; // 'Chó', 'Mèo', 'Spa', 'Thú y', 'Cát vệ sinh', 'Sữa tắm', v.v.
   final String description;
+  final double? weightKg;
   final String shopProvince;
 
   ProductModel({
@@ -25,6 +26,7 @@ class ProductModel {
     required this.type,
     required this.category,
     this.description = 'Chưa có thông tin mô tả chi tiết.',
+    this.weightKg,
     this.shopProvince = 'Thành phố Hà Nội',
   });
 
@@ -39,6 +41,7 @@ class ProductModel {
       type: map['type'] ?? '',
       category: map['category'] ?? 'Tất cả',
       description: map['description'] ?? 'Chưa có thông tin mô tả chi tiết.',
+      weightKg: _parseDouble(map['weightKg']),
       shopProvince: map['shopProvince'] ?? 'Thành phố Hà Nội',
     );
   }
@@ -57,6 +60,7 @@ class ProductModel {
       type: _determineType(dto.categoryName),
       category: dto.categoryName ?? 'Tất cả',
       description: 'Sản phẩm chất lượng cao',
+      weightKg: dto.weightKg,
       shopProvince: dto.shopProvince?.trim().isNotEmpty == true
           ? dto.shopProvince!.trim()
           : 'Thành phố Hà Nội',
@@ -76,4 +80,10 @@ class ProductModel {
       return 'product';
     }
   }
+}
+
+double? _parseDouble(dynamic value) {
+  if (value == null) return null;
+  if (value is num) return value.toDouble();
+  return double.tryParse(value.toString());
 }

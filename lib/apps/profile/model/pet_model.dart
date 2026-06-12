@@ -1,4 +1,4 @@
-import 'package:petpee_mobile/apps/profile/model/pet_dto.dart';
+import 'package:pawly_mobile/apps/profile/model/pet_dto.dart';
 
 class PetModel {
   final int? id;

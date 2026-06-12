@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/common/auth/api/auth_service.dart';
-import 'package:petpee_mobile/common/auth/model/auth_dto.dart';
-import 'package:petpee_mobile/common/component/auth_text_field.dart';
-import 'package:petpee_mobile/common/toast/app_toast.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/common/auth/api/auth_service.dart';
+import 'package:pawly_mobile/common/auth/model/auth_dto.dart';
+import 'package:pawly_mobile/common/component/auth_text_field.dart';
+import 'package:pawly_mobile/common/toast/app_toast.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -229,7 +229,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: Color(0xFF1E293B)),
+          icon: const Icon(LucideIcons.arrow_left, color: Color(0xFF1E293B)),
           onPressed: () => Navigator.pop(context),
         ),
       ),

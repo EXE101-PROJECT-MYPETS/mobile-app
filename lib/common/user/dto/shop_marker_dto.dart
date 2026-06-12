@@ -1,4 +1,4 @@
-import 'package:petpee_mobile/common/utils/image_url_util.dart';
+import 'package:pawly_mobile/common/utils/image_url_util.dart';
 
 class ShopMarkerDTO {
   final int? id;

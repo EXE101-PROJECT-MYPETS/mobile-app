@@ -1,6 +1,6 @@
-# PetPee Mobile
+# Pawly Mobile
 
-PetPee Mobile la ung dung Flutter cho chu thu cung, tap trung vao mua sam san
+Pawly Mobile la ung dung Flutter cho chu thu cung, tap trung vao mua sam san
 pham, dat dich vu spa/thu y, quan ly gio hang, dia chi, thu cung va thong tin
 tai khoan.
 

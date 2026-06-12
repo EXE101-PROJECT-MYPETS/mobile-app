@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
-import 'package:petpee_mobile/common/auth/model/auth_dto.dart';
-import 'package:petpee_mobile/common/config/api_config.dart';
-import 'package:petpee_mobile/common/user/model/user_model.dart';
+import 'package:pawly_mobile/common/auth/model/auth_dto.dart';
+import 'package:pawly_mobile/common/config/api_config.dart';
+import 'package:pawly_mobile/common/user/model/user_model.dart';
 
 class AuthService {
   static const Map<String, String> _jsonHeaders = {

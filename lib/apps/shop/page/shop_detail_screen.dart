@@ -2,16 +2,16 @@ import 'dart:ui' show PointerDeviceKind;
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/apps/product/api/product_service.dart';
-import 'package:petpee_mobile/apps/product/page/product_detail_screen.dart';
-import 'package:petpee_mobile/apps/service/api/service_service.dart';
-import 'package:petpee_mobile/common/component/service_card.dart';
-import 'package:petpee_mobile/common/user/dto/product_dto.dart';
-import 'package:petpee_mobile/common/user/dto/service_public_dto.dart';
-import 'package:petpee_mobile/common/utils/category_badge_style.dart';
-import 'package:petpee_mobile/common/utils/price_formatter.dart';
-import 'package:petpee_mobile/features/chat/screens/chat_detail_screen.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/apps/product/api/product_service.dart';
+import 'package:pawly_mobile/apps/product/page/product_detail_screen.dart';
+import 'package:pawly_mobile/apps/service/api/service_service.dart';
+import 'package:pawly_mobile/common/component/service_card.dart';
+import 'package:pawly_mobile/common/user/dto/product_dto.dart';
+import 'package:pawly_mobile/common/user/dto/service_public_dto.dart';
+import 'package:pawly_mobile/common/utils/category_badge_style.dart';
+import 'package:pawly_mobile/common/utils/price_formatter.dart';
+import 'package:pawly_mobile/features/chat/screens/chat_detail_screen.dart';
 
 class ShopDetailScreen extends StatefulWidget {
   const ShopDetailScreen({
@@ -192,7 +192,7 @@ class _ShopHeroHeader extends StatelessWidget {
                   Row(
                     children: [
                       _HeaderIconButton(
-                        icon: LucideIcons.arrowLeft,
+                        icon: LucideIcons.arrow_left,
                         onTap: onBack,
                       ),
                       const SizedBox(width: 8),
@@ -272,7 +272,7 @@ class _ShopHeroHeader extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 4),
                                   const Icon(
-                                    LucideIcons.chevronRight,
+                                    LucideIcons.chevron_right,
                                     size: 15,
                                     color: Colors.white,
                                   ),
@@ -305,7 +305,7 @@ class _ShopHeroHeader extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       _OutlineHeroButton(
-                        icon: LucideIcons.messageCircle,
+                        icon: LucideIcons.message_circle,
                         label: 'Chat',
                         onTap: onChat,
                       ),
@@ -527,7 +527,7 @@ class _SectionShell extends StatelessWidget {
                 ),
                 const SizedBox(width: 2),
                 const Icon(
-                  LucideIcons.chevronRight,
+                  LucideIcons.chevron_right,
                   size: 14,
                   color: Color(0xFFFF5A4E),
                 ),

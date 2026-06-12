@@ -5,15 +5,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 
-import 'package:petpee_mobile/common/auth/page/login_screen.dart';
-import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
+import 'package:pawly_mobile/common/auth/page/login_screen.dart';
+import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
 
 void main() {
   late Directory hiveDirectory;
 
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
-    hiveDirectory = await Directory.systemTemp.createTemp('petpee_hive_test_');
+    hiveDirectory = await Directory.systemTemp.createTemp('pawly_hive_test_');
     Hive.init(hiveDirectory.path);
     await Hive.openBox('auth_box');
   });
@@ -38,6 +38,6 @@ void main() {
     );
 
     expect(find.text('Đăng nhập'), findsWidgets);
-    expect(find.text('PETPEE'), findsOneWidget);
+    expect(find.text('PAWLY'), findsOneWidget);
   });
 }

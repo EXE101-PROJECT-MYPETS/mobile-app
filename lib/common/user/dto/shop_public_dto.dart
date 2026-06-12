@@ -1,4 +1,4 @@
-import 'package:petpee_mobile/common/config/api_config.dart';
+import 'package:pawly_mobile/common/config/api_config.dart';
 
 class ShopPublicContactDTO {
   final String? name;

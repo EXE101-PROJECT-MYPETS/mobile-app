@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 
 /// Hiển thị bottom sheet yêu cầu đăng nhập theo phong cách mobile native.
 void showLoginRequiredSheet(BuildContext context) {
@@ -56,7 +56,7 @@ class _LoginRequiredSheet extends StatelessWidget {
             ),
             child: const Center(
               child: Icon(
-                LucideIcons.logIn,
+                LucideIcons.log_in,
                 size: 34,
                 color: Color(0xFFE11D48),
               ),
@@ -123,7 +123,7 @@ class _LoginRequiredSheet extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Icon(
-                      LucideIcons.logIn,
+                      LucideIcons.log_in,
                       size: 18,
                       color: Colors.white,
                     ),

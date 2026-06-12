@@ -1,201 +1,181 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/apps/checkout/model/checkout_response_model.dart';
-import 'package:petpee_mobile/apps/home/page/home_screen.dart';
-import 'package:petpee_mobile/apps/profile/page/orders_screen.dart';
-import 'package:petpee_mobile/common/utils/price_formatter.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/apps/checkout/model/checkout_response_model.dart';
+import 'package:pawly_mobile/apps/home/page/home_screen.dart';
+import 'package:pawly_mobile/apps/profile/page/orders_screen.dart';
 
 class CheckoutSuccessScreen extends StatelessWidget {
-  final CheckoutResponseModel response;
-
   const CheckoutSuccessScreen({super.key, required this.response});
+
+  final CheckoutResponseModel response;
 
   @override
   Widget build(BuildContext context) {
-    final hasOrder = response.orderId != null;
-    final bookingCount = response.bookingIds.length;
+    final hasOrder = response.orderId != null || response.orderCode != null;
+    final message = hasOrder
+        ? 'Đơn hàng của bạn đang chờ shop xác nhận. Pawly sẽ cập nhật trạng thái đơn trong mục Đơn mua.'
+        : 'Lịch dịch vụ của bạn đang chờ shop xác nhận. Pawly sẽ cập nhật trạng thái trong mục Đơn mua.';
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: const Color(0xFFF5F6F8),
       body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 24,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 84,
-                    height: 84,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFEFF6FF),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      LucideIcons.check,
-                      color: Color(0xFF2563EB),
-                      size: 40,
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  Text(
-                    'Thanh toán thành công',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      color: const Color(0xFF111827),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    hasOrder
-                        ? 'Đơn hàng và lịch spa của bạn đã được ghi nhận. Chúng tôi sẽ xử lý trong thời gian sớm nhất.'
-                        : 'Lịch spa của bạn đã được ghi nhận. Chúng tôi sẽ liên hệ và xác nhận sớm nhất có thể.',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      height: 1.5,
-                      color: const Color(0xFF64748B),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  if (response.orderCode != null) ...[
-                    _InfoRow(label: 'Mã đơn', value: response.orderCode!),
-                    const SizedBox(height: 10),
-                  ],
-                  if (bookingCount > 0) ...[
-                    _InfoRow(label: 'Số lịch spa', value: '$bookingCount lịch'),
-                    const SizedBox(height: 10),
-                  ],
-                  _InfoRow(
-                    label: 'Tổng thanh toán',
-                    value: PriceFormatter.formatVnd(response.totalAmount),
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () {
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const HomeScreen(),
-                              ),
-                              (route) => false,
-                            );
-                          },
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Color(0xFFE2E8F0)),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                          child: Text(
-                            'Về trang chủ',
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFF111827),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const OrdersScreen(),
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFB7185),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                          child: Text(
-                            'Xem đơn hàng',
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+        top: false,
+        child: Column(
+          children: [
+            _ShopeeLikeHeader(
+              message: message,
+              onBack: () => _goHome(context),
+              onHome: () => _goHome(context),
+              onOrders: () => _openOrders(context),
             ),
-          ),
+            const Expanded(child: ColoredBox(color: Colors.white)),
+          ],
         ),
+      ),
+    );
+  }
+
+  static void _goHome(BuildContext context) {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const HomeScreen()),
+      (route) => false,
+    );
+  }
+
+  static void _openOrders(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const OrdersScreen(initialTabIndex: 1),
       ),
     );
   }
 }
 
-class _InfoRow extends StatelessWidget {
-  final String label;
-  final String value;
+class _ShopeeLikeHeader extends StatelessWidget {
+  const _ShopeeLikeHeader({
+    required this.message,
+    required this.onBack,
+    required this.onHome,
+    required this.onOrders,
+  });
 
-  const _InfoRow({required this.label, required this.value});
+  final String message;
+  final VoidCallback onBack;
+  final VoidCallback onHome;
+  final VoidCallback onOrders;
 
   @override
   Widget build(BuildContext context) {
+    final topPadding = MediaQuery.paddingOf(context).top;
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+      padding: EdgeInsets.fromLTRB(12, topPadding + 8, 12, 16),
+      decoration: const BoxDecoration(
+        color: Color(0xFFFF5A2C),
+        gradient: LinearGradient(
+          colors: [Color(0xFFFF6A3D), Color(0xFFFF4D2D)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
       ),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(
+          Row(
+            children: [
+              IconButton(
+                tooltip: 'Quay lại',
+                onPressed: onBack,
+                icon: const Icon(
+                  LucideIcons.arrow_left,
+                  color: Colors.white,
+                  size: 22,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                width: 26,
+                height: 26,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.white70),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  LucideIcons.message_circle,
+                  color: Colors.white,
+                  size: 15,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          const Icon(LucideIcons.circle_alert, color: Colors.white, size: 24),
+          const SizedBox(height: 8),
+          Text(
+            'Đang chờ xác nhận',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              color: Colors.white,
+              fontSize: 17,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Text(
-              label,
+              message,
+              textAlign: TextAlign.center,
               style: GoogleFonts.inter(
-                fontSize: 13,
-                color: const Color(0xFF64748B),
+                color: Colors.white,
+                fontSize: 12,
+                height: 1.45,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
-          const SizedBox(width: 12),
-          Text(
-            value,
-            style: GoogleFonts.inter(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: const Color(0xFF111827),
-            ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _HeaderButton(label: 'Trang chủ', onPressed: onHome),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _HeaderButton(label: 'Đơn mua', onPressed: onOrders),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 }
+<<<<<<< feature/notifications-update
+=======
+
+class _HeaderButton extends StatelessWidget {
+  const _HeaderButton({required this.label, required this.onPressed});
+
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(
+        foregroundColor: Colors.white,
+        side: const BorderSide(color: Colors.white),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        textStyle: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700),
+      ),
+      child: Text(label),
+    );
+  }
+}
+>>>>>>> main

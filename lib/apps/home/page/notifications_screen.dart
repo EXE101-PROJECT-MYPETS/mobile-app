@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+<<<<<<< feature/notifications-update
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:petpee_mobile/common/toast/app_toast.dart';
 import 'package:petpee_mobile/common/notification/store/notification_provider.dart';
 import 'package:petpee_mobile/common/notification/model/notification_model.dart';
+=======
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/common/component/common_bottom_nav.dart';
+import 'package:pawly_mobile/common/navigation/main_tab_navigation.dart';
+import 'package:pawly_mobile/common/toast/app_toast.dart';
+>>>>>>> main
 
 import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
 import 'package:petpee_mobile/features/chat/screens/pet_ai_selection_screen.dart';
@@ -81,7 +88,53 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< feature/notifications-update
     final canPop = Navigator.canPop(context);
+=======
+    // Dữ liệu mock
+    final notifications = [
+      {
+        'title': 'Đặt lịch Spa thành công!',
+        'body':
+            'Lịch spa của Buddy vào 10:00 AM, 22/04/2026 đã được xác nhận. Vui lòng mang bé đến đúng giờ nhé!',
+        'time': 'Vừa xong',
+        'isRead': false,
+        'icon': LucideIcons.calendar_check,
+        'color': Colors.pink,
+        'bgColor': Colors.pink.shade50,
+      },
+      {
+        'title': 'Đơn hàng đang giao',
+        'body':
+            'Đơn hàng thức ăn cho mèo của bạn đang được shipper Giao Hàng Nhanh vận chuyển. Sẽ đến trong hôm nay.',
+        'time': '2 giờ trước',
+        'isRead': false,
+        'icon': LucideIcons.truck,
+        'color': Colors.orange,
+        'bgColor': Colors.orange.shade50,
+      },
+      {
+        'title': 'Khuyến mãi 50% Giờ Vàng',
+        'body':
+            'Chỉ duy nhất hôm nay, giảm 50% cho tất cả dịch vụ Spa & Grooming. Nhanh tay đặt lịch ngay!',
+        'time': '1 ngày trước',
+        'isRead': true,
+        'icon': LucideIcons.tag,
+        'color': Colors.red,
+        'bgColor': Colors.red.shade50,
+      },
+      {
+        'title': 'Nhắc nhở tiêm phòng',
+        'body':
+            'Bé Lucy đã đến hạn tiêm phòng dại định kỳ hàng năm. Đặt lịch thú y để Pawly hỗ trợ nhé.',
+        'time': '3 ngày trước',
+        'isRead': true,
+        'icon': LucideIcons.activity,
+        'color': Colors.blue,
+        'bgColor': Colors.blue.shade50,
+      },
+    ];
+>>>>>>> main
 
     return WillPopScope(
       onWillPop: () async {
@@ -99,6 +152,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       },
       child: Scaffold(
         backgroundColor: Colors.white,
+<<<<<<< feature/notifications-update
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0.5,
@@ -145,6 +199,28 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   tooltip: 'Đánh dấu tất cả đã đọc',
                 );
               },
+=======
+        elevation: 0.5,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
+          onPressed: () => MainTabNavigation.backToPreviousOrHome(context),
+        ),
+        title: Text(
+          'Thông Báo',
+          style: GoogleFonts.inter(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(
+              LucideIcons.check_check,
+              color: Colors.pink,
+              size: 22,
+>>>>>>> main
             ),
           ],
         ),
@@ -340,6 +416,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             }
           },
         ),
+      ),
+      bottomNavigationBar: CommonBottomNavBar(
+        currentIndex: 3,
+        onTap: (index) =>
+            MainTabNavigation.open(context, index, currentIndex: 3),
       ),
     );
   }

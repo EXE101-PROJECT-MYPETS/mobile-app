@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:petpee_mobile/apps/checkout/model/checkout_request_model.dart';
-import 'package:petpee_mobile/apps/checkout/model/checkout_response_model.dart';
-import 'package:petpee_mobile/common/config/api_client.dart';
-import 'package:petpee_mobile/common/config/api_config.dart';
+import 'package:pawly_mobile/apps/checkout/model/checkout_request_model.dart';
+import 'package:pawly_mobile/apps/checkout/model/checkout_response_model.dart';
+import 'package:pawly_mobile/common/config/api_client.dart';
+import 'package:pawly_mobile/common/config/api_config.dart';
 
 class CheckoutService {
   final ApiClient _client;
@@ -13,15 +13,23 @@ class CheckoutService {
   Future<CheckoutResponseModel> checkout(CheckoutRequestModel request) async {
     final uri = Uri.parse(ApiConfig.ordersUrl);
 
+<<<<<<< feature/notifications-update
     // Map CheckoutRequestModel to OrderDTO expected by backend
+=======
+    // Backend expects product items under `items`, while service bookings stay
+    // in the checkout payload so spa services can be booked from the cart.
+>>>>>>> main
     final payload = {
       'shopId': request.shopId,
       'userId': request.userId,
       if (request.customerId != null) 'customerId': request.customerId,
+      if (request.userAddressId != null) 'userAddressId': request.userAddressId,
+      'source': request.source,
       'receiverName': request.receiverName,
       'receiverPhone': request.receiverPhone,
       'shippingAddress': request.shippingAddress,
       'shippingFee': request.shippingFee,
+      if (request.pickupFee > 0) 'pickupFee': request.pickupFee,
       'discountAmount': request.discountAmount,
       if (request.note != null && request.note!.trim().isNotEmpty)
         'note': request.note!.trim(),
@@ -34,6 +42,13 @@ class CheckoutService {
             },
           )
           .toList(),
+<<<<<<< feature/notifications-update
+=======
+      if (request.serviceBookings.isNotEmpty)
+        'serviceBookings': request.serviceBookings
+            .map((item) => item.toJson())
+            .toList(),
+>>>>>>> main
     };
 
     final response = await _client.post(uri, body: jsonEncode(payload));

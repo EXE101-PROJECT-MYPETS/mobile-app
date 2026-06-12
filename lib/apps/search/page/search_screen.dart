@@ -2,20 +2,22 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/apps/product/page/product_detail_screen.dart';
-import 'package:petpee_mobile/apps/search/api/search_service.dart';
-import 'package:petpee_mobile/apps/search/model/search_models.dart';
-import 'package:petpee_mobile/apps/service/page/service_detail_screen.dart';
-import 'package:petpee_mobile/apps/shop/page/shop_detail_screen.dart';
-import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
-import 'package:petpee_mobile/common/store/app_state.dart';
-import 'package:petpee_mobile/common/utils/image_url_util.dart';
-import 'package:petpee_mobile/common/utils/price_formatter.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/apps/product/page/product_detail_screen.dart';
+import 'package:pawly_mobile/apps/search/api/search_service.dart';
+import 'package:pawly_mobile/apps/search/model/search_models.dart';
+import 'package:pawly_mobile/apps/service/page/service_detail_screen.dart';
+import 'package:pawly_mobile/apps/shop/page/shop_detail_screen.dart';
+import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
+import 'package:pawly_mobile/common/store/app_state.dart';
+import 'package:pawly_mobile/common/utils/image_url_util.dart';
+import 'package:pawly_mobile/common/utils/price_formatter.dart';
 import 'package:provider/provider.dart';
 
 const double _searchGridCardExtent = 248;
 const double _searchCardImageHeight = 116;
+const Color _shopeeOrange = Color(0xFFFF4D33);
+const Color _searchResultBackground = Color(0xFFF3F3F3);
 const int _recommendedPageStep = 20;
 const int _recommendedMaxSize = 100;
 
@@ -39,12 +41,12 @@ class _SearchScreenState extends State<SearchScreen> {
   List<SearchItem> _results = [];
 
   String _activeKeyword = '';
-  String _type = 'ALL';
+  final String _type = 'ALL';
   String _sort = 'RELEVANT';
   int _page = 0;
-  int _totalElements = 0;
   bool _hasNext = false;
   bool _ignoreTextChange = false;
+  int _searchRequestId = 0;
 
   bool _initialLoading = false;
   bool _suggestionLoading = false;
@@ -252,6 +254,8 @@ class _SearchScreenState extends State<SearchScreen> {
     _debounce?.cancel();
     FocusScope.of(context).unfocus();
     final location = _currentLocation();
+    final requestedSort = _sort;
+    final requestId = ++_searchRequestId;
 
     setState(() {
       _activeKeyword = keyword;
@@ -263,7 +267,6 @@ class _SearchScreenState extends State<SearchScreen> {
       _results = [];
       _page = 0;
       _hasNext = false;
-      _totalElements = 0;
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_resultScrollController.hasClients) {
@@ -278,16 +281,17 @@ class _SearchScreenState extends State<SearchScreen> {
         lat: location.lat,
         lng: location.lng,
         radiusKm: location.radiusKm,
-        sort: _sort,
+        sort: requestedSort,
         page: 0,
         size: 20,
       );
-      if (!mounted) return;
+      if (!mounted || requestId != _searchRequestId || requestedSort != _sort) {
+        return;
+      }
       setState(() {
-        _results = response.content;
+        _results = _sortItems(response.content, requestedSort);
         _page = response.page;
         _hasNext = response.hasNext;
-        _totalElements = response.totalElements;
       });
       _saveHistoryIfLoggedIn(keyword);
     } catch (_) {
@@ -311,6 +315,8 @@ class _SearchScreenState extends State<SearchScreen> {
     }
 
     final location = _currentLocation();
+    final requestedSort = _sort;
+    final requestId = _searchRequestId;
     setState(() => _loadMoreLoading = true);
 
     try {
@@ -320,16 +326,20 @@ class _SearchScreenState extends State<SearchScreen> {
         lat: location.lat,
         lng: location.lng,
         radiusKm: location.radiusKm,
-        sort: _sort,
+        sort: requestedSort,
         page: _page + 1,
         size: 20,
       );
-      if (!mounted) return;
+      if (!mounted || requestId != _searchRequestId || requestedSort != _sort) {
+        return;
+      }
       setState(() {
-        _results = [..._results, ...response.content];
+        _results = _sortItems([
+          ..._results,
+          ...response.content,
+        ], requestedSort);
         _page = response.page;
         _hasNext = response.hasNext;
-        _totalElements = response.totalElements;
       });
     } catch (_) {
       if (!mounted) return;
@@ -339,6 +349,48 @@ class _SearchScreenState extends State<SearchScreen> {
         setState(() => _loadMoreLoading = false);
       }
     }
+  }
+
+  List<SearchItem> _sortItems(List<SearchItem> items, String sort) {
+    final sorted = [...items];
+    switch (sort) {
+      case 'PRICE_ASC':
+        sorted.sort(_comparePriceAscending);
+        break;
+      case 'PRICE_DESC':
+        sorted.sort(_comparePriceDescending);
+        break;
+      case 'SOLD_DESC':
+        sorted.sort((a, b) {
+          final soldCompare = (b.soldCount ?? 0).compareTo(a.soldCount ?? 0);
+          if (soldCompare != 0) return soldCompare;
+          return (b.rating ?? 0).compareTo(a.rating ?? 0);
+        });
+        break;
+    }
+    return sorted;
+  }
+
+  int _comparePriceAscending(SearchItem a, SearchItem b) {
+    final aPrice = a.price;
+    final bPrice = b.price;
+    if (aPrice == null && bPrice == null) return 0;
+    if (aPrice == null) return 1;
+    if (bPrice == null) return -1;
+    final priceCompare = aPrice.compareTo(bPrice);
+    if (priceCompare != 0) return priceCompare;
+    return a.id.compareTo(b.id);
+  }
+
+  int _comparePriceDescending(SearchItem a, SearchItem b) {
+    final aPrice = a.price;
+    final bPrice = b.price;
+    if (aPrice == null && bPrice == null) return 0;
+    if (aPrice == null) return 1;
+    if (bPrice == null) return -1;
+    final priceCompare = bPrice.compareTo(aPrice);
+    if (priceCompare != 0) return priceCompare;
+    return a.id.compareTo(b.id);
   }
 
   void _submitKeyword(String keyword) {
@@ -368,14 +420,6 @@ class _SearchScreenState extends State<SearchScreen> {
         _focusNode.requestFocus();
       }
     });
-  }
-
-  void _changeType(String value) {
-    if (_type == value) return;
-    setState(() => _type = value);
-    if (_activeKeyword.isNotEmpty) {
-      _performSearch(_activeKeyword);
-    }
   }
 
   void _changeSort(String value) {
@@ -522,6 +566,7 @@ class _SearchScreenState extends State<SearchScreen> {
             _SearchHeader(
               controller: _controller,
               focusNode: _focusNode,
+              showSearchAction: !_hasSearched,
               onBack: () {
                 FocusManager.instance.primaryFocus?.unfocus();
                 Navigator.pop(context);
@@ -578,7 +623,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   visualDensity: VisualDensity.compact,
                   onPressed: () => _deleteHistory(),
                   icon: const Icon(
-                    LucideIcons.trash2,
+                    LucideIcons.trash_2,
                     size: 17,
                     color: Color(0xFF94A3B8),
                   ),
@@ -625,21 +670,31 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Widget _buildSuggestionBody() {
     final keyword = _controller.text.trim();
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
-      children: [
-        if (_suggestionLoading) const LinearProgressIndicator(minHeight: 2),
-        if (!_suggestionLoading && _suggestions.isEmpty)
-          _SuggestionTile(
-            keyword: keyword,
-            subtitle: 'Tìm kiếm chính xác từ khóa này',
-            onTap: () => _submitKeyword(keyword),
+    return Container(
+      color: const Color(0xFFF3F3F3),
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          if (_suggestionLoading)
+            const LinearProgressIndicator(
+              minHeight: 2,
+              color: Color(0xFFFF4D33),
+              backgroundColor: Color(0xFFFFE1DC),
+            ),
+          if (!_suggestionLoading && _suggestions.isEmpty)
+            _SuggestionTile(
+              keyword: keyword,
+              subtitle: 'Tìm kiếm chính xác từ khóa này',
+              onTap: () => _submitKeyword(keyword),
+            ),
+          ..._suggestions.map(
+            (item) => _SuggestionTile(
+              keyword: item,
+              onTap: () => _submitKeyword(item),
+            ),
           ),
-        ..._suggestions.map(
-          (item) =>
-              _SuggestionTile(keyword: item, onTap: () => _submitKeyword(item)),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -647,13 +702,7 @@ class _SearchScreenState extends State<SearchScreen> {
     if (_searchLoading) {
       return Column(
         children: [
-          _FilterBar(
-            type: _type,
-            sort: _sort,
-            totalElements: _totalElements,
-            onTypeChanged: _changeType,
-            onSortChanged: _changeSort,
-          ),
+          _FilterBar(sort: _sort, onSortChanged: _changeSort),
           const Expanded(child: Center(child: CircularProgressIndicator())),
         ],
       );
@@ -662,13 +711,7 @@ class _SearchScreenState extends State<SearchScreen> {
     if (_searchError != null) {
       return Column(
         children: [
-          _FilterBar(
-            type: _type,
-            sort: _sort,
-            totalElements: _totalElements,
-            onTypeChanged: _changeType,
-            onSortChanged: _changeSort,
-          ),
+          _FilterBar(sort: _sort, onSortChanged: _changeSort),
           Expanded(
             child: _ErrorState(
               message: _searchError!,
@@ -682,16 +725,10 @@ class _SearchScreenState extends State<SearchScreen> {
     if (_results.isEmpty) {
       return Column(
         children: [
-          _FilterBar(
-            type: _type,
-            sort: _sort,
-            totalElements: _totalElements,
-            onTypeChanged: _changeType,
-            onSortChanged: _changeSort,
-          ),
+          _FilterBar(sort: _sort, onSortChanged: _changeSort),
           const Expanded(
             child: _EmptyState(
-              icon: LucideIcons.packageSearch,
+              icon: LucideIcons.package_search,
               title: 'Không tìm thấy kết quả',
               message: 'Thử từ khóa ngắn hơn hoặc đổi bộ lọc tìm kiếm.',
             ),
@@ -702,38 +739,30 @@ class _SearchScreenState extends State<SearchScreen> {
 
     return Column(
       children: [
-        _FilterBar(
-          type: _type,
-          sort: _sort,
-          totalElements: _totalElements,
-          onTypeChanged: _changeType,
-          onSortChanged: _changeSort,
-        ),
+        _FilterBar(sort: _sort, onSortChanged: _changeSort),
         Expanded(
-          child: GridView.builder(
-            controller: _resultScrollController,
-            padding: EdgeInsets.fromLTRB(
-              12,
-              10,
-              12,
-              _loadMoreLoading ? 84 : 24,
+          child: Container(
+            color: _searchResultBackground,
+            child: GridView.builder(
+              controller: _resultScrollController,
+              padding: EdgeInsets.fromLTRB(8, 8, 8, _loadMoreLoading ? 84 : 18),
+              itemCount: _results.length + (_loadMoreLoading ? 1 : 0),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 6,
+                mainAxisSpacing: 8,
+                mainAxisExtent: _searchGridCardExtent,
+              ),
+              itemBuilder: (context, index) {
+                if (index >= _results.length) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                return _SearchItemCard(
+                  item: _results[index],
+                  onTap: () => _openItem(_results[index]),
+                );
+              },
             ),
-            itemCount: _results.length + (_loadMoreLoading ? 1 : 0),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              mainAxisExtent: _searchGridCardExtent,
-            ),
-            itemBuilder: (context, index) {
-              if (index >= _results.length) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              return _SearchItemCard(
-                item: _results[index],
-                onTap: () => _openItem(_results[index]),
-              );
-            },
           ),
         ),
       ],
@@ -745,6 +774,7 @@ class _SearchHeader extends StatelessWidget {
   const _SearchHeader({
     required this.controller,
     required this.focusNode,
+    required this.showSearchAction,
     required this.onBack,
     required this.onClear,
     required this.onSearch,
@@ -752,6 +782,7 @@ class _SearchHeader extends StatelessWidget {
 
   final TextEditingController controller;
   final FocusNode focusNode;
+  final bool showSearchAction;
   final VoidCallback onBack;
   final VoidCallback onClear;
   final VoidCallback onSearch;
@@ -759,29 +790,30 @@ class _SearchHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(6, 10, 8, 10),
+      padding: const EdgeInsets.fromLTRB(4, 8, 8, 8),
       decoration: const BoxDecoration(color: Colors.white),
       child: Row(
         children: [
           IconButton(
             onPressed: onBack,
+            visualDensity: VisualDensity.compact,
             icon: const Icon(
-              LucideIcons.arrowLeft,
-              color: Color(0xFFFF6B57),
-              size: 28,
+              LucideIcons.arrow_left,
+              color: Color(0xFFFF4D33),
+              size: 24,
             ),
           ),
           Expanded(
             child: Container(
-              height: 50,
+              height: 34,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFFF6B57), width: 1.4),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFFF4D33), width: 1),
               ),
               child: Row(
                 children: [
-                  const SizedBox(width: 14),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: TextField(
                       controller: controller,
@@ -794,85 +826,63 @@ class _SearchHeader extends StatelessWidget {
                       onSubmitted: (_) => onSearch(),
                       decoration: InputDecoration(
                         border: InputBorder.none,
-                        hintText: 'Đồ Công Nghệ -50%',
+                        hintText: 'Tìm kiếm',
                         hintStyle: GoogleFonts.inter(
-                          color: const Color(0xFFCBD5E1),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF9CA3AF),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
                         ),
                         isCollapsed: true,
                       ),
                       style: GoogleFonts.inter(
-                        color: const Color(0xFF1F2937),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF111827),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
-                  ValueListenableBuilder<TextEditingValue>(
-                    valueListenable: controller,
-                    builder: (context, value, child) {
-                      if (value.text.trim().isEmpty) {
-                        return Container(
-                          width: 48,
-                          height: 50,
-                          decoration: const BoxDecoration(
-                            border: Border(
-                              left: BorderSide(color: Color(0xFFFECACA)),
-                            ),
-                          ),
-                          child: const Icon(
-                            LucideIcons.camera,
-                            color: Color(0xFF737373),
-                            size: 22,
-                          ),
-                        );
-                      }
-
-                      return GestureDetector(
-                        onTap: onClear,
-                        child: Container(
-                          width: 48,
-                          height: 50,
-                          decoration: const BoxDecoration(
-                            border: Border(
-                              left: BorderSide(color: Color(0xFFFECACA)),
-                            ),
-                          ),
-                          child: const Icon(
-                            LucideIcons.x,
-                            color: Color(0xFF737373),
-                            size: 20,
-                          ),
-                        ),
-                      );
-                    },
+                  Container(
+                    width: 42,
+                    height: 34,
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        left: BorderSide(color: Color(0xFFFFD1C8)),
+                      ),
+                    ),
+                    child: const Icon(
+                      LucideIcons.camera,
+                      color: Color(0xFF737373),
+                      size: 19,
+                    ),
                   ),
                 ],
               ),
             ),
           ),
-          const SizedBox(width: 6),
-          SizedBox(
-            width: 56,
-            height: 50,
-            child: FilledButton(
-              onPressed: onSearch,
-              style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFFFF5A32),
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.zero,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+          if (showSearchAction)
+            SizedBox(
+              width: 43,
+              height: 34,
+              child: FilledButton(
+                onPressed: onSearch,
+                style: FilledButton.styleFrom(
+                  backgroundColor: _shopeeOrange,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.zero,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: const BorderRadius.only(
+                      topRight: Radius.circular(8),
+                      bottomRight: Radius.circular(8),
+                    ),
+                  ),
+                ),
+                child: const Icon(
+                  LucideIcons.search,
+                  color: Colors.white,
+                  size: 19,
                 ),
               ),
-              child: const Icon(
-                LucideIcons.search,
-                color: Colors.white,
-                size: 22,
-              ),
             ),
-          ),
         ],
       ),
     );
@@ -1018,54 +1028,47 @@ class _SuggestionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          child: Row(
-            children: [
-              const Icon(
-                LucideIcons.search,
-                size: 17,
-                color: Color(0xFF94A3B8),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      keyword,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.inter(
-                        color: const Color(0xFF1F2937),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    if (subtitle != null) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        subtitle!,
-                        style: GoogleFonts.inter(
-                          color: const Color(0xFF94A3B8),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ],
+        child: Container(
+          constraints: BoxConstraints(minHeight: subtitle == null ? 47 : 58),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+          decoration: const BoxDecoration(
+            border: Border(
+              bottom: BorderSide(color: Color(0xFFEDEDED), width: 1),
+            ),
+          ),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  keyword,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFF111111),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-              ),
-              const Icon(
-                LucideIcons.chevronRight,
-                size: 16,
-                color: Color(0xFFCBD5E1),
-              ),
-            ],
+                if (subtitle != null) ...[
+                  const SizedBox(height: 3),
+                  Text(
+                    subtitle!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      color: const Color(0xFF8A8A8A),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
         ),
       ),
@@ -1074,80 +1077,63 @@ class _SuggestionTile extends StatelessWidget {
 }
 
 class _FilterBar extends StatelessWidget {
-  const _FilterBar({
-    required this.type,
-    required this.sort,
-    required this.totalElements,
-    required this.onTypeChanged,
-    required this.onSortChanged,
-  });
+  const _FilterBar({required this.sort, required this.onSortChanged});
 
-  final String type;
   final String sort;
-  final int totalElements;
-  final ValueChanged<String> onTypeChanged;
   final ValueChanged<String> onSortChanged;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: const Color(0xFFD5F4FF),
-      padding: const EdgeInsets.fromLTRB(12, 4, 12, 6),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (totalElements > 0)
-            Padding(
-              padding: const EdgeInsets.only(left: 2, bottom: 6),
-              child: Text(
-                '$totalElements kết quả',
-                style: GoogleFonts.inter(
-                  color: const Color(0xFF64748B),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                ),
+    final priceSelected = sort == 'PRICE_ASC' || sort == 'PRICE_DESC';
+    final priceLabel = sort == 'PRICE_DESC'
+        ? 'Giá ↓'
+        : sort == 'PRICE_ASC'
+        ? 'Giá ↑'
+        : 'Giá ↕';
+
+    return Column(
+      children: [
+        Container(
+          height: 40,
+          color: Colors.white,
+          child: Row(
+            children: [
+              _ResultSortTab(
+                label: 'Liên quan',
+                selected: sort == 'RELEVANT',
+                onTap: () => onSortChanged('RELEVANT'),
               ),
-            ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _FilterPill(
-                  label: 'Tất cả',
-                  selected: type == 'ALL',
-                  onTap: () => onTypeChanged('ALL'),
-                ),
-                _FilterPill(
-                  label: 'Dịch vụ',
-                  selected: type == 'SERVICE',
-                  onTap: () => onTypeChanged('SERVICE'),
-                ),
-                _FilterPill(
-                  label: 'Sản phẩm',
-                  selected: type == 'PRODUCT',
-                  onTap: () => onTypeChanged('PRODUCT'),
-                ),
-                _FilterPill(
-                  label: 'Gần nhất',
-                  selected: sort == 'NEAREST',
-                  onTap: () => onSortChanged('NEAREST'),
-                ),
-                _FilterPill(
-                  label: sort == 'PRICE_DESC' ? 'Giá ↓' : 'Giá ↑',
-                  selected: sort == 'PRICE_ASC' || sort == 'PRICE_DESC',
-                  onTap: () => onSortChanged('PRICE'),
-                ),
-              ],
-            ),
+              const _FilterSeparator(),
+              _ResultSortTab(
+                label: 'Bán chạy',
+                selected: sort == 'SOLD_DESC',
+                onTap: () => onSortChanged('SOLD_DESC'),
+              ),
+              const _FilterSeparator(),
+              _ResultSortTab(
+                label: priceLabel,
+                selected: priceSelected,
+                onTap: () => onSortChanged('PRICE'),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
 
-class _FilterPill extends StatelessWidget {
-  const _FilterPill({
+class _FilterSeparator extends StatelessWidget {
+  const _FilterSeparator();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(width: 1, height: 16, color: const Color(0xFFE8E8E8));
+  }
+}
+
+class _ResultSortTab extends StatelessWidget {
+  const _ResultSortTab({
     required this.label,
     required this.selected,
     required this.onTap,
@@ -1159,25 +1145,36 @@ class _FilterPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: Material(
-        color: selected ? const Color(0xFFFF5A4E) : Colors.white,
-        borderRadius: BorderRadius.circular(999),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(999),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Text(
-              label,
-              style: GoogleFonts.inter(
-                color: selected ? Colors.white : const Color(0xFF334155),
-                fontSize: 12,
-                fontWeight: FontWeight.w800,
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        child: Stack(
+          children: [
+            Center(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.inter(
+                  color: selected ? _shopeeOrange : const Color(0xFF4B5563),
+                  fontSize: 12,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                ),
               ),
             ),
-          ),
+            if (selected)
+              const Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: SizedBox(
+                  height: 2,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(color: _shopeeOrange),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );
@@ -1399,7 +1396,7 @@ class _SearchItemCard extends StatelessWidget {
                       Row(
                         children: [
                           const Icon(
-                            LucideIcons.mapPin,
+                            LucideIcons.map_pin,
                             size: 11,
                             color: Color(0xFF94A3B8),
                           ),
@@ -1555,7 +1552,11 @@ class _ErrorState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(LucideIcons.wifiOff, size: 42, color: Color(0xFF94A3B8)),
+            const Icon(
+              LucideIcons.wifi_off,
+              size: 42,
+              color: Color(0xFF94A3B8),
+            ),
             const SizedBox(height: 12),
             Text(
               message,

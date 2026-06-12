@@ -1,5 +1,5 @@
 import 'package:image_picker/image_picker.dart';
-import 'package:petpee_mobile/common/user/model/user_model.dart';
+import 'package:pawly_mobile/common/user/model/user_model.dart';
 
 typedef User = UserModel;
 

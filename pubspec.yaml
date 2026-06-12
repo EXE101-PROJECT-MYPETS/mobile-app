@@ -1,4 +1,4 @@
-name: petpee_mobile
+name: pawly_mobile
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -33,7 +33,7 @@ dependencies:
 
   cupertino_icons: ^1.0.8
   google_fonts: ^6.2.1
-  lucide_icons: ^0.257.0
+  flutter_lucide: ^1.11.0
   provider: ^6.1.5+1
   hive: ^2.2.3
   hive_flutter: ^1.1.0
@@ -79,6 +79,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/icon_chatbot.png
+    - assets/pet_dog_cat_illustration.png
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

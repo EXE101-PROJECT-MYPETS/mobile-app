@@ -1,5 +1,5 @@
-import 'package:petpee_mobile/common/utils/image_url_util.dart';
-import 'package:petpee_mobile/common/utils/price_formatter.dart';
+import 'package:pawly_mobile/common/utils/image_url_util.dart';
+import 'package:pawly_mobile/common/utils/price_formatter.dart';
 
 class ProductPublicDetailDTO {
   final int? id;
@@ -23,6 +23,7 @@ class ProductPublicDetailDTO {
   final int? originalPrice;
   final int? discountPercent;
   final String? unit;
+  final double? weightKg;
   final int? stockQty;
   final int? soldCount;
   final double? rating;
@@ -58,6 +59,7 @@ class ProductPublicDetailDTO {
     this.originalPrice,
     this.discountPercent,
     this.unit,
+    this.weightKg,
     this.stockQty,
     this.soldCount,
     this.rating,
@@ -131,6 +133,7 @@ class ProductPublicDetailDTO {
       originalPrice: json['originalPrice'] as int?,
       discountPercent: json['discountPercent'] as int?,
       unit: getString(json['unit']),
+      weightKg: (json['weightKg'] as num?)?.toDouble(),
       stockQty: json['stockQty'] as int?,
       soldCount: json['soldCount'] as int?,
       rating: (json['rating'] as num?)?.toDouble(),

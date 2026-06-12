@@ -49,6 +49,8 @@ class CheckoutRequestModel {
   final int shopId;
   final int userId;
   final int? customerId;
+  final int? userAddressId;
+  final String source;
   final String receiverName;
   final String receiverPhone;
   final String shippingAddress;
@@ -63,6 +65,8 @@ class CheckoutRequestModel {
     required this.shopId,
     required this.userId,
     this.customerId,
+    this.userAddressId,
+    this.source = 'ONLINE',
     required this.receiverName,
     required this.receiverPhone,
     required this.shippingAddress,
@@ -79,6 +83,8 @@ class CheckoutRequestModel {
       'shopId': shopId,
       'userId': userId,
       if (customerId != null) 'customerId': customerId,
+      if (userAddressId != null) 'userAddressId': userAddressId,
+      'source': source,
       'receiverName': receiverName,
       'receiverPhone': receiverPhone,
       'shippingAddress': shippingAddress,

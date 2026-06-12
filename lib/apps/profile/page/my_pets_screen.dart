@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
-import 'package:petpee_mobile/apps/profile/model/pet_model.dart';
-import 'package:petpee_mobile/apps/profile/api/pet_service.dart';
-import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
-import 'package:petpee_mobile/common/config/api_config.dart';
-import 'package:petpee_mobile/common/toast/app_toast.dart';
+import 'package:pawly_mobile/apps/profile/model/pet_model.dart';
+import 'package:pawly_mobile/apps/profile/api/pet_service.dart';
+import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
+import 'package:pawly_mobile/common/config/api_config.dart';
+import 'package:pawly_mobile/common/toast/app_toast.dart';
 import 'add_pet_screen.dart';
 
 class MyPetsScreen extends StatefulWidget {
@@ -105,7 +105,7 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: Colors.black87),
+          icon: const Icon(LucideIcons.arrow_left, color: Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -249,7 +249,7 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               _buildSmallIconButton(
-                LucideIcons.edit2,
+                LucideIcons.square_pen,
                 'Sửa',
                 Colors.pink.shade100,
                 Colors.pink,
@@ -267,7 +267,7 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
               ),
               const SizedBox(width: 8),
               _buildSmallIconButton(
-                LucideIcons.trash2,
+                LucideIcons.trash_2,
                 'Xóa',
                 Colors.pink.shade100,
                 Colors.pink,
@@ -369,7 +369,7 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
           Row(
             children: [
               const Icon(
-                LucideIcons.checkCircle2,
+                LucideIcons.circle_check_big,
                 size: 14,
                 color: Colors.grey,
               ),
@@ -483,7 +483,7 @@ class _PetLoadErrorState extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: const Icon(
-                LucideIcons.alertTriangle,
+                LucideIcons.triangle_alert,
                 color: Color(0xFFE76F51),
                 size: 30,
               ),
@@ -516,7 +516,7 @@ class _PetLoadErrorState extends StatelessWidget {
               height: 48,
               child: ElevatedButton.icon(
                 onPressed: onRetry,
-                icon: const Icon(LucideIcons.refreshCw, size: 18),
+                icon: const Icon(LucideIcons.refresh_cw, size: 18),
                 label: const Text('Thử lại'),
                 style: ElevatedButton.styleFrom(
                   foregroundColor: Colors.white,
@@ -558,7 +558,7 @@ class _PetLoginRequiredState extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: const Icon(
-                LucideIcons.alertCircle,
+                LucideIcons.circle_alert,
                 color: Color(0xFFE76F51),
                 size: 30,
               ),
@@ -575,7 +575,7 @@ class _PetLoginRequiredState extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Đăng nhập để PetPee tải hồ sơ thú cưng và đồng bộ dữ liệu của bạn.',
+              'Đăng nhập để Pawly tải hồ sơ thú cưng và đồng bộ dữ liệu của bạn.',
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 color: const Color(0xFF7B685B),
@@ -605,7 +605,7 @@ class _PetLoginRequiredState extends StatelessWidget {
                 ),
                 child: ElevatedButton.icon(
                   onPressed: () => Navigator.pushNamed(context, '/login'),
-                  icon: const Icon(LucideIcons.logIn, size: 18),
+                  icon: const Icon(LucideIcons.log_in, size: 18),
                   label: const Text('Đăng nhập'),
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,

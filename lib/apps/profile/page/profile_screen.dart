@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/apps/home/page/home_screen.dart';
-import 'package:petpee_mobile/apps/home/page/notifications_screen.dart';
-import 'package:petpee_mobile/apps/product/page/spa_service_screen.dart';
-import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
-import 'package:petpee_mobile/features/chat/screens/pet_ai_selection_screen.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/common/component/common_bottom_nav.dart';
+import 'package:pawly_mobile/common/navigation/main_tab_navigation.dart';
 import 'settings_screen.dart';
 import 'orders_screen.dart';
 import 'favorite_products_screen.dart';
 import 'recently_viewed_screen.dart';
-import 'package:petpee_mobile/apps/cart/page/cart_screen.dart';
+import 'package:pawly_mobile/apps/cart/page/cart_screen.dart';
 import 'my_pets_screen.dart';
 import 'edit_profile_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
-import 'package:petpee_mobile/common/config/api_config.dart';
+import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
+import 'package:pawly_mobile/common/config/api_config.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -94,7 +91,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             },
           ),
           IconButton(
-            icon: const Icon(LucideIcons.messageCircle, color: Colors.black87),
+            icon: const Icon(LucideIcons.message_circle, color: Colors.black87),
             onPressed: () {},
           ),
         ],
@@ -187,7 +184,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   ListTile(
                     leading: const Icon(
-                      LucideIcons.fileText,
+                      LucideIcons.file_text,
                       color: Colors.blue,
                     ),
                     title: const Text(
@@ -228,7 +225,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         _buildOrderStatus(LucideIcons.wallet, 'Chờ xác nhận'),
                         _buildOrderStatus(
-                          LucideIcons.packageSearch,
+                          LucideIcons.package_search,
                           'Đang xử lý',
                         ),
                         _buildOrderStatus(LucideIcons.truck, 'Đang giao'),
@@ -247,7 +244,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 children: [
                   _buildListTileItem(
-                    LucideIcons.shoppingCart,
+                    LucideIcons.shopping_cart,
                     'Giỏ hàng',
                     Colors.orange,
                     onTap: () {
@@ -337,35 +334,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       bottomNavigationBar: CommonBottomNavBar(
         currentIndex: 4,
-        onTap: (index) {
-          if (index == 0) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const HomeScreen()),
-              (route) => false,
-            );
-          } else if (index == 1) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const PetAiSelectionScreen(),
-              ),
-            );
-          } else if (index == 2) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const CartScreen()),
-            );
-          } else if (index == 3) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const NotificationsScreen(),
-              ),
-              (route) => false,
-            );
-          }
-        },
+        onTap: (index) =>
+            MainTabNavigation.open(context, index, currentIndex: 4),
       ),
     );
   }
@@ -423,7 +393,7 @@ class _ProfileLoginRequiredScreen extends StatelessWidget {
         centerTitle: true,
         leading: IconButton(
           tooltip: 'Quay lại',
-          icon: const Icon(LucideIcons.arrowLeft, color: Colors.black87),
+          icon: const Icon(LucideIcons.arrow_left, color: Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -449,7 +419,7 @@ class _ProfileLoginRequiredScreen extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
-                  LucideIcons.alertCircle,
+                  LucideIcons.circle_alert,
                   color: Color(0xFFE76F51),
                   size: 30,
                 ),
@@ -466,7 +436,7 @@ class _ProfileLoginRequiredScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Đăng nhập để PetPee tải hồ sơ và đồng bộ thông tin tài khoản của bạn.',
+                'Đăng nhập để Pawly tải hồ sơ và đồng bộ thông tin tài khoản của bạn.',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   color: const Color(0xFF7B685B),
@@ -496,7 +466,7 @@ class _ProfileLoginRequiredScreen extends StatelessWidget {
                   ),
                   child: ElevatedButton.icon(
                     onPressed: () => Navigator.pushNamed(context, '/login'),
-                    icon: const Icon(LucideIcons.logIn, size: 18),
+                    icon: const Icon(LucideIcons.log_in, size: 18),
                     label: const Text('Đăng nhập'),
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,

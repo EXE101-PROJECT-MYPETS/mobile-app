@@ -3,32 +3,36 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
-import 'package:petpee_mobile/apps/checkout/api/order_service.dart';
+import 'package:pawly_mobile/apps/checkout/api/order_service.dart';
+import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
+import 'package:pawly_mobile/common/config/api_config.dart';
+import 'package:pawly_mobile/common/toast/app_toast.dart';
+import 'package:pawly_mobile/apps/profile/page/order_detail_screen.dart';
+import 'package:pawly_mobile/features/chat/providers/chat_provider.dart';
+import 'package:pawly_mobile/features/chat/screens/chat_detail_screen.dart';
 
 class OrdersScreen extends StatelessWidget {
-  const OrdersScreen({super.key});
+  const OrdersScreen({super.key, this.initialTabIndex = 0});
+
+  final int initialTabIndex;
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 5,
+      length: 8,
+      initialIndex: initialTabIndex.clamp(0, 7),
       child: Scaffold(
         backgroundColor: const Color(0xFFF1F5F9),
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
-          leadingWidth: 80,
-          leading: TextButton.icon(
+          leading: IconButton(
+            tooltip: 'Quay lại',
             onPressed: () => Navigator.pop(context),
             icon: const Icon(
               Icons.arrow_back_ios,
               color: Color(0xFFFB7185),
               size: 16,
-            ),
-            label: const Text(
-              'Back',
-              style: TextStyle(color: Color(0xFFFB7185), fontSize: 14),
             ),
           ),
           title: Text(
@@ -54,8 +58,11 @@ class OrdersScreen extends StatelessWidget {
               Tab(text: 'Tất cả'),
               Tab(text: 'Chờ xác nhận'),
               Tab(text: 'Đã xác nhận'),
+              Tab(text: 'Chờ lấy hàng'),
+              Tab(text: 'Chờ giao hàng'),
               Tab(text: 'Đang giao'),
               Tab(text: 'Đã hoàn thành'),
+              Tab(text: 'Đã hủy'),
             ],
           ),
         ),
@@ -64,8 +71,11 @@ class OrdersScreen extends StatelessWidget {
             _OrdersList(status: null),
             _OrdersList(status: 'PENDING'),
             _OrdersList(status: 'CONFIRMED'),
+            _OrdersList(status: 'PACKING'),
+            _OrdersList(status: 'WAITING_GHTK_PICKUP'),
             _OrdersList(status: 'SHIPPING'),
             _OrdersList(status: 'COMPLETED'),
+            _OrdersList(status: 'CANCELLED'),
           ],
         ),
       ),
@@ -91,6 +101,7 @@ class _OrdersListState extends State<_OrdersList> {
   int? _cursor;
   Timer? _refreshTimer;
   String? _error;
+  final Set<String> _expandedOrderIds = <String>{};
 
   @override
   void initState() {
@@ -215,9 +226,9 @@ class _OrdersListState extends State<_OrdersList> {
       case 'CONFIRMED':
         return 'Đã xác nhận';
       case 'PACKING':
-        return 'Đang đóng gói';
-      case 'WAITING_GHTK_PICKUP':
         return 'Chờ lấy hàng';
+      case 'WAITING_GHTK_PICKUP':
+        return 'Chờ giao hàng';
       case 'SHIPPING':
         return 'Đang giao';
       case 'COMPLETED':
@@ -248,16 +259,113 @@ class _OrdersListState extends State<_OrdersList> {
     }
   }
 
-  String _formatDate(String? isoDate) {
-    if (isoDate == null) return '';
+  List<Map<String, dynamic>> _getOrderItems(dynamic rawItems) {
+    if (rawItems is! List) return const [];
+    return rawItems
+        .whereType<Map>()
+        .map((item) => Map<String, dynamic>.from(item))
+        .toList();
+  }
+
+  String _asString(dynamic value, [String fallback = '']) {
+    final text = value?.toString().trim();
+    return text == null || text.isEmpty ? fallback : text;
+  }
+
+  int? _asInt(dynamic value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value?.toString() ?? '');
+  }
+
+  num _asNum(dynamic value) {
+    if (value is num) return value;
+    return num.tryParse(value?.toString() ?? '') ?? 0;
+  }
+
+  int _getTotalQuantity(List<Map<String, dynamic>> items) {
+    final total = items.fold<int>(
+      0,
+      (sum, item) => sum + (_asInt(item['qty']) ?? 0),
+    );
+    return total > 0 ? total : items.length;
+  }
+
+  String _orderExpansionKey(Map<String, dynamic> order) {
+    return _asString(order['id'], _asString(order['orderCode']));
+  }
+
+  void _toggleExpandedOrder(Map<String, dynamic> order) {
+    final key = _orderExpansionKey(order);
+    if (key.isEmpty) return;
+
+    setState(() {
+      if (_expandedOrderIds.contains(key)) {
+        _expandedOrderIds.remove(key);
+      } else {
+        _expandedOrderIds.add(key);
+      }
+    });
+  }
+
+  String _resolveImageUrl(Map<String, dynamic> item) {
+    return ApiConfig.formatImageUrl(_asString(item['productImageUrl']));
+  }
+
+  int? _resolveShopId(Map<String, dynamic> order) {
+    final orderShopId = _asInt(order['shopId']);
+    if (orderShopId != null && orderShopId > 0) return orderShopId;
+
+    final items = _getOrderItems(order['items']);
+    for (final item in items) {
+      final itemShopId = _asInt(item['shopId']);
+      if (itemShopId != null && itemShopId > 0) return itemShopId;
+    }
+
+    return null;
+  }
+
+  Future<void> _openChatForOrder(Map<String, dynamic> order) async {
+    final shopId = _resolveShopId(order);
+    if (shopId == null) {
+      showAppToast(
+        context,
+        message: 'Không xác định được shop để mở chat',
+        type: AppToastType.error,
+      );
+      return;
+    }
+
+    final shopName = _asString(order['shopName'], 'Cửa hàng');
+    final chatProvider = context.read<ChatProvider>();
+
     try {
-      final date = DateTime.parse(isoDate).toLocal();
-      return DateFormat('dd/MM/yyyy HH:mm').format(date);
+      final conversation = await chatProvider.openConversationForShop(
+        shopId.toString(),
+      );
+      if (!mounted) return;
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ChatDetailScreen(
+            conversationId: conversation.id,
+            shopId: conversation.shopId,
+            shopName: shopName,
+          ),
+        ),
+      );
     } catch (e) {
-      return isoDate;
+      if (!mounted) return;
+      showAppToast(
+        context,
+        message: 'Không thể mở chat với shop',
+        type: AppToastType.error,
+      );
     }
   }
 
+<<<<<<< feature/notifications-update
   String _getProductsNames(List<dynamic>? items) {
     if (items == null || items.isEmpty) return 'Không có sản phẩm';
     final names = items
@@ -265,6 +373,210 @@ class _OrdersListState extends State<_OrdersList> {
         .toList();
     if (names.length == 1) return names.first;
     return '${names.first} và ${names.length - 1} sản phẩm khác';
+=======
+  void _openOrderDetail(Map<String, dynamic> order) {
+    final orderId = _asInt(order['id']);
+    if (orderId == null) {
+      showAppToast(
+        context,
+        message: 'Không xác định được đơn hàng',
+        type: AppToastType.error,
+      );
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => OrderDetailScreen(orderId: orderId),
+      ),
+    );
+  }
+
+  Widget _buildOrderCard(
+    Map<String, dynamic> order,
+    NumberFormat currencyFormat,
+  ) {
+    final statusString = order['status'] as String?;
+    final statusLabel = _formatStatus(statusString);
+    final statusColor = _getStatusColor(statusString);
+    final items = _getOrderItems(order['items']);
+    final totalQuantity = _getTotalQuantity(items);
+    final expansionKey = _orderExpansionKey(order);
+    final isExpanded = _expandedOrderIds.contains(expansionKey);
+    final visibleItems = isExpanded ? items : items.take(1).toList();
+    final hasHiddenItems = items.length > 1;
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => _openOrderDetail(order),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFF0F3),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                    child: const Icon(
+                      Icons.store,
+                      size: 13,
+                      color: Color(0xFFFB7185),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      _asString(order['shopName'], 'Cửa hàng'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        color: const Color(0xFF111827),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    statusLabel,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      color: statusColor,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1, color: Color(0xFFF1F5F9)),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+              child: Text(
+                'Mã đơn: ${order['orderCode'] ?? order['id']}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.inter(
+                  color: const Color(0xFF64748B),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            if (items.isEmpty)
+              const Padding(
+                padding: EdgeInsets.fromLTRB(12, 12, 12, 4),
+                child: Text(
+                  'Không có sản phẩm',
+                  style: TextStyle(color: Color(0xFF64748B), fontSize: 12),
+                ),
+              )
+            else
+              ...visibleItems.map(
+                (item) => _OrderItemRow(
+                  item: item,
+                  imageUrl: _resolveImageUrl(item),
+                  currencyFormat: currencyFormat,
+                  asString: _asString,
+                  asInt: _asInt,
+                  asNum: _asNum,
+                ),
+              ),
+            if (hasHiddenItems)
+              Center(
+                child: TextButton.icon(
+                  onPressed: () => _toggleExpandedOrder(order),
+                  iconAlignment: IconAlignment.end,
+                  icon: Icon(
+                    isExpanded
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
+                    size: 18,
+                  ),
+                  label: Text(isExpanded ? 'Thu gọn' : 'Xem thêm'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFF64748B),
+                    textStyle: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            const Divider(height: 16, color: Color(0xFFF1F5F9)),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          'Tổng số tiền ($totalQuantity sản phẩm):',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            color: const Color(0xFF111827),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        currencyFormat.format(_asNum(order['totalAmount'])),
+                        style: GoogleFonts.inter(
+                          color: const Color(0xFFE53935),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  OutlinedButton(
+                    onPressed: () => _openChatForOrder(order),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF111827),
+                      side: const BorderSide(color: Color(0xFFD1D5DB)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 10,
+                      ),
+                      textStyle: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    child: const Text('Liên hệ Shop'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+>>>>>>> main
   }
 
   @override
@@ -327,99 +639,163 @@ class _OrdersListState extends State<_OrdersList> {
             );
           }
 
-          final order = _orders[index];
-          final statusString = order['status'] as String?;
-          final statusLabel = _formatStatus(statusString);
-          final statusColor = _getStatusColor(statusString);
+          final rawOrder = _orders[index];
+          if (rawOrder is! Map) return const SizedBox.shrink();
+          return _buildOrderCard(
+            Map<String, dynamic>.from(rawOrder),
+            currencyFormat,
+          );
+        },
+      ),
+    );
+  }
+}
 
-          return Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.02),
-                  blurRadius: 5,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+class _OrderItemRow extends StatelessWidget {
+  const _OrderItemRow({
+    required this.item,
+    required this.imageUrl,
+    required this.currencyFormat,
+    required this.asString,
+    required this.asInt,
+    required this.asNum,
+  });
+
+  final Map<String, dynamic> item;
+  final String imageUrl;
+  final NumberFormat currencyFormat;
+  final String Function(dynamic value, [String fallback]) asString;
+  final int? Function(dynamic value) asInt;
+  final num Function(dynamic value) asNum;
+
+  String _formatItemDate(dynamic value) {
+    final raw = value?.toString();
+    if (raw == null || raw.isEmpty) return '';
+    final parsed = DateTime.tryParse(raw);
+    if (parsed == null) return raw;
+    return DateFormat('dd/MM/yyyy HH:mm').format(parsed.toLocal());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final qty = asInt(item['qty']) ?? 1;
+    final unitPrice = asNum(item['unitPrice']);
+    final amount = asNum(item['amount']);
+    final createdAtText = _formatItemDate(item['createdAt']);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: SizedBox(
+              width: 72,
+              height: 72,
+              child: imageUrl.isEmpty
+                  ? const _OrderItemImagePlaceholder()
+                  : Image.network(
+                      imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const _OrderItemImagePlaceholder(),
+                    ),
             ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFF0F3),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: const Icon(
-                            Icons.store,
-                            size: 14,
-                            color: Color(0xFFFB7185),
-                          ),
+                    Expanded(
+                      child: Text(
+                        asString(item['productName'], 'Sản phẩm'),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          color: const Color(0xFF111827),
+                          fontSize: 13,
+                          height: 1.3,
+                          fontWeight: FontWeight.w500,
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          order['shopName']?.toString() ?? 'Cửa hàng',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     Text(
-                      statusLabel,
-                      style: TextStyle(
-                        color: statusColor,
-                        fontWeight: FontWeight.w600,
+                      'x$qty',
+                      style: GoogleFonts.inter(
+                        color: const Color(0xFF64748B),
                         fontSize: 12,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  'Mã đơn: ${order['orderCode'] ?? order['id']}',
-                  style: const TextStyle(fontSize: 12, color: Colors.black87),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: unitPrice > 0
+                          ? Text(
+                              currencyFormat.format(unitPrice),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.inter(
+                                color: const Color(0xFF94A3B8),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                    ),
+                    Text(
+                      currencyFormat.format(amount > 0 ? amount : unitPrice),
+                      style: GoogleFonts.inter(
+                        color: const Color(0xFF111827),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  'Sản phẩm: ${_getProductsNames(order['items'])}',
-                  style: const TextStyle(fontSize: 12, color: Colors.black87),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Ngày tạo: ${_formatDate(order['createdAt'])}',
-                  style: const TextStyle(fontSize: 12, color: Colors.black87),
-                ),
-
-                const SizedBox(height: 12),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    currencyFormat.format(order['totalAmount'] ?? 0),
-                    style: const TextStyle(
-                      color: Color(0xFFC62828), // Đỏ đậm
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                if (createdAtText.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    'Ngày tạo: $createdAtText',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      color: const Color(0xFF64748B),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                ),
+                ],
               ],
             ),
-          );
-        },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _OrderItemImagePlaceholder extends StatelessWidget {
+  const _OrderItemImagePlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: const Color(0xFFF1F5F9),
+      alignment: Alignment.center,
+      child: const Icon(
+        Icons.image_not_supported_outlined,
+        color: Color(0xFF94A3B8),
+        size: 24,
       ),
     );
   }

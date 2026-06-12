@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
-import 'package:petpee_mobile/apps/profile/api/pet_service.dart';
-import 'package:petpee_mobile/apps/profile/model/pet_dto.dart';
-import 'package:petpee_mobile/apps/service/api/service_service.dart';
-import 'package:petpee_mobile/apps/service/model/booking_create_request.dart';
-import 'package:petpee_mobile/apps/service/model/service_detail_dto.dart';
-import 'package:petpee_mobile/apps/shop/page/shop_detail_screen.dart';
-import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
-import 'package:petpee_mobile/common/component/login_required_sheet.dart';
-import 'package:petpee_mobile/common/utils/image_url_util.dart';
-import 'package:petpee_mobile/common/utils/price_formatter.dart';
+import 'package:pawly_mobile/apps/profile/api/pet_service.dart';
+import 'package:pawly_mobile/apps/profile/model/pet_dto.dart';
+import 'package:pawly_mobile/apps/service/api/service_service.dart';
+import 'package:pawly_mobile/apps/service/model/booking_create_request.dart';
+import 'package:pawly_mobile/apps/service/model/service_detail_dto.dart';
+import 'package:pawly_mobile/apps/shop/page/shop_detail_screen.dart';
+import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
+import 'package:pawly_mobile/common/component/login_required_sheet.dart';
+import 'package:pawly_mobile/common/component/service_card.dart';
+import 'package:pawly_mobile/common/user/dto/service_public_dto.dart';
+import 'package:pawly_mobile/common/utils/image_url_util.dart';
+import 'package:pawly_mobile/common/utils/price_formatter.dart';
 
 class ServiceDetailScreen extends StatefulWidget {
   const ServiceDetailScreen({
@@ -44,26 +46,35 @@ class ServiceDetailScreen extends StatefulWidget {
 }
 
 class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
+  static const int _relatedPageSize = 10;
+
   final ServicePublicService _service = ServicePublicService();
   final ServiceBookingService _bookingService = ServiceBookingService();
   final PetService _petService = PetService();
   final TextEditingController _noteController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   ServiceDetailDTO? _detail;
   List<PetDTO> _pets = const [];
+  List<ServicePublicDTO> _relatedServices = const [];
   int? _selectedPetId;
   Object? _error;
   Object? _petsError;
+  Object? _relatedError;
+  int? _relatedCursor;
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = const TimeOfDay(hour: 9, minute: 0);
   bool _isLoading = true;
   bool _isLoadingPets = false;
+  bool _isLoadingRelated = false;
+  bool _hasMoreRelated = true;
   bool _requestedPets = false;
   bool _isBooking = false;
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_handleScroll);
     _loadDetail();
   }
 
@@ -75,6 +86,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _noteController.dispose();
     super.dispose();
   }
@@ -93,6 +105,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
         _isLoading = false;
       });
       _loadPetsIfNeeded(detail: detail);
+      _loadRelatedServices(reset: true);
     } catch (error) {
       if (!mounted) return;
       setState(() {
@@ -100,6 +113,63 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _loadRelatedServices({bool reset = false}) async {
+    if (_isLoadingRelated) return;
+    if (!reset && !_hasMoreRelated) return;
+
+    final serviceId = _detail?.id ?? widget.serviceId;
+
+    setState(() {
+      _isLoadingRelated = true;
+      _relatedError = null;
+      if (reset) {
+        _relatedServices = const [];
+        _relatedCursor = null;
+        _hasMoreRelated = true;
+      }
+    });
+
+    try {
+      final response = await _service.getRelatedForScroll(
+        serviceId: serviceId,
+        cursor: reset ? null : _relatedCursor,
+        size: _relatedPageSize,
+      );
+      if (!mounted) return;
+
+      final existingIds = _relatedServices
+          .map((service) => service.id)
+          .whereType<int>()
+          .toSet();
+      final nextServices = response.content.where((service) {
+        final id = service.id;
+        return id != null && id != serviceId && !existingIds.contains(id);
+      }).toList();
+
+      setState(() {
+        _relatedServices = reset
+            ? nextServices
+            : [..._relatedServices, ...nextServices];
+        _relatedCursor = response.nextCursor;
+        _hasMoreRelated = response.hasNext && response.nextCursor != null;
+        _isLoadingRelated = false;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _relatedError = error;
+        _hasMoreRelated = false;
+        _isLoadingRelated = false;
+      });
+    }
+  }
+
+  void _handleScroll() {
+    if (!_scrollController.hasClients) return;
+    if (_scrollController.position.extentAfter > 700) return;
+    _loadRelatedServices();
   }
 
   Future<void> _loadPets() async {
@@ -331,8 +401,10 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       body: _ServiceDetailContent(
+        scrollController: _scrollController,
         detail: detail,
         pets: _pets,
+        relatedServices: _relatedServices,
         selectedPetId: _selectedPetId,
         selectedDate: _selectedDate,
         selectedTime: _selectedTime,
@@ -340,12 +412,16 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
         isLoggedIn: isLoggedIn,
         requiresPet: _requiresPet(detail),
         isLoadingPets: _isLoadingPets,
+        isLoadingRelated: _isLoadingRelated,
+        hasMoreRelated: _hasMoreRelated,
         petsError: _petsError,
+        relatedError: _relatedError,
         onSelectDate: _selectDate,
         onSelectTime: _selectTime,
         onSelectPet: _openPetPicker,
         onManagePets: _openPets,
         onRetryPets: _loadPets,
+        onRetryRelated: () => _loadRelatedServices(reset: true),
       ),
       bottomNavigationBar: _BookingBar(
         detail: detail,
@@ -358,8 +434,10 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
 
 class _ServiceDetailContent extends StatelessWidget {
   const _ServiceDetailContent({
+    required this.scrollController,
     required this.detail,
     required this.pets,
+    required this.relatedServices,
     required this.selectedPetId,
     required this.selectedDate,
     required this.selectedTime,
@@ -367,16 +445,22 @@ class _ServiceDetailContent extends StatelessWidget {
     required this.isLoggedIn,
     required this.requiresPet,
     required this.isLoadingPets,
+    required this.isLoadingRelated,
+    required this.hasMoreRelated,
     required this.petsError,
+    required this.relatedError,
     required this.onSelectDate,
     required this.onSelectTime,
     required this.onSelectPet,
     required this.onManagePets,
     required this.onRetryPets,
+    required this.onRetryRelated,
   });
 
+  final ScrollController scrollController;
   final ServiceDetailDTO detail;
   final List<PetDTO> pets;
+  final List<ServicePublicDTO> relatedServices;
   final int? selectedPetId;
   final DateTime selectedDate;
   final TimeOfDay selectedTime;
@@ -384,16 +468,21 @@ class _ServiceDetailContent extends StatelessWidget {
   final bool isLoggedIn;
   final bool requiresPet;
   final bool isLoadingPets;
+  final bool isLoadingRelated;
+  final bool hasMoreRelated;
   final Object? petsError;
+  final Object? relatedError;
   final VoidCallback onSelectDate;
   final VoidCallback onSelectTime;
   final VoidCallback onSelectPet;
   final VoidCallback onManagePets;
   final VoidCallback onRetryPets;
+  final VoidCallback onRetryRelated;
 
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
+      controller: scrollController,
       slivers: [
         SliverAppBar(
           pinned: true,
@@ -407,7 +496,7 @@ class _ServiceDetailContent extends StatelessWidget {
               backgroundColor: Colors.white.withValues(alpha: 0.92),
               foregroundColor: const Color(0xFF111827),
             ),
-            icon: const Icon(LucideIcons.arrowLeft, size: 20),
+            icon: const Icon(LucideIcons.arrow_left, size: 20),
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
@@ -435,6 +524,8 @@ class _ServiceDetailContent extends StatelessWidget {
                 const SizedBox(height: 12),
                 _ShopPanel(detail: detail),
                 const SizedBox(height: 12),
+                _ReviewsPanel(detail: detail),
+                const SizedBox(height: 12),
                 _SchedulePanel(
                   pets: pets,
                   selectedPetId: selectedPetId,
@@ -450,6 +541,14 @@ class _ServiceDetailContent extends StatelessWidget {
                   onSelectPet: onSelectPet,
                   onManagePets: onManagePets,
                   onRetryPets: onRetryPets,
+                ),
+                const SizedBox(height: 12),
+                _RelatedServicesPanel(
+                  services: relatedServices,
+                  isLoading: isLoadingRelated,
+                  hasMore: hasMoreRelated,
+                  error: relatedError,
+                  onRetry: onRetryRelated,
                 ),
               ],
             ),
@@ -513,8 +612,8 @@ class _HeroImage extends StatelessWidget {
                   if (detail.active != null)
                     _Pill(
                       icon: detail.active!
-                          ? LucideIcons.checkCircle2
-                          : LucideIcons.alertCircle,
+                          ? LucideIcons.circle_check_big
+                          : LucideIcons.circle_alert,
                       text: detail.active! ? 'Đang mở đặt lịch' : 'Tạm ngưng',
                       color: detail.active!
                           ? const Color(0xFFDCFCE7)
@@ -585,10 +684,18 @@ class _HeaderPanel extends StatelessWidget {
                 ),
               if (detail.distanceKm != null)
                 _Pill(
-                  icon: LucideIcons.mapPin,
+                  icon: LucideIcons.map_pin,
                   text: _formatDistance(detail.distanceKm!),
                   color: const Color(0xFFF0FDF4),
                   textColor: const Color(0xFF166534),
+                ),
+              if ((detail.rating ?? 0) > 0 || (detail.ratingCount ?? 0) > 0)
+                _Pill(
+                  icon: LucideIcons.star,
+                  text:
+                      '${_formatRating(detail.rating ?? 0)} (${detail.ratingCount ?? 0} đánh giá)',
+                  color: const Color(0xFFFFF7ED),
+                  textColor: const Color(0xFFC2410C),
                 ),
             ],
           ),
@@ -611,12 +718,17 @@ class _QuickInfoPanel extends StatelessWidget {
         label: 'Loại dịch vụ',
         value: _serviceTypeLabel(detail.serviceType),
       ),
-      _DetailRow(
-        icon: LucideIcons.tag,
-        label: 'Nhóm dịch vụ',
-        value: _displayText(detail.categoryName, 'Đang cập nhật'),
-      ),
     ];
+
+    if (!_requiresPet(detail)) {
+      rows.add(
+        _DetailRow(
+          icon: LucideIcons.tag,
+          label: 'Nhóm dịch vụ',
+          value: _displayText(detail.categoryName, 'Đang cập nhật'),
+        ),
+      );
+    }
 
     if (detail.veterinaryServiceType?.isNotEmpty == true) {
       rows.add(
@@ -642,7 +754,7 @@ class _QuickInfoPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _PanelTitle(icon: LucideIcons.fileText, text: 'Thông tin dịch vụ'),
+          _PanelTitle(icon: LucideIcons.file_text, text: 'Thông tin dịch vụ'),
           const SizedBox(height: 12),
           ...rows.expand((row) sync* {
             yield row;
@@ -661,94 +773,92 @@ class _ShopPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    void openShop() {
+      if (detail.shopId == null) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ShopDetailScreen(
+            shopId: detail.shopId,
+            shopName: detail.shopName,
+            shopAvatarUrl: detail.shopImageUrl,
+          ),
+        ),
+      );
+    }
+
+    final canOpenShop = detail.shopId != null;
+
     return _Panel(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _PanelTitle(icon: LucideIcons.store, text: 'Cửa hàng cung cấp'),
           const SizedBox(height: 14),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(14),
-                child: SizedBox(
-                  width: 58,
-                  height: 58,
-                  child: detail.shopImageUrl != null
-                      ? Image.network(
-                          detail.shopImageUrl!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              const _ShopFallbackImage(),
-                        )
-                      : const _ShopFallbackImage(),
+          InkWell(
+            onTap: canOpenShop ? openShop : null,
+            borderRadius: BorderRadius.circular(14),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: SizedBox(
+                    width: 58,
+                    height: 58,
+                    child: detail.shopImageUrl != null
+                        ? Image.network(
+                            detail.shopImageUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const _ShopFallbackImage(),
+                          )
+                        : const _ShopFallbackImage(),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _displayText(detail.shopName, 'Cửa hàng'),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.inter(
-                        color: const Color(0xFF111827),
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        height: 1.25,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _displayText(detail.shopName, 'Cửa hàng'),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          color: const Color(0xFF111827),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          height: 1.25,
+                        ),
                       ),
-                    ),
-                    if (detail.shopPhone?.isNotEmpty == true) ...[
-                      const SizedBox(height: 6),
-                      _InlineInfo(
-                        icon: LucideIcons.phone,
-                        text: detail.shopPhone!,
-                      ),
+                      if (detail.shopPhone?.isNotEmpty == true) ...[
+                        const SizedBox(height: 6),
+                        _InlineInfo(
+                          icon: LucideIcons.phone,
+                          text: detail.shopPhone!,
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
-            ],
+                if (canOpenShop) ...[
+                  const SizedBox(width: 8),
+                  const Padding(
+                    padding: EdgeInsets.only(top: 2),
+                    child: Icon(
+                      LucideIcons.chevron_right,
+                      color: Color(0xFFCBD5E1),
+                      size: 18,
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
           if (detail.shopAddress?.isNotEmpty == true) ...[
             const SizedBox(height: 12),
-            _InlineInfo(icon: LucideIcons.mapPin, text: detail.shopAddress!),
-          ],
-          if (detail.shopId != null) ...[
-            const SizedBox(height: 14),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ShopDetailScreen(
-                        shopId: detail.shopId,
-                        shopName: detail.shopName,
-                        shopAvatarUrl: detail.shopImageUrl,
-                      ),
-                    ),
-                  );
-                },
-                icon: const Icon(LucideIcons.store, size: 18),
-                label: const Text('Xem cửa hàng'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFFE11D48),
-                  side: const BorderSide(color: Color(0xFFFDA4AF)),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  textStyle: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-            ),
+            _InlineInfo(icon: LucideIcons.map_pin, text: detail.shopAddress!),
           ],
         ],
       ),
@@ -802,7 +912,7 @@ class _SchedulePanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _PanelTitle(icon: LucideIcons.calendarCheck, text: 'Chọn lịch hẹn'),
+          _PanelTitle(icon: LucideIcons.calendar_check, text: 'Chọn lịch hẹn'),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -834,7 +944,7 @@ class _SchedulePanel extends StatelessWidget {
             maxLines: 4,
             textInputAction: TextInputAction.newline,
             decoration: _inputDecoration(
-              icon: LucideIcons.messageCircle,
+              icon: LucideIcons.message_circle,
               label: 'Ghi chú',
               hint: 'Ví dụ: Tiêm nhắc lại, bé hơi nhạy cảm...',
             ),
@@ -862,7 +972,7 @@ class _SchedulePanel extends StatelessWidget {
               )
             else if (petsError != null)
               _PanelPrompt(
-                icon: LucideIcons.alertCircle,
+                icon: LucideIcons.circle_alert,
                 title: 'Không thể tải thú cưng',
                 message: petsError.toString().replaceFirst('Exception: ', ''),
                 buttonText: 'Thử lại',
@@ -882,6 +992,206 @@ class _SchedulePanel extends StatelessWidget {
                 onTap: onSelectPet,
               ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+class _RelatedServicesPanel extends StatelessWidget {
+  const _RelatedServicesPanel({
+    required this.services,
+    required this.isLoading,
+    required this.hasMore,
+    required this.error,
+    required this.onRetry,
+  });
+
+  final List<ServicePublicDTO> services;
+  final bool isLoading;
+  final bool hasMore;
+  final Object? error;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final errorMessage = error?.toString().replaceFirst('Exception: ', '');
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Icon(LucideIcons.layers, size: 18, color: Color(0xFFE11D48)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Dịch vụ liên quan',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.inter(
+                  color: const Color(0xFF111827),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (services.isEmpty && isLoading)
+          const _RelatedServicesLoading()
+        else if (services.isEmpty && error != null)
+          _PanelPrompt(
+            icon: LucideIcons.circle_alert,
+            title: 'Không thể tải dịch vụ liên quan',
+            message: errorMessage ?? 'Vui lòng thử lại sau.',
+            buttonText: 'Thử lại',
+            onPressed: onRetry,
+          )
+        else if (services.isEmpty)
+          const _RelatedServicesEmpty()
+        else ...[
+          LayoutBuilder(
+            builder: (context, constraints) {
+              const itemGap = 10.0;
+              final itemWidth = (constraints.maxWidth - itemGap) / 2;
+
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: services.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: itemGap,
+                  mainAxisSpacing: itemGap,
+                  childAspectRatio: 0.66,
+                ),
+                itemBuilder: (context, index) {
+                  return ServiceCard(
+                    service: services[index],
+                    width: itemWidth,
+                  );
+                },
+              );
+            },
+          ),
+          if (isLoading)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Center(
+                child: CircularProgressIndicator(color: Color(0xFFE11D48)),
+              ),
+            )
+          else if (error != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: _InlineRetry(
+                message: errorMessage ?? 'Không thể tải thêm dịch vụ.',
+                onRetry: onRetry,
+              ),
+            )
+          else if (!hasMore)
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: Center(
+                child: Text(
+                  'Đã hiển thị hết dịch vụ liên quan',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFF94A3B8),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ],
+    );
+  }
+}
+
+class _RelatedServicesLoading extends StatelessWidget {
+  const _RelatedServicesLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 28),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: const Center(
+        child: CircularProgressIndicator(color: Color(0xFFE11D48)),
+      ),
+    );
+  }
+}
+
+class _RelatedServicesEmpty extends StatelessWidget {
+  const _RelatedServicesEmpty();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Text(
+        'Chưa có dịch vụ liên quan.',
+        textAlign: TextAlign.center,
+        style: GoogleFonts.inter(
+          color: const Color(0xFF64748B),
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}
+
+class _InlineRetry extends StatelessWidget {
+  const _InlineRetry({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF1F2),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            LucideIcons.circle_alert,
+            color: Color(0xFFE11D48),
+            size: 18,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.inter(
+                color: const Color(0xFF64748B),
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          TextButton(onPressed: onRetry, child: const Text('Thử lại')),
         ],
       ),
     );
@@ -986,7 +1296,7 @@ class _PetSelectTile extends StatelessWidget {
             ),
             const SizedBox(width: 10),
             const Icon(
-              LucideIcons.chevronRight,
+              LucideIcons.chevron_right,
               color: Color(0xFFE11D48),
               size: 20,
             ),
@@ -1186,7 +1496,7 @@ class _PetChoiceTile extends StatelessWidget {
             const SizedBox(width: 10),
             Icon(
               isSelected
-                  ? LucideIcons.checkCircle2
+                  ? LucideIcons.circle_check_big
                   : Icons.radio_button_unchecked,
               color: isSelected
                   ? const Color(0xFFE11D48)
@@ -1300,6 +1610,250 @@ class _PanelPrompt extends StatelessWidget {
               textStyle: GoogleFonts.inter(fontWeight: FontWeight.w800),
             ),
             child: Text(buttonText),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReviewsPanel extends StatelessWidget {
+  const _ReviewsPanel({required this.detail});
+
+  static const int _previewLimit = 5;
+
+  final ServiceDetailDTO detail;
+
+  @override
+  Widget build(BuildContext context) {
+    final reviews = detail.reviews ?? const <ServiceDetailReviewDTO>[];
+    final rating = detail.rating ?? _averageServiceRating(reviews);
+    final total = detail.ratingCount ?? reviews.length;
+    final previewReviews = reviews.take(_previewLimit).toList();
+
+    return _Panel(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _PanelTitle(icon: LucideIcons.star, text: 'Đánh giá khách hàng'),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Text(
+                _formatRating(rating),
+                style: GoogleFonts.inter(
+                  color: const Color(0xFF111827),
+                  fontSize: 26,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(width: 6),
+              const Icon(
+                Icons.star_rounded,
+                color: Color(0xFFF59E0B),
+                size: 22,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Đánh giá dịch vụ ($total)',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFF111827),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              if (reviews.length > _previewLimit)
+                TextButton(
+                  onPressed: () => _showAllReviews(context, reviews),
+                  style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                  child: Text(
+                    'Tất cả',
+                    style: GoogleFonts.inter(
+                      color: const Color(0xFF64748B),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (reviews.isEmpty)
+            Text(
+              'Chưa có đánh giá nào.',
+              style: GoogleFonts.inter(
+                color: const Color(0xFF64748B),
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            )
+          else ...[
+            ...previewReviews.map(
+              (review) => _ServiceReviewCard(review: review),
+            ),
+            if (reviews.length > _previewLimit)
+              TextButton(
+                onPressed: () => _showAllReviews(context, reviews),
+                child: const Text('Xem tất cả đánh giá'),
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  void _showAllReviews(
+    BuildContext context,
+    List<ServiceDetailReviewDTO> reviews,
+  ) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      builder: (context) {
+        return SafeArea(
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.82,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 12, 12),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Tất cả đánh giá (${reviews.length})',
+                          style: GoogleFonts.inter(
+                            color: const Color(0xFF111827),
+                            fontSize: 17,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: 'Đóng',
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.close),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1),
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                    itemCount: reviews.length,
+                    itemBuilder: (context, index) {
+                      return _ServiceReviewCard(review: reviews[index]);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _ServiceReviewCard extends StatelessWidget {
+  const _ServiceReviewCard({required this.review});
+
+  final ServiceDetailReviewDTO review;
+
+  @override
+  Widget build(BuildContext context) {
+    final user = review.user;
+    final avatarUrl = user?.avatarUrl;
+    final reviewerName = user?.fullName ?? user?.email ?? 'Khách hàng';
+    final reviewDate = _formatReviewDate(review.date);
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                radius: 14,
+                backgroundColor: const Color(0xFFE5E7EB),
+                backgroundImage: avatarUrl != null
+                    ? NetworkImage(avatarUrl)
+                    : null,
+                child: avatarUrl == null
+                    ? Text(
+                        _reviewInitial(reviewerName),
+                        style: GoogleFonts.inter(
+                          color: const Color(0xFF6B7280),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      )
+                    : null,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _maskReviewerName(reviewerName),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        color: const Color(0xFF111827),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: List.generate(
+                        5,
+                        (index) => Icon(
+                          index < (review.star ?? 0).clamp(0, 5)
+                              ? Icons.star
+                              : Icons.star_border,
+                          color: const Color(0xFFFBBF24),
+                          size: 14,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (reviewDate.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              reviewDate,
+              style: GoogleFonts.inter(
+                color: const Color(0xFF9CA3AF),
+                fontSize: 11,
+              ),
+            ),
+          ],
+          const SizedBox(height: 8),
+          Text(
+            _displayText(review.content, 'Khách hàng chưa để lại nhận xét.'),
+            style: GoogleFonts.inter(
+              color: const Color(0xFF374151),
+              fontSize: 14,
+              height: 1.45,
+            ),
           ),
         ],
       ),
@@ -1479,7 +2033,7 @@ class _ErrorState extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
-                  LucideIcons.alertCircle,
+                  LucideIcons.circle_alert,
                   color: Color(0xFFE11D48),
                   size: 34,
                 ),
@@ -1509,7 +2063,7 @@ class _ErrorState extends StatelessWidget {
               const SizedBox(height: 18),
               FilledButton.icon(
                 onPressed: onRetry,
-                icon: const Icon(LucideIcons.refreshCw, size: 18),
+                icon: const Icon(LucideIcons.refresh_cw, size: 18),
                 label: const Text('Thử lại'),
                 style: FilledButton.styleFrom(
                   backgroundColor: const Color(0xFFE11D48),
@@ -1767,11 +2321,7 @@ String _petMeta(PetDTO pet) {
   if (pet.weightKg != null && pet.weightKg! > 0) {
     parts.add('${pet.weightKg!.toStringAsFixed(1)} kg');
   }
-  if (pet.speciesName?.trim().isNotEmpty == true) {
-    parts.add(pet.speciesName!.trim());
-  }
-  if (pet.breedText?.trim().isNotEmpty == true &&
-      pet.breedText!.trim() != pet.speciesName?.trim()) {
+  if (pet.breedText?.trim().isNotEmpty == true) {
     parts.add(pet.breedText!.trim());
   }
   if (pet.gender?.trim().isNotEmpty == true) {
@@ -1831,6 +2381,41 @@ String _formatDistance(double distanceKm) {
   if (distanceKm >= 100) return '${distanceKm.round()} km';
   final value = distanceKm.toStringAsFixed(1);
   return '${value.endsWith('.0') ? value.substring(0, value.length - 2) : value} km';
+}
+
+double _averageServiceRating(List<ServiceDetailReviewDTO> reviews) {
+  final stars = reviews
+      .map((review) => review.star)
+      .whereType<int>()
+      .where((star) => star > 0)
+      .toList();
+  if (stars.isEmpty) return 0;
+  return stars.reduce((sum, star) => sum + star) / stars.length;
+}
+
+String _formatRating(double rating) {
+  return rating <= 0 ? '0.0' : rating.toStringAsFixed(1);
+}
+
+String _maskReviewerName(String? name) {
+  final value = _displayText(name, 'Khách hàng');
+  if (value.length <= 2) return value;
+  return '${value[0]}${'*' * (value.length - 2)}${value[value.length - 1]}';
+}
+
+String _reviewInitial(String? name) {
+  final value = _displayText(name, 'K');
+  return value[0].toUpperCase();
+}
+
+String _formatReviewDate(String? raw) {
+  final text = raw?.trim();
+  if (text == null || text.isEmpty) return '';
+  final parsed = DateTime.tryParse(text);
+  if (parsed == null) return text;
+  return '${parsed.day.toString().padLeft(2, '0')}/'
+      '${parsed.month.toString().padLeft(2, '0')}/'
+      '${parsed.year}';
 }
 
 String _serviceTypeLabel(String? value) {

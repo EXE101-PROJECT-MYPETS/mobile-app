@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'package:petpee_mobile/apps/checkout/model/ghtk_fee_model.dart';
-import 'package:petpee_mobile/common/config/api_client.dart';
-import 'package:petpee_mobile/common/config/api_config.dart';
+import 'package:pawly_mobile/apps/checkout/model/ghtk_fee_model.dart';
+import 'package:pawly_mobile/common/config/api_client.dart';
+import 'package:pawly_mobile/common/config/api_config.dart';
 
 class ShippingService {
   final ApiClient _client;

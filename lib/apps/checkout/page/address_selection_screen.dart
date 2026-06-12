@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
-import 'package:petpee_mobile/common/store/app_state.dart';
+import 'package:pawly_mobile/common/store/app_state.dart';
 import 'add_address_screen.dart';
 
 class AddressSelectionScreen extends StatelessWidget {
@@ -20,7 +20,7 @@ class AddressSelectionScreen extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: Colors.black87),
+          icon: const Icon(LucideIcons.arrow_left, color: Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(

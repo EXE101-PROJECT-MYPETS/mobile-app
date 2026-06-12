@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/apps/home/page/home_screen.dart';
-import 'package:petpee_mobile/apps/product/api/product_service.dart';
-import 'package:petpee_mobile/apps/product/page/product_detail_screen.dart';
-import 'package:petpee_mobile/common/user/dto/product_dto.dart';
-import 'package:petpee_mobile/apps/profile/page/orders_screen.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/apps/home/page/home_screen.dart';
+import 'package:pawly_mobile/apps/product/api/product_service.dart';
+import 'package:pawly_mobile/apps/product/page/product_detail_screen.dart';
+import 'package:pawly_mobile/common/user/dto/product_dto.dart';
+import 'package:pawly_mobile/apps/profile/page/orders_screen.dart';
 
 class OrderSuccessScreen extends StatefulWidget {
   const OrderSuccessScreen({super.key});
@@ -68,7 +68,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                         children: [
                           IconButton(
                             icon: const Icon(
-                              LucideIcons.arrowLeft,
+                              LucideIcons.arrow_left,
                               color: Color(0xFF111827),
                             ),
                             onPressed: () => Navigator.pop(context),

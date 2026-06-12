@@ -1,14 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:petpee_mobile/apps/checkout/api/address_service.dart';
-import 'package:petpee_mobile/apps/product/model/product_model.dart';
-import 'package:petpee_mobile/apps/product/api/product_service.dart';
-import 'package:petpee_mobile/apps/service/api/service_service.dart';
-import 'package:petpee_mobile/common/user/dto/service_public_dto.dart';
-import 'package:petpee_mobile/apps/cart/model/cart_item_model.dart';
-import 'package:petpee_mobile/apps/profile/api/pet_service.dart';
-import 'package:petpee_mobile/apps/profile/model/pet_model.dart';
-import 'package:petpee_mobile/apps/checkout/model/address_model.dart';
+import 'package:pawly_mobile/apps/checkout/api/address_service.dart';
+import 'package:pawly_mobile/apps/product/model/product_model.dart';
+import 'package:pawly_mobile/apps/product/api/product_service.dart';
+import 'package:pawly_mobile/apps/service/api/service_service.dart';
+import 'package:pawly_mobile/common/user/dto/service_public_dto.dart';
+import 'package:pawly_mobile/apps/cart/model/cart_item_model.dart';
+import 'package:pawly_mobile/apps/profile/api/pet_service.dart';
+import 'package:pawly_mobile/apps/profile/model/pet_model.dart';
+import 'package:pawly_mobile/apps/checkout/model/address_model.dart';
 
 class AppState extends ChangeNotifier {
   final ProductService _productService = ProductService();
@@ -86,6 +86,7 @@ class AppState extends ChangeNotifier {
   List<ServicePublicDTO> get veterinaryServices => _veterinaryServices;
   bool get isLoadingVeterinary => _isLoadingVeterinary;
   String? get veterinaryError => _veterinaryError;
+  int? get veterinaryCursor => _veterinaryCursor;
   bool get hasMoreVeterinary => _hasMoreVeterinary;
   double? get serviceUserLat => _serviceUserLat;
   double? get serviceUserLng => _serviceUserLng;
@@ -338,6 +339,7 @@ class AppState extends ChangeNotifier {
       'type': product.type,
       'category': product.category,
       'description': product.description,
+      'weightKg': product.weightKg,
       'shopProvince': product.shopProvince,
       'timestamp': DateTime.now().toIso8601String(),
     };
@@ -448,7 +450,10 @@ class AppState extends ChangeNotifier {
           i.shopName == shopName,
     );
     if (index >= 0) {
-      _cartItems[index].quantity += quantity;
+      _cartItems[index] = _cartItems[index].copyWith(
+        quantity: _cartItems[index].quantity + quantity,
+        weightKg: product.weightKg,
+      );
     } else {
       _cartItems.add(
         CartItemModel.product(
@@ -460,6 +465,7 @@ class AppState extends ChangeNotifier {
           name: product.name,
           imageUrl: product.image,
           unitPrice: _parsePrice(product.price),
+          weightKg: product.weightKg,
           quantity: quantity,
           isSelected: true,
           description: product.description,
@@ -517,8 +523,11 @@ class AppState extends ChangeNotifier {
           i.shopName == shopName,
     );
     if (index >= 0) {
-      _cartItems[index].quantity = quantity;
-      _cartItems[index].isSelected = true;
+      _cartItems[index] = _cartItems[index].copyWith(
+        quantity: quantity,
+        isSelected: true,
+        weightKg: product.weightKg,
+      );
     } else {
       _cartItems.add(
         CartItemModel.product(
@@ -530,6 +539,7 @@ class AppState extends ChangeNotifier {
           name: product.name,
           imageUrl: product.image,
           unitPrice: _parsePrice(product.price),
+          weightKg: product.weightKg,
           quantity: quantity,
           isSelected: true,
           description: product.description,

@@ -1,4 +1,4 @@
-import 'package:petpee_mobile/common/utils/image_url_util.dart';
+import 'package:pawly_mobile/common/utils/image_url_util.dart';
 
 class ServicePublicDTO {
   final ServiceInfoDTO? service;
@@ -19,6 +19,10 @@ class ServicePublicDTO {
   int? get durationMin => service?.durationMin;
   int? get basePrice => service?.basePrice;
   int? get categoryId => service?.categoryId;
+  String? get serviceType => service?.serviceType;
+  String? get veterinaryServiceType => service?.veterinaryServiceType;
+  int? get vaccineId => service?.vaccineId;
+  String? get vaccineName => service?.vaccineName;
   String? get imageUrl => service?.imageUrl;
   bool? get active => service?.active;
   double? get rating => service?.rating;
@@ -51,6 +55,10 @@ class ServiceInfoDTO {
   final int? durationMin;
   final int? basePrice;
   final int? categoryId;
+  final String? serviceType;
+  final String? veterinaryServiceType;
+  final int? vaccineId;
+  final String? vaccineName;
   final String? imageUrl;
   final bool? active;
   final double? rating;
@@ -62,6 +70,10 @@ class ServiceInfoDTO {
     this.durationMin,
     this.basePrice,
     this.categoryId,
+    this.serviceType,
+    this.veterinaryServiceType,
+    this.vaccineId,
+    this.vaccineName,
     this.imageUrl,
     this.active,
     this.rating,
@@ -70,15 +82,19 @@ class ServiceInfoDTO {
 
   factory ServiceInfoDTO.fromJson(Map<String, dynamic> json) {
     return ServiceInfoDTO(
-      id: json['id'] as int?,
+      id: _asInt(json['id']),
       name: json['name'] as String?,
-      durationMin: json['durationMin'] as int?,
-      basePrice: json['basePrice'] as int?,
-      categoryId: json['categoryId'] as int?,
+      durationMin: _asInt(json['durationMin']),
+      basePrice: _asInt(json['basePrice']),
+      categoryId: _asInt(json['categoryId']),
+      serviceType: json['serviceType'] as String?,
+      veterinaryServiceType: json['veterinaryServiceType'] as String?,
+      vaccineId: _asInt(json['vaccineId']),
+      vaccineName: json['vaccineName'] as String?,
       imageUrl: ImageUrlUtil.buildPublicUrl(json['imageUrl'] as String?),
       active: json['active'] as bool?,
-      rating: (json['rating'] as num?)?.toDouble(),
-      ratingCount: json['ratingCount'] as int?,
+      rating: _asDouble(json['rating']),
+      ratingCount: _asInt(json['ratingCount']),
     );
   }
 
@@ -89,12 +105,28 @@ class ServiceInfoDTO {
       'durationMin': durationMin,
       'basePrice': basePrice,
       'categoryId': categoryId,
+      'serviceType': serviceType,
+      'veterinaryServiceType': veterinaryServiceType,
+      'vaccineId': vaccineId,
+      'vaccineName': vaccineName,
       'imageUrl': imageUrl,
       'active': active,
       'rating': rating,
       'ratingCount': ratingCount,
     };
   }
+}
+
+int? _asInt(dynamic value) {
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  return int.tryParse(value?.toString() ?? '');
+}
+
+double? _asDouble(dynamic value) {
+  if (value is double) return value;
+  if (value is num) return value.toDouble();
+  return double.tryParse(value?.toString() ?? '');
 }
 
 class ShopInfoDTO {

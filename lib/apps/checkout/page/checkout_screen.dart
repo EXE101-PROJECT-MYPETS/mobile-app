@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:petpee_mobile/apps/cart/model/cart_item_model.dart';
-import 'package:petpee_mobile/apps/checkout/api/checkout_service.dart';
-import 'package:petpee_mobile/apps/checkout/api/shipping_service.dart';
-import 'package:petpee_mobile/apps/checkout/model/address_model.dart';
-import 'package:petpee_mobile/apps/checkout/model/checkout_request_model.dart';
-import 'package:petpee_mobile/apps/checkout/model/ghtk_fee_model.dart';
-import 'package:petpee_mobile/apps/checkout/page/address_selection_screen.dart';
-import 'package:petpee_mobile/apps/checkout/page/checkout_success_screen.dart';
-import 'package:petpee_mobile/apps/profile/page/add_pet_screen.dart';
-import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
-import 'package:petpee_mobile/common/store/app_state.dart';
-import 'package:petpee_mobile/common/toast/app_toast.dart';
-import 'package:petpee_mobile/common/user/model/user_model.dart';
-import 'package:petpee_mobile/common/utils/price_formatter.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:pawly_mobile/apps/cart/model/cart_item_model.dart';
+import 'package:pawly_mobile/apps/checkout/api/checkout_service.dart';
+import 'package:pawly_mobile/apps/checkout/api/shipping_service.dart';
+import 'package:pawly_mobile/apps/checkout/model/address_model.dart';
+import 'package:pawly_mobile/apps/checkout/model/checkout_request_model.dart';
+import 'package:pawly_mobile/apps/checkout/model/ghtk_fee_model.dart';
+import 'package:pawly_mobile/apps/checkout/page/address_selection_screen.dart';
+import 'package:pawly_mobile/apps/checkout/page/checkout_success_screen.dart';
+import 'package:pawly_mobile/apps/product/api/product_service.dart';
+import 'package:pawly_mobile/apps/profile/page/add_pet_screen.dart';
+import 'package:pawly_mobile/apps/shop/page/shop_detail_screen.dart';
+import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
+import 'package:pawly_mobile/common/store/app_state.dart';
+import 'package:pawly_mobile/common/toast/app_toast.dart';
+import 'package:pawly_mobile/common/user/model/user_model.dart';
+import 'package:pawly_mobile/common/utils/price_formatter.dart';
 import 'package:provider/provider.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -30,6 +32,7 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   final ShippingService _shippingService = ShippingService();
   final CheckoutService _checkoutService = CheckoutService();
+  final ProductService _productService = ProductService();
   final TextEditingController _noteController = TextEditingController();
   static const int _pickupFeeValue = 50000;
 
@@ -114,6 +117,33 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return _productSubtotal(state) + _serviceSubtotal(state);
   }
 
+  Future<int> _productWeight(AppState state) async {
+    double totalWeight = 0;
+    final productItems = _getCheckoutItems(
+      state,
+    ).where((item) => !item.isService);
+
+    for (final item in productItems) {
+      var weightKg = item.weightKg;
+      if ((weightKg == null || weightKg <= 0) && item.productId != null) {
+        try {
+          final detail = await _productService.getProductDetail(
+            item.productId.toString(),
+          );
+          weightKg = detail.weightKg;
+        } catch (_) {
+          weightKg = null;
+        }
+      }
+
+      if (weightKg != null && weightKg > 0) {
+        totalWeight += weightKg * item.quantity;
+      }
+    }
+
+    return totalWeight.ceil().clamp(1, 1000000000).toInt();
+  }
+
   Future<void> _refreshShippingFee() async {
     final appState = context.read<AppState>();
     if (!_hasProductItems(appState)) {
@@ -140,11 +170,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     });
 
     try {
+<<<<<<< feature/notifications-update
       final int weight = _getCheckoutItems(appState)
           .where((item) => !item.isService)
           .fold<int>(0, (sum, item) => sum + item.quantity * 500)
           .clamp(500, 5000)
           .toInt();
+=======
+      final int weight = await _productWeight(appState);
+>>>>>>> main
 
       final feeResponse = await _shippingService.getShippingFee(
         GhtkFeeRequest(
@@ -269,6 +303,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       return;
     }
 
+    if (hasProducts && _isLoadingFee) {
+      _showMessage('Vui lòng chờ hệ thống tính phí vận chuyển.');
+      return;
+    }
+
+    if (hasProducts && _shippingFeeError != null) {
+      _showMessage('Vui lòng tính lại phí vận chuyển trước khi đặt hàng.');
+      return;
+    }
+
     if (hasServices) {
       if (appState.myPets.isEmpty) {
         _showMessage('Vui lòng thêm thú cưng trước khi đặt lịch spa.');
@@ -285,6 +329,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
 
     final address = _selectedAddress ?? appState.defaultAddress;
+<<<<<<< feature/notifications-update
+=======
+    final userAddressId = hasProducts && address != null
+        ? int.tryParse(address.id)
+        : null;
+    if (hasProducts && (userAddressId == null || userAddressId <= 0)) {
+      _showMessage('Địa chỉ giao hàng chưa hợp lệ. Vui lòng chọn lại địa chỉ.');
+      return;
+    }
+
+>>>>>>> main
     final shippingAddressText = address != null
         ? _buildShippingAddressText(address, user)
         : '';
@@ -294,6 +349,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         : 0;
 
     final selectedShopId = items.first.shopId;
+    if (selectedShopId <= 0) {
+      _showMessage('Không tìm thấy thông tin cửa hàng của giỏ hàng.');
+      return;
+    }
+
     final productOrders = items
         .where((item) => !item.isService)
         .map(
@@ -305,16 +365,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         )
         .toList();
 
-    final selectedBookingDate = _selectedBookingDate!;
-    final selectedBookingTime = _selectedBookingTime!;
-    final bookingDateTime = DateTime(
-      selectedBookingDate.year,
-      selectedBookingDate.month,
-      selectedBookingDate.day,
-      selectedBookingTime.hour,
-      selectedBookingTime.minute,
-    );
+    if (hasProducts &&
+        productOrders.any((item) => item.productId <= 0 || item.qty <= 0)) {
+      _showMessage('Thông tin sản phẩm trong giỏ hàng chưa hợp lệ.');
+      return;
+    }
 
+<<<<<<< feature/notifications-update
     final serviceBookings = items
         .where((item) => item.isService)
         .map(
@@ -329,10 +386,45 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ),
         )
         .toList();
+=======
+    final DateTime? bookingDateTime = hasServices
+        ? DateTime(
+            _selectedBookingDate!.year,
+            _selectedBookingDate!.month,
+            _selectedBookingDate!.day,
+            _selectedBookingTime!.hour,
+            _selectedBookingTime!.minute,
+          )
+        : null;
+
+    final serviceBookings = hasServices
+        ? items
+              .where((item) => item.isService)
+              .map(
+                (item) => CheckoutServiceBookingRequest(
+                  serviceId: item.serviceId ?? int.tryParse(item.id) ?? 0,
+                  petId: _selectedPetId!,
+                  bookingDate: bookingDateTime!,
+                  bookingTime: bookingDateTime,
+                  note: _noteController.text.trim().isEmpty
+                      ? null
+                      : _noteController.text.trim(),
+                ),
+              )
+              .toList()
+        : <CheckoutServiceBookingRequest>[];
+
+    if (hasServices &&
+        serviceBookings.any((item) => item.serviceId <= 0 || item.petId <= 0)) {
+      _showMessage('Thông tin dịch vụ trong giỏ hàng chưa hợp lệ.');
+      return;
+    }
+>>>>>>> main
 
     final request = CheckoutRequestModel(
       shopId: selectedShopId,
       userId: user.id,
+      userAddressId: userAddressId,
       receiverName: user.fullName,
       receiverPhone: user.phone,
       shippingAddress: shippingAddressText,
@@ -386,24 +478,25 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final hasProducts = items.any((item) => !item.isService);
     final hasServices = items.any((item) => item.isService);
     final address = _selectedAddress ?? state.defaultAddress;
+<<<<<<< feature/notifications-update
     final shippingFee = _shippingFee ?? 0;
+=======
+    final shippingFee = (_shippingFee ?? 0).round();
+>>>>>>> main
     final pickupFee = hasServices && _transportOption == 1
         ? _pickupFeeValue
         : 0;
     final subtotalAmount = _subtotalAmount(state);
     final totalAmount = subtotalAmount + shippingFee + pickupFee - 0;
 
-    final productItems = items.where((item) => !item.isService).toList();
-    final serviceItems = items.where((item) => item.isService).toList();
-
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: Color(0xFF111827)),
+          icon: const Icon(LucideIcons.arrow_left, color: Color(0xFFFF4D2D)),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -419,11 +512,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         children: [
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (hasProducts) ...[
+<<<<<<< feature/notifications-update
                     _CheckoutCard(
                       title: 'Địa chỉ giao hàng',
                       child: Column(
@@ -514,12 +608,42 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           ],
                         ],
                       ),
+=======
+                    _AddressCheckoutBlock(
+                      addressName: address?.name,
+                      phone: address?.phone,
+                      addressText: address != null
+                          ? _buildShippingAddressText(
+                              address,
+                              authProvider.currentUser,
+                            )
+                          : null,
+                      onTap: _onSelectAddress,
+>>>>>>> main
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 10),
+                  ],
+                  _ShopCheckoutBlock(
+                    shopName: items.isNotEmpty
+                        ? items.first.shopName
+                        : 'Cửa hàng Pawly',
+                    shopId: items.isNotEmpty ? items.first.shopId : null,
+                    items: items,
+                    noteController: _noteController,
+                  ),
+                  const SizedBox(height: 10),
+                  if (hasProducts) ...[
+                    _ShippingMethodBlock(
+                      isLoading: _isLoadingFee,
+                      error: _shippingFeeError,
+                      fee: shippingFee,
+                      onRetry: _refreshShippingFee,
+                    ),
+                    const SizedBox(height: 10),
                   ],
                   if (hasServices) ...[
                     _CheckoutCard(
-                      title: 'Lịch dịch vụ Spa',
+                      title: 'Thông tin lịch dịch vụ',
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -644,7 +768,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 child: OutlinedButton.icon(
                                   onPressed: _pickBookingDate,
                                   icon: const Icon(
+<<<<<<< feature/notifications-update
                                     LucideIcons.calendarDays,
+=======
+                                    LucideIcons.calendar_days,
+>>>>>>> main
                                     size: 18,
                                   ),
                                   label: Text(
@@ -671,7 +799,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 child: OutlinedButton.icon(
                                   onPressed: _pickBookingTime,
                                   icon: const Icon(
+<<<<<<< feature/notifications-update
                                     LucideIcons.clock3,
+=======
+                                    LucideIcons.clock_3,
+>>>>>>> main
                                     size: 18,
                                   ),
                                   label: Text(
@@ -701,7 +833,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 10),
                     _CheckoutCard(
                       title: 'Hình thức nhận bé',
                       child: Column(
@@ -723,8 +855,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 10),
                   ],
+<<<<<<< feature/notifications-update
                   _CheckoutCard(
                     title: 'Tóm tắt chi phí',
                     child: Column(
@@ -772,60 +905,289 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         ),
                       ],
                     ),
+=======
+                  const _PaymentMethodBlock(),
+                  const SizedBox(height: 10),
+                  _PaymentDetailBlock(
+                    productTotal: _productSubtotal(state),
+                    serviceTotal: _serviceSubtotal(state),
+                    shippingFee: shippingFee,
+                    pickupFee: pickupFee,
+                    showPickupFee: hasServices,
+                    totalAmount: totalAmount,
+>>>>>>> main
                   ),
-                  const SizedBox(height: 16),
-                  _CheckoutCard(
-                    title: 'Ghi chú',
-                    child: TextField(
-                      controller: _noteController,
-                      maxLines: 3,
-                      decoration: InputDecoration(
-                        hintText: 'Nhập ghi chú cho đơn hàng hoặc lịch spa',
-                        hintStyle: GoogleFonts.inter(),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
+                  const SizedBox(height: 12),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Text(
+                      'Nhấn "Đặt hàng" đồng nghĩa với việc bạn đồng ý với điều khoản mua hàng và đặt lịch của Pawly.',
+                      style: GoogleFonts.inter(
+                        color: const Color(0xFF64748B),
+                        fontSize: 11,
+                        height: 1.4,
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _CheckoutCard(
-                    title: 'Danh sách đã chọn',
-                    child: Column(
-                      children: [
-                        ...productItems.map(
-                          (item) => _CompactCheckoutItem(item: item),
-                        ),
-                        ...serviceItems.map(
-                          (item) => _CompactCheckoutItem(item: item),
-                        ),
-                      ],
                     ),
                   ),
                 ],
               ),
             ),
           ),
-          Container(
-            color: Colors.white,
-            padding: EdgeInsets.fromLTRB(
-              16,
-              12,
-              16,
-              12 + MediaQuery.of(context).padding.bottom,
+          _CheckoutBottomBar(
+            totalAmount: totalAmount,
+            isSubmitting: _isSubmitting,
+            onSubmit: _submitCheckout,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AddressCheckoutBlock extends StatelessWidget {
+  const _AddressCheckoutBlock({
+    required this.addressName,
+    required this.phone,
+    required this.addressText,
+    required this.onTap,
+  });
+
+  final String? addressName;
+  final String? phone;
+  final String? addressText;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasAddress = addressText?.trim().isNotEmpty == true;
+
+    return _FlatCheckoutBlock(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 12, 10, 12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(top: 2),
+                child: Icon(
+                  LucideIcons.map_pin,
+                  color: Color(0xFFFF4D2D),
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      hasAddress
+                          ? [addressName?.trim(), phone?.trim()]
+                                .whereType<String>()
+                                .where((v) => v.isNotEmpty)
+                                .join('  ')
+                          : 'Chọn địa chỉ nhận hàng',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        color: const Color(0xFF111827),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      hasAddress
+                          ? addressText!
+                          : 'Nhấn để chọn địa chỉ giao hàng mặc định',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        color: const Color(0xFF64748B),
+                        fontSize: 12,
+                        height: 1.35,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Padding(
+                padding: EdgeInsets.only(top: 16),
+                child: Icon(
+                  LucideIcons.chevron_right,
+                  color: Color(0xFFCBD5E1),
+                  size: 18,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ShopCheckoutBlock extends StatelessWidget {
+  const _ShopCheckoutBlock({
+    required this.shopName,
+    required this.shopId,
+    required this.items,
+    required this.noteController,
+  });
+
+  final String shopName;
+  final int? shopId;
+  final List<CartItem> items;
+  final TextEditingController noteController;
+
+  @override
+  Widget build(BuildContext context) {
+    void openShop() {
+      final id = shopId;
+      if (id == null || id <= 0) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              ShopDetailScreen(shopId: id, shopName: shopName),
+        ),
+      );
+    }
+
+    final canOpenShop = shopId != null && shopId! > 0;
+
+    return _FlatCheckoutBlock(
+      child: Column(
+        children: [
+          InkWell(
+            onTap: canOpenShop ? openShop : null,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 10, 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      shopName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        color: const Color(0xFF111827),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                  if (canOpenShop) ...[
+                    const SizedBox(width: 4),
+                    const Icon(
+                      LucideIcons.chevron_right,
+                      color: Color(0xFFCBD5E1),
+                      size: 16,
+                    ),
+                  ],
+                ],
+              ),
             ),
-            child: SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: ElevatedButton(
-                onPressed: _isSubmitting ? null : _submitCheckout,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFB7185),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+          ),
+          const Divider(height: 1, color: Color(0xFFF1F5F9)),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
+            child: Column(
+              children: items
+                  .map((item) => _CompactCheckoutItem(item: item))
+                  .toList(),
+            ),
+          ),
+          const Divider(height: 1, color: Color(0xFFF1F5F9)),
+          _CheckoutActionRow(
+            label: 'Voucher của Shop',
+            value: '-0đ',
+            valueColor: const Color(0xFFFF4D2D),
+            onTap: () {},
+          ),
+          const Divider(height: 1, color: Color(0xFFF1F5F9)),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 2, 12, 2),
+            child: Row(
+              children: [
+                Text(
+                  'Lời nhắn cho Shop',
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFF334155),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: noteController,
+                    textAlign: TextAlign.right,
+                    minLines: 1,
+                    maxLines: 2,
+                    decoration: InputDecoration(
+                      isDense: true,
+                      border: InputBorder.none,
+                      hintText: 'Để lại lời nhắn',
+                      hintStyle: GoogleFonts.inter(
+                        color: const Color(0xFFCBD5E1),
+                        fontSize: 13,
+                      ),
+                    ),
+                    style: GoogleFonts.inter(
+                      color: const Color(0xFF111827),
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ShippingMethodBlock extends StatelessWidget {
+  const _ShippingMethodBlock({
+    required this.isLoading,
+    required this.error,
+    required this.fee,
+    required this.onRetry,
+  });
+
+  final bool isLoading;
+  final String? error;
+  final num fee;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final shippingWindow = _formatShippingWindow(DateTime.now());
+
+    return _FlatCheckoutBlock(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  'Phương thức vận chuyển',
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFF111827),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+<<<<<<< feature/notifications-update
                 child: _isSubmitting
                     ? const SizedBox(
                         width: 22,
@@ -837,15 +1199,385 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       )
                     : Text(
                         'Xác nhận đặt hàng',
-                        style: GoogleFonts.inter(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
+=======
+                const Spacer(),
+                Text(
+                  'Xem tất cả',
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFF64748B),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(width: 2),
+                const Icon(
+                  LucideIcons.chevron_right,
+                  color: Color(0xFFCBD5E1),
+                  size: 16,
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FFFC),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: const Color(0xFF99DCC5)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Giao hàng tiêu chuẩn',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            color: const Color(0xFF111827),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
                       ),
+                      const SizedBox(width: 8),
+                      Text(
+                        isLoading
+                            ? 'Đang tính...'
+                            : error != null
+                            ? 'Chưa có phí'
+                            : PriceFormatter.formatVnd(fee),
+>>>>>>> main
+                        style: GoogleFonts.inter(
+                          color: error != null
+                              ? const Color(0xFFDC2626)
+                              : const Color(0xFF059669),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Nhận từ $shippingWindow. Đơn hàng sẽ được shop xác nhận trước khi giao.',
+                    style: GoogleFonts.inter(
+                      color: const Color(0xFF64748B),
+                      fontSize: 11,
+                      height: 1.35,
+                    ),
+                  ),
+                  if (error != null) ...[
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: onRetry,
+                        child: const Text('Tính lại phí'),
+                      ),
+                    ),
+                  ],
+                ],
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PaymentMethodBlock extends StatelessWidget {
+  const _PaymentMethodBlock();
+
+  @override
+  Widget build(BuildContext context) {
+    return _FlatCheckoutBlock(
+      child: Column(
+        children: [
+          _CheckoutActionRow(
+            label: 'Phương thức thanh toán',
+            value: 'Xem tất cả',
+            onTap: () {},
+          ),
+          const Divider(height: 1, color: Color(0xFFF1F5F9)),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+            child: Row(
+              children: [
+                const Icon(
+                  LucideIcons.badge_dollar_sign,
+                  color: Color(0xFFFF4D2D),
+                  size: 18,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Thanh toán khi nhận hàng',
+                    style: GoogleFonts.inter(
+                      color: const Color(0xFF111827),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                const Icon(
+                  LucideIcons.circle_check_big,
+                  color: Color(0xFFFF4D2D),
+                  size: 18,
+                ),
+              ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _PaymentDetailBlock extends StatelessWidget {
+  const _PaymentDetailBlock({
+    required this.productTotal,
+    required this.serviceTotal,
+    required this.shippingFee,
+    required this.pickupFee,
+    required this.showPickupFee,
+    required this.totalAmount,
+  });
+
+  final int productTotal;
+  final int serviceTotal;
+  final num shippingFee;
+  final int pickupFee;
+  final bool showPickupFee;
+  final int totalAmount;
+
+  @override
+  Widget build(BuildContext context) {
+    return _FlatCheckoutBlock(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+        child: Column(
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Chi tiết thanh toán',
+                style: GoogleFonts.inter(
+                  color: const Color(0xFF111827),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            _SummaryRow(
+              label: 'Tổng tiền hàng',
+              value: PriceFormatter.formatVnd(productTotal),
+            ),
+            if (serviceTotal > 0)
+              _SummaryRow(
+                label: 'Tổng tiền dịch vụ',
+                value: PriceFormatter.formatVnd(serviceTotal),
+              ),
+            _SummaryRow(
+              label: 'Tổng phí vận chuyển',
+              value: PriceFormatter.formatVnd(shippingFee),
+            ),
+            if (showPickupFee)
+              _SummaryRow(
+                label: 'Phí đón bé',
+                value: PriceFormatter.formatVnd(pickupFee),
+              ),
+            _SummaryRow(
+              label: 'Tổng giảm giá',
+              value: PriceFormatter.formatVnd(0),
+            ),
+            const Divider(height: 24, color: Color(0xFFF1F5F9)),
+            _SummaryRow(
+              label: 'Tổng thanh toán',
+              value: PriceFormatter.formatVnd(totalAmount),
+              labelStyle: GoogleFonts.inter(
+                color: const Color(0xFF111827),
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+              ),
+              valueStyle: GoogleFonts.inter(
+                color: const Color(0xFFFF4D2D),
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CheckoutBottomBar extends StatelessWidget {
+  const _CheckoutBottomBar({
+    required this.totalAmount,
+    required this.isSubmitting,
+    required this.onSubmit,
+  });
+
+  final int totalAmount;
+  final bool isSubmitting;
+  final VoidCallback onSubmit;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        12,
+        8,
+        12,
+        8 + MediaQuery.of(context).padding.bottom,
+      ),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: Color(0xFFE5E7EB))),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  'Tổng cộng',
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFF334155),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  PriceFormatter.formatVnd(totalAmount),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFFFF4D2D),
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          SizedBox(
+            width: 122,
+            height: 48,
+            child: FilledButton(
+              onPressed: isSubmitting ? null : onSubmit,
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xFFFF4D2D),
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: const Color(0xFFFCA5A5),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+              child: isSubmitting
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Text(
+                      'Đặt hàng',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FlatCheckoutBlock extends StatelessWidget {
+  const _FlatCheckoutBlock({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: child,
+    );
+  }
+}
+
+class _CheckoutActionRow extends StatelessWidget {
+  const _CheckoutActionRow({
+    required this.label,
+    required this.value,
+    this.valueColor,
+    required this.onTap,
+  });
+
+  final String label;
+  final String value;
+  final Color? valueColor;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 12, 10, 12),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.inter(
+                  color: const Color(0xFF334155),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              value,
+              style: GoogleFonts.inter(
+                color: valueColor ?? const Color(0xFF94A3B8),
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(width: 2),
+            const Icon(
+              LucideIcons.chevron_right,
+              color: Color(0xFFCBD5E1),
+              size: 16,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -984,14 +1716,12 @@ class _SummaryRow extends StatelessWidget {
   final String value;
   final TextStyle? labelStyle;
   final TextStyle? valueStyle;
-  final Color? valueColor;
 
   const _SummaryRow({
     required this.label,
     required this.value,
     this.labelStyle,
     this.valueStyle,
-    this.valueColor,
   });
 
   @override
@@ -1020,7 +1750,7 @@ class _SummaryRow extends StatelessWidget {
                 GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: valueColor ?? const Color(0xFF111827),
+                  color: const Color(0xFF111827),
                 ),
           ),
         ],
@@ -1107,3 +1837,19 @@ class _CompactCheckoutItem extends StatelessWidget {
     );
   }
 }
+<<<<<<< feature/notifications-update
+=======
+
+String _formatShippingWindow(DateTime now) {
+  final today = DateTime(now.year, now.month, now.day);
+  final startDate = today.add(const Duration(days: 2));
+  final endDate = today.add(const Duration(days: 5));
+  return '${_formatShippingDate(startDate)} - ${_formatShippingDate(endDate)}';
+}
+
+String _formatShippingDate(DateTime date) {
+  final day = date.day.toString().padLeft(2, '0');
+  final month = date.month.toString().padLeft(2, '0');
+  return '$day Th$month';
+}
+>>>>>>> main
