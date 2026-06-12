@@ -668,7 +668,11 @@ class _EmptyCartState extends StatelessWidget {
               borderRadius: BorderRadius.circular(24),
             ),
             child: const Icon(
+<<<<<<< feature/notifications-update
+              LucideIcons.shoppingCart,
+=======
               LucideIcons.shopping_cart,
+>>>>>>> main
               size: 38,
               color: Color(0xFFFB7185),
             ),

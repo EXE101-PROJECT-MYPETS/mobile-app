@@ -92,18 +92,18 @@ flutter test
 
 ## Cau hinh backend
 
-Endpoint backend nam trong `lib/common/config/api_config.dart`.
+App tu dong chon base URL theo moi truong:
+- Android Emulator -> `http://10.0.2.2:8080/api`
+- iOS Simulator -> `http://localhost:8080/api`
+- Thiet bi that -> app thu lan luot cac IP LAN cua may backend va chon IP
+  nao truy cap duoc backend
+
+Neu can ep tay, co the dung `--dart-define=API_BASE_URL=...`.
 
 ```dart
-static const String baseUrl = String.fromEnvironment(
-  'API_BASE_URL',
-  defaultValue: 'http://192.168.1.26:8080/api',
-);
+await ApiConfig.initialize();
 ```
 
-- Neu chay tren Android Emulator va backend o may host, dung
-  `http://10.0.2.2:<port>/api`.
-- Neu chay tren thiet bi that, dung IPv4 LAN cua may chay backend.
 - Co the override khong can sua code:
   `flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8080/api`.
 - Hien tai app chi goi backend cho auth:

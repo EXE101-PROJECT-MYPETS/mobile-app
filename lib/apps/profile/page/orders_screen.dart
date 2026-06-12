@@ -365,6 +365,15 @@ class _OrdersListState extends State<_OrdersList> {
     }
   }
 
+<<<<<<< feature/notifications-update
+  String _getProductsNames(List<dynamic>? items) {
+    if (items == null || items.isEmpty) return 'Không có sản phẩm';
+    final names = items
+        .map((i) => i['productName']?.toString() ?? 'Sản phẩm')
+        .toList();
+    if (names.length == 1) return names.first;
+    return '${names.first} và ${names.length - 1} sản phẩm khác';
+=======
   void _openOrderDetail(Map<String, dynamic> order) {
     final orderId = _asInt(order['id']);
     if (orderId == null) {
@@ -567,6 +576,7 @@ class _OrdersListState extends State<_OrdersList> {
         ),
       ),
     );
+>>>>>>> main
   }
 
   @override

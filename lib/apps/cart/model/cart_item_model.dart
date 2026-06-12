@@ -94,7 +94,11 @@ class CartItem {
 
   int get amount => unitPrice * quantity;
 
+<<<<<<< feature/notifications-update
+  CartItem copyWith({int? quantity, bool? isSelected}) {
+=======
   CartItem copyWith({int? quantity, bool? isSelected, double? weightKg}) {
+>>>>>>> main
     return CartItem._(
       id: id,
       isService: isService,
@@ -153,9 +157,12 @@ class CartItem {
 }
 
 typedef CartItemModel = CartItem;
+<<<<<<< feature/notifications-update
+=======
 
 double? _parseDouble(dynamic value) {
   if (value == null) return null;
   if (value is num) return value.toDouble();
   return double.tryParse(value.toString());
 }
+>>>>>>> main

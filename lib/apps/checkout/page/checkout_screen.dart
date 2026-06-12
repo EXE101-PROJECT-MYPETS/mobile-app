@@ -170,7 +170,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     });
 
     try {
+<<<<<<< feature/notifications-update
+      final int weight = _getCheckoutItems(appState)
+          .where((item) => !item.isService)
+          .fold<int>(0, (sum, item) => sum + item.quantity * 500)
+          .clamp(500, 5000)
+          .toInt();
+=======
       final int weight = await _productWeight(appState);
+>>>>>>> main
 
       final feeResponse = await _shippingService.getShippingFee(
         GhtkFeeRequest(
@@ -321,6 +329,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
 
     final address = _selectedAddress ?? appState.defaultAddress;
+<<<<<<< feature/notifications-update
+=======
     final userAddressId = hasProducts && address != null
         ? int.tryParse(address.id)
         : null;
@@ -329,6 +339,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       return;
     }
 
+>>>>>>> main
     final shippingAddressText = address != null
         ? _buildShippingAddressText(address, user)
         : '';
@@ -360,6 +371,22 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       return;
     }
 
+<<<<<<< feature/notifications-update
+    final serviceBookings = items
+        .where((item) => item.isService)
+        .map(
+          (item) => CheckoutServiceBookingRequest(
+            serviceId: item.serviceId ?? int.tryParse(item.id) ?? 0,
+            petId: _selectedPetId!,
+            bookingDate: bookingDateTime,
+            bookingTime: bookingDateTime,
+            note: _noteController.text.trim().isEmpty
+                ? null
+                : _noteController.text.trim(),
+          ),
+        )
+        .toList();
+=======
     final DateTime? bookingDateTime = hasServices
         ? DateTime(
             _selectedBookingDate!.year,
@@ -392,6 +419,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       _showMessage('Thông tin dịch vụ trong giỏ hàng chưa hợp lệ.');
       return;
     }
+>>>>>>> main
 
     final request = CheckoutRequestModel(
       shopId: selectedShopId,
@@ -450,7 +478,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final hasProducts = items.any((item) => !item.isService);
     final hasServices = items.any((item) => item.isService);
     final address = _selectedAddress ?? state.defaultAddress;
+<<<<<<< feature/notifications-update
+    final shippingFee = _shippingFee ?? 0;
+=======
     final shippingFee = (_shippingFee ?? 0).round();
+>>>>>>> main
     final pickupFee = hasServices && _transportOption == 1
         ? _pickupFeeValue
         : 0;
@@ -485,6 +517,98 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (hasProducts) ...[
+<<<<<<< feature/notifications-update
+                    _CheckoutCard(
+                      title: 'Địa chỉ giao hàng',
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          InkWell(
+                            onTap: _onSelectAddress,
+                            borderRadius: BorderRadius.circular(14),
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(14),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF8FAFC),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: const Color(0xFFE2E8F0),
+                                ),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Icon(
+                                    LucideIcons.mapPin,
+                                    color: Color(0xFFFB7185),
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          address != null
+                                              ? address.name
+                                              : 'Chọn địa chỉ nhận hàng',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w700,
+                                            color: const Color(0xFF111827),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          address != null
+                                              ? _buildShippingAddressText(
+                                                  address,
+                                                  authProvider.currentUser,
+                                                )
+                                              : 'Nhấn để chọn hoặc thêm địa chỉ giao hàng',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 12,
+                                            color: const Color(0xFF64748B),
+                                            height: 1.4,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Icon(
+                                    LucideIcons.chevronRight,
+                                    color: Color(0xFF94A3B8),
+                                    size: 18,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          _SummaryRow(
+                            label: 'Phí vận chuyển',
+                            value: _isLoadingFee
+                                ? 'Đang tính...'
+                                : _shippingFeeError != null
+                                ? _shippingFeeError!
+                                : PriceFormatter.formatVnd(_shippingFee ?? 0),
+                            valueColor: _shippingFeeError != null
+                                ? const Color(0xFFDC2626)
+                                : const Color(0xFF111827),
+                          ),
+                          if (_shippingFeeError != null) ...[
+                            const SizedBox(height: 8),
+                            TextButton(
+                              onPressed: _refreshShippingFee,
+                              child: const Text('Thử lại'),
+                            ),
+                          ],
+                        ],
+                      ),
+=======
                     _AddressCheckoutBlock(
                       addressName: address?.name,
                       phone: address?.phone,
@@ -495,6 +619,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             )
                           : null,
                       onTap: _onSelectAddress,
+>>>>>>> main
                     ),
                     const SizedBox(height: 10),
                   ],
@@ -643,7 +768,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 child: OutlinedButton.icon(
                                   onPressed: _pickBookingDate,
                                   icon: const Icon(
+<<<<<<< feature/notifications-update
+                                    LucideIcons.calendarDays,
+=======
                                     LucideIcons.calendar_days,
+>>>>>>> main
                                     size: 18,
                                   ),
                                   label: Text(
@@ -670,7 +799,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 child: OutlinedButton.icon(
                                   onPressed: _pickBookingTime,
                                   icon: const Icon(
+<<<<<<< feature/notifications-update
+                                    LucideIcons.clock3,
+=======
                                     LucideIcons.clock_3,
+>>>>>>> main
                                     size: 18,
                                   ),
                                   label: Text(
@@ -724,6 +857,55 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     ),
                     const SizedBox(height: 10),
                   ],
+<<<<<<< feature/notifications-update
+                  _CheckoutCard(
+                    title: 'Tóm tắt chi phí',
+                    child: Column(
+                      children: [
+                        _SummaryRow(
+                          label: 'Tổng sản phẩm',
+                          value: PriceFormatter.formatVnd(
+                            _productSubtotal(state),
+                          ),
+                        ),
+                        _SummaryRow(
+                          label: 'Tổng dịch vụ',
+                          value: PriceFormatter.formatVnd(
+                            _serviceSubtotal(state),
+                          ),
+                        ),
+                        _SummaryRow(
+                          label: 'Phí vận chuyển',
+                          value: PriceFormatter.formatVnd(shippingFee),
+                        ),
+                        if (hasServices) ...[
+                          _SummaryRow(
+                            label: 'Phí đón bé',
+                            value: PriceFormatter.formatVnd(pickupFee),
+                          ),
+                        ],
+                        _SummaryRow(
+                          label: 'Giảm giá',
+                          value: PriceFormatter.formatVnd(0),
+                        ),
+                        const Divider(height: 28),
+                        _SummaryRow(
+                          label: 'Tổng thanh toán',
+                          value: PriceFormatter.formatVnd(totalAmount),
+                          labelStyle: GoogleFonts.inter(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF111827),
+                          ),
+                          valueStyle: GoogleFonts.inter(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFFEF4444),
+                          ),
+                        ),
+                      ],
+                    ),
+=======
                   const _PaymentMethodBlock(),
                   const SizedBox(height: 10),
                   _PaymentDetailBlock(
@@ -733,6 +915,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     pickupFee: pickupFee,
                     showPickupFee: hasServices,
                     totalAmount: totalAmount,
+>>>>>>> main
                   ),
                   const SizedBox(height: 12),
                   Padding(
@@ -1004,6 +1187,19 @@ class _ShippingMethodBlock extends StatelessWidget {
                     fontWeight: FontWeight.w800,
                   ),
                 ),
+<<<<<<< feature/notifications-update
+                child: _isSubmitting
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.4,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        'Xác nhận đặt hàng',
+=======
                 const Spacer(),
                 Text(
                   'Xem tất cả',
@@ -1055,6 +1251,7 @@ class _ShippingMethodBlock extends StatelessWidget {
                             : error != null
                             ? 'Chưa có phí'
                             : PriceFormatter.formatVnd(fee),
+>>>>>>> main
                         style: GoogleFonts.inter(
                           color: error != null
                               ? const Color(0xFFDC2626)
@@ -1640,6 +1837,8 @@ class _CompactCheckoutItem extends StatelessWidget {
     );
   }
 }
+<<<<<<< feature/notifications-update
+=======
 
 String _formatShippingWindow(DateTime now) {
   final today = DateTime(now.year, now.month, now.day);
@@ -1653,3 +1852,4 @@ String _formatShippingDate(DateTime date) {
   final month = date.month.toString().padLeft(2, '0');
   return '$day Th$month';
 }
+>>>>>>> main
