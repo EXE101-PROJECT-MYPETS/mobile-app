@@ -1,23 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-<<<<<<< feature/notifications-update
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:provider/provider.dart';
-import 'package:petpee_mobile/common/toast/app_toast.dart';
-import 'package:petpee_mobile/common/notification/store/notification_provider.dart';
-import 'package:petpee_mobile/common/notification/model/notification_model.dart';
-=======
 import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:pawly_mobile/common/component/common_bottom_nav.dart';
 import 'package:pawly_mobile/common/navigation/main_tab_navigation.dart';
+import 'package:pawly_mobile/common/notification/store/notification_provider.dart';
 import 'package:pawly_mobile/common/toast/app_toast.dart';
->>>>>>> main
-
-import 'package:petpee_mobile/common/component/common_bottom_nav.dart';
-import 'package:petpee_mobile/features/chat/screens/pet_ai_selection_screen.dart';
-import 'package:petpee_mobile/apps/cart/page/cart_screen.dart';
-import 'package:petpee_mobile/apps/profile/page/profile_screen.dart';
-import 'package:petpee_mobile/apps/home/page/home_screen.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -66,13 +54,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case 'BOOKING_STATUS_UPDATED':
       case 'SERVICE_BOOKED':
         return {
-          'icon': LucideIcons.calendarCheck,
+          'icon': LucideIcons.calendar_check,
           'color': Colors.pink,
           'bgColor': Colors.pink.shade50,
         };
       case 'CHAT_MESSAGE':
         return {
-          'icon': LucideIcons.messageSquare,
+          'icon': LucideIcons.message_square,
           'color': Colors.blue,
           'bgColor': Colors.blue.shade50,
         };
@@ -86,88 +74,55 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
+  Future<void> _openNotification(
+    NotificationProvider provider,
+    int notificationId,
+    String type,
+    bool isRead,
+  ) async {
+    if (!isRead) {
+      await provider.markAsRead(notificationId);
+    }
+
+    if (!mounted) return;
+    if (type.contains('ORDER')) {
+      Navigator.of(context).pushNamed('/orders');
+    } else if (type.contains('BOOKING') || type.contains('SERVICE')) {
+      showAppToast(
+        context,
+        message: 'Lịch hẹn đang được xử lý',
+        type: AppToastType.info,
+      );
+    } else if (type == 'CHAT_MESSAGE') {
+      Navigator.of(context).pushNamed('/conversations');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-<<<<<<< feature/notifications-update
     final canPop = Navigator.canPop(context);
-=======
-    // Dữ liệu mock
-    final notifications = [
-      {
-        'title': 'Đặt lịch Spa thành công!',
-        'body':
-            'Lịch spa của Buddy vào 10:00 AM, 22/04/2026 đã được xác nhận. Vui lòng mang bé đến đúng giờ nhé!',
-        'time': 'Vừa xong',
-        'isRead': false,
-        'icon': LucideIcons.calendar_check,
-        'color': Colors.pink,
-        'bgColor': Colors.pink.shade50,
-      },
-      {
-        'title': 'Đơn hàng đang giao',
-        'body':
-            'Đơn hàng thức ăn cho mèo của bạn đang được shipper Giao Hàng Nhanh vận chuyển. Sẽ đến trong hôm nay.',
-        'time': '2 giờ trước',
-        'isRead': false,
-        'icon': LucideIcons.truck,
-        'color': Colors.orange,
-        'bgColor': Colors.orange.shade50,
-      },
-      {
-        'title': 'Khuyến mãi 50% Giờ Vàng',
-        'body':
-            'Chỉ duy nhất hôm nay, giảm 50% cho tất cả dịch vụ Spa & Grooming. Nhanh tay đặt lịch ngay!',
-        'time': '1 ngày trước',
-        'isRead': true,
-        'icon': LucideIcons.tag,
-        'color': Colors.red,
-        'bgColor': Colors.red.shade50,
-      },
-      {
-        'title': 'Nhắc nhở tiêm phòng',
-        'body':
-            'Bé Lucy đã đến hạn tiêm phòng dại định kỳ hàng năm. Đặt lịch thú y để Pawly hỗ trợ nhé.',
-        'time': '3 ngày trước',
-        'isRead': true,
-        'icon': LucideIcons.activity,
-        'color': Colors.blue,
-        'bgColor': Colors.blue.shade50,
-      },
-    ];
->>>>>>> main
 
-    return WillPopScope(
-      onWillPop: () async {
-        if (canPop) {
-          return true;
-        } else {
-          // Quay lại Trang chủ nếu không pop được (chuyển tab)
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
-            (route) => false,
-          );
-          return false;
-        }
+    return PopScope(
+      canPop: canPop,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        MainTabNavigation.backToPreviousOrHome(context);
       },
       child: Scaffold(
         backgroundColor: Colors.white,
-<<<<<<< feature/notifications-update
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0.5,
-          leading: canPop
-              ? IconButton(
-                  icon: const Icon(
-                    Icons.arrow_back_ios,
-                    color: Colors.black,
-                    size: 20,
-                  ),
-                  onPressed: () => Navigator.pop(context),
-                )
-              : null,
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: Colors.black,
+              size: 20,
+            ),
+            onPressed: () => MainTabNavigation.backToPreviousOrHome(context),
+          ),
           title: Text(
-            'Thông Báo',
+            'Thông báo',
             style: GoogleFonts.inter(
               color: Colors.black,
               fontWeight: FontWeight.bold,
@@ -178,139 +133,109 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           actions: [
             Consumer<NotificationProvider>(
               builder: (context, provider, child) {
-                if (provider.notifications.isEmpty)
+                if (provider.notifications.isEmpty) {
                   return const SizedBox.shrink();
+                }
+
                 return IconButton(
                   icon: const Icon(
-                    LucideIcons.checkCheck,
+                    LucideIcons.check_check,
                     color: Colors.pink,
                     size: 22,
                   ),
-                  onPressed: () async {
-                    await provider.markAllRead();
-                    if (mounted) {
-                      showAppToast(
-                        context,
-                        message: 'Đã đánh dấu tất cả đã đọc',
-                        type: AppToastType.success,
-                      );
-                    }
-                  },
+                  onPressed: provider.unreadCount == 0
+                      ? null
+                      : () async {
+                          await provider.markAllRead();
+                          if (!context.mounted) return;
+                          showAppToast(
+                            context,
+                            message: 'Đã đánh dấu tất cả đã đọc',
+                            type: AppToastType.success,
+                          );
+                        },
                   tooltip: 'Đánh dấu tất cả đã đọc',
                 );
               },
-=======
-        elevation: 0.5,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
-          onPressed: () => MainTabNavigation.backToPreviousOrHome(context),
-        ),
-        title: Text(
-          'Thông Báo',
-          style: GoogleFonts.inter(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(
-              LucideIcons.check_check,
-              color: Colors.pink,
-              size: 22,
->>>>>>> main
             ),
           ],
         ),
         body: Consumer<NotificationProvider>(
           builder: (context, provider, child) {
-            if (provider.isLoading) {
+            if (provider.isLoading && provider.notifications.isEmpty) {
               return const Center(
                 child: CircularProgressIndicator(color: Colors.pink),
               );
             }
 
             final notifications = provider.notifications;
-
             if (notifications.isEmpty) {
               return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: Colors.pink.shade50,
-                        shape: BoxShape.circle,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.pink.shade50,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          LucideIcons.bell_off,
+                          size: 48,
+                          color: Colors.pink,
+                        ),
                       ),
-                      child: const Icon(
-                        LucideIcons.bellOff,
-                        size: 48,
-                        color: Colors.pink,
+                      const SizedBox(height: 16),
+                      Text(
+                        'Không có thông báo nào',
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Không có thông báo nào',
-                      style: GoogleFonts.inter(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                      const SizedBox(height: 8),
+                      Text(
+                        'Bạn sẽ nhận được thông báo khi có hoạt động mới.',
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          color: Colors.grey.shade500,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Bạn sẽ nhận được thông báo khi có hoạt động mới.',
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        color: Colors.grey.shade500,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             }
 
             return RefreshIndicator(
-              onRefresh: () => provider.fetchNotifications(),
+              onRefresh: provider.fetchNotifications,
               color: Colors.pink,
               child: ListView.separated(
                 itemCount: notifications.length,
                 separatorBuilder: (context, index) =>
                     const Divider(height: 1, color: Colors.black12),
                 itemBuilder: (context, index) {
-                  final notif = notifications[index];
-                  final style = _getNotificationStyle(notif.type);
-                  final isRead = notif.isRead;
+                  final notification = notifications[index];
+                  final style = _getNotificationStyle(notification.type);
+                  final isRead = notification.isRead;
 
-                  return GestureDetector(
-                    onTap: () async {
-                      if (!isRead) {
-                        await provider.markAsRead(notif.id);
-                      }
-
-                      if (mounted) {
-                        if (notif.type.contains('ORDER')) {
-                          Navigator.of(context).pushNamed('/orders');
-                        } else if (notif.type.contains('BOOKING') ||
-                            notif.type.contains('SERVICE')) {
-                          showAppToast(
-                            context,
-                            message: 'Lịch hẹn đang được xử lý',
-                            type: AppToastType.info,
-                          );
-                        } else if (notif.type == 'CHAT_MESSAGE') {
-                          Navigator.of(context).pushNamed('/conversations');
-                        }
-                      }
-                    },
+                  return InkWell(
+                    onTap: () => _openNotification(
+                      provider,
+                      notification.id,
+                      notification.type,
+                      isRead,
+                    ),
                     child: Container(
                       color: isRead
                           ? Colors.white
-                          : Colors.pink.shade50.withOpacity(0.1),
+                          : Colors.pink.shade50.withValues(alpha: 0.35),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 16,
@@ -337,13 +262,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        notif.title,
-                                        style: TextStyle(
+                                        notification.title,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: GoogleFonts.inter(
                                           fontWeight: isRead
                                               ? FontWeight.w600
                                               : FontWeight.bold,
@@ -354,9 +280,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                         ),
                                       ),
                                     ),
+                                    const SizedBox(width: 10),
                                     Text(
-                                      _getRelativeTime(notif.createdAt),
-                                      style: TextStyle(
+                                      _getRelativeTime(notification.createdAt),
+                                      style: GoogleFonts.inter(
                                         color: Colors.grey.shade500,
                                         fontSize: 12,
                                       ),
@@ -365,8 +292,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                 ),
                                 const SizedBox(height: 6),
                                 Text(
-                                  notif.body,
-                                  style: TextStyle(
+                                  notification.body,
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.inter(
                                     color: isRead
                                         ? Colors.grey.shade600
                                         : Colors.black87,
@@ -388,39 +317,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         ),
         bottomNavigationBar: CommonBottomNavBar(
           currentIndex: 3,
-          onTap: (index) {
-            if (index == 0) {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-                (route) => false,
-              );
-            } else if (index == 1) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const PetAiSelectionScreen(),
-                ),
-              );
-            } else if (index == 2) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const CartScreen()),
-              );
-            } else if (index == 4) {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const ProfileScreen()),
-                (route) => false,
-              );
-            }
-          },
+          onTap: (index) =>
+              MainTabNavigation.open(context, index, currentIndex: 3),
         ),
-      ),
-      bottomNavigationBar: CommonBottomNavBar(
-        currentIndex: 3,
-        onTap: (index) =>
-            MainTabNavigation.open(context, index, currentIndex: 3),
       ),
     );
   }

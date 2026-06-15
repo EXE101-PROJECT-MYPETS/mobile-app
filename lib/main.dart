@@ -1,22 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-<<<<<<< feature/notifications-update
-import 'package:petpee_mobile/app.dart';
-import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
-import 'package:petpee_mobile/common/config/api_config.dart';
-import 'package:petpee_mobile/common/store/app_state.dart';
-
-import 'package:petpee_mobile/features/chat/providers/chat_provider.dart';
-import 'package:petpee_mobile/common/config/firebase_notification_service.dart';
-import 'package:petpee_mobile/common/notification/store/notification_provider.dart';
-=======
 import 'package:pawly_mobile/app.dart';
 import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
+import 'package:pawly_mobile/common/config/api_config.dart';
+import 'package:pawly_mobile/common/config/firebase_notification_service.dart';
+import 'package:pawly_mobile/common/notification/store/notification_provider.dart';
 import 'package:pawly_mobile/common/store/app_state.dart';
-
 import 'package:pawly_mobile/features/chat/providers/chat_provider.dart';
->>>>>>> main
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

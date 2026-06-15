@@ -2,12 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
-<<<<<<< feature/notifications-update
-import 'package:petpee_mobile/common/store/app_state.dart';
-import 'package:petpee_mobile/common/notification/store/notification_provider.dart';
-=======
+import 'package:pawly_mobile/common/notification/store/notification_provider.dart';
 import 'package:pawly_mobile/common/store/app_state.dart';
->>>>>>> main
 
 class CommonBottomNavBar extends StatelessWidget {
   const CommonBottomNavBar({

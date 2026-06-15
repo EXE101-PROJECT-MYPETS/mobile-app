@@ -161,7 +161,7 @@ class ProductPublicDetailDTO {
       ? PriceFormatter.formatVnd(originalPrice, fallback: '')
       : '';
   String get soldText => soldCount != null ? 'Đã bán ${soldCount!}+' : 'Đã bán';
-  String get stockText => stockQty != null ? 'Kho còn ${stockQty}' : 'Còn hàng';
+  String get stockText => stockQty != null ? 'Kho còn $stockQty' : 'Còn hàng';
   String get reviewSummary =>
       reviewCount != null ? '$reviewCount đánh giá' : 'Chưa có đánh giá';
 }

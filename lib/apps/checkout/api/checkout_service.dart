@@ -13,12 +13,8 @@ class CheckoutService {
   Future<CheckoutResponseModel> checkout(CheckoutRequestModel request) async {
     final uri = Uri.parse(ApiConfig.ordersUrl);
 
-<<<<<<< feature/notifications-update
-    // Map CheckoutRequestModel to OrderDTO expected by backend
-=======
     // Backend expects product items under `items`, while service bookings stay
     // in the checkout payload so spa services can be booked from the cart.
->>>>>>> main
     final payload = {
       'shopId': request.shopId,
       'userId': request.userId,
@@ -42,13 +38,10 @@ class CheckoutService {
             },
           )
           .toList(),
-<<<<<<< feature/notifications-update
-=======
       if (request.serviceBookings.isNotEmpty)
         'serviceBookings': request.serviceBookings
             .map((item) => item.toJson())
             .toList(),
->>>>>>> main
     };
 
     final response = await _client.post(uri, body: jsonEncode(payload));

@@ -131,7 +131,7 @@ class _AddPetScreenState extends State<AddPetScreen> {
                                 ? Image.network(
                                     widget.pet!.avatarUrl!,
                                     fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => const Icon(
+                                    errorBuilder: (_, _, _) => const Icon(
                                       LucideIcons.camera,
                                       color: Colors.grey,
                                       size: 40,
@@ -462,7 +462,7 @@ class _AddPetScreenState extends State<AddPetScreen> {
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
-          value: value,
+          initialValue: value,
           decoration: InputDecoration(
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),

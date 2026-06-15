@@ -44,7 +44,9 @@ class AddressSelectionScreen extends StatelessWidget {
                   margin: const EdgeInsets.only(top: 8),
                   child: RadioListTile<String>(
                     value: addr.id,
+                    // ignore: deprecated_member_use
                     groupValue: state.defaultAddress?.id,
+                    // ignore: deprecated_member_use
                     onChanged: (val) {
                       if (val != null) {
                         context.read<AppState>().setDefaultAddress(val);

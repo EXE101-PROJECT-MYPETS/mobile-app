@@ -101,7 +101,7 @@ class _LoginRequiredSheet extends StatelessWidget {
                 borderRadius: BorderRadius.circular(14),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFFE11D48).withOpacity(0.28),
+                    color: const Color(0xFFE11D48).withValues(alpha: 0.28),
                     blurRadius: 14,
                     offset: const Offset(0, 6),
                   ),

@@ -312,7 +312,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Colors.black.withOpacity(0.32), Colors.transparent],
+                  colors: [
+                    Colors.black.withValues(alpha: 0.32),
+                    Colors.transparent,
+                  ],
                 ),
               ),
             ),
@@ -360,7 +363,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.35),
+                color: Colors.black.withValues(alpha: 0.35),
                 borderRadius: BorderRadius.circular(999),
               ),
               child: Text(
@@ -383,7 +386,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     required VoidCallback onTap,
   }) {
     return Material(
-      color: Colors.black.withOpacity(0.28),
+      color: Colors.black.withValues(alpha: 0.28),
       shape: const CircleBorder(),
       child: InkWell(
         customBorder: const CircleBorder(),
@@ -522,7 +525,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
         );
       },
-      child: Container(
+      child: SizedBox(
         width: double.infinity,
         child: Column(
           children: [
@@ -708,7 +711,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
               itemCount: products.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              separatorBuilder: (_, _) => const SizedBox(width: 12),
               itemBuilder: (context, index) {
                 final product = products[index];
                 return GestureDetector(
@@ -743,7 +746,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         border: Border.all(color: const Color(0xFFE5E7EB)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -768,7 +771,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ? Image.network(
                             product.image,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) =>
+                            errorBuilder: (_, _, _) =>
                                 _buildShopProductImageFallback(),
                           )
                         : _buildShopProductImageFallback(),
@@ -783,7 +786,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.96),
+                      color: Colors.white.withValues(alpha: 0.96),
                       borderRadius: BorderRadius.circular(999),
                       border: Border.all(color: const Color(0xFFE5E7EB)),
                     ),
@@ -1088,7 +1091,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: review.images.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 12),
+                separatorBuilder: (_, _) => const SizedBox(width: 12),
                 itemBuilder: (context, index) {
                   return ClipRRect(
                     borderRadius: BorderRadius.circular(14),

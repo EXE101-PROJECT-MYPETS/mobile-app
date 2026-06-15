@@ -135,7 +135,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen>
                         width: 36,
                         height: 36,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Icon(
+                        errorBuilder: (_, _, _) => const Icon(
                           Icons.store,
                           color: Colors.grey,
                           size: 20,
@@ -227,7 +227,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen>
                         width: 24,
                         height: 24,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Icon(
+                        errorBuilder: (_, _, _) => const Icon(
                           Icons.store,
                           size: 12,
                           color: Colors.grey,
@@ -250,7 +250,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen>
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 5,
                     offset: const Offset(0, 2),
                   ),
@@ -280,7 +280,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen>
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 5,
             offset: const Offset(0, -2),
           ),

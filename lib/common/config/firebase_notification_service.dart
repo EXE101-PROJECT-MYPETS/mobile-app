@@ -4,10 +4,10 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:petpee_mobile/common/config/api_config.dart';
+import 'package:pawly_mobile/common/config/api_config.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:petpee_mobile/app.dart';
+import 'package:pawly_mobile/app.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -30,9 +30,9 @@ class FirebaseNotificationService {
 
   static const AndroidNotificationChannel _androidChannel =
       AndroidNotificationChannel(
-        'petpee_channel_id',
-        'PetPee Thông báo',
-        description: 'Kênh thông báo của PetPee',
+        'pawly_channel_id',
+        'Pawly Thông báo',
+        description: 'Kênh thông báo của Pawly',
         importance: Importance.max,
       );
 
@@ -154,9 +154,9 @@ class FirebaseNotificationService {
   Future<void> _showLocalNotification(RemoteMessage message) async {
     const AndroidNotificationDetails androidNotificationDetails =
         AndroidNotificationDetails(
-          'petpee_channel_id',
-          'PetPee Thông báo',
-          channelDescription: 'Kênh thông báo của PetPee',
+          'pawly_channel_id',
+          'Pawly Thông báo',
+          channelDescription: 'Kênh thông báo của Pawly',
           importance: Importance.max,
           priority: Priority.high,
           icon: '@mipmap/launcher_icon',

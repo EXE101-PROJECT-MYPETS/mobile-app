@@ -326,7 +326,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.0"
-<<<<<<< feature/notifications-update
   flutter_local_notifications:
     dependency: "direct main"
     description:
@@ -351,7 +350,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.2.0"
-=======
   flutter_lucide:
     dependency: "direct main"
     description:
@@ -360,7 +358,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.11.0"
->>>>>>> main
   flutter_map:
     dependency: "direct main"
     description:
@@ -1023,8 +1020,7 @@ packages:
       sha256: "949a932224383300f01be9221c39180316445ecb8e7547f70a41a35bf421fb9e"
       url: "https://pub.dev"
     source: hosted
-<<<<<<< feature/notifications-update
-    version: "0.7.7"
+    version: "0.7.11"
   timezone:
     dependency: transitive
     description:
@@ -1033,9 +1029,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.9.4"
-=======
-    version: "0.7.11"
->>>>>>> main
   typed_data:
     dependency: transitive
     description:

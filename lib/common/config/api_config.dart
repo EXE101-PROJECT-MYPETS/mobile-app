@@ -14,15 +14,7 @@ class ApiConfig {
 
   static String _baseUrl = const String.fromEnvironment(
     'API_BASE_URL',
-<<<<<<< feature/notifications-update
     defaultValue: '',
-=======
-    // Mặc định sử dụng IP nội bộ hiện tại của máy chạy backend.
-    // Nếu dùng Android emulator, chạy app với --dart-define=API_BASE_URL="http://10.0.2.2:8080/api"
-    defaultValue: 'http://192.168.1.11:8080/api',
-    //192.168.110.56 nam
-    //192.168.1.246 hieu
->>>>>>> main
   );
 
   static Future<void> initialize() async {
@@ -59,8 +51,8 @@ class ApiConfig {
     _baseUrl = await _resolvePhysicalDeviceBaseUrl();
   }
 
-  // Thay đổi IP này thành IP của máy tính bạn trong mạng LAN (IPv4)
-  // Nếu dùng máy ảo Android (Emulator), dùng 10.0.2.2
+  // Thay đổi IP này thành IP của máy tính bạn trong mạng LAN (IPv4).
+  // Nếu dùng máy ảo Android (emulator), dùng 10.0.2.2.
   static String get baseUrl => _baseUrl;
 
   static Future<String> _resolvePhysicalDeviceBaseUrl() async {

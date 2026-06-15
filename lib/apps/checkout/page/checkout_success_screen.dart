@@ -154,8 +154,6 @@ class _ShopeeLikeHeader extends StatelessWidget {
     );
   }
 }
-<<<<<<< feature/notifications-update
-=======
 
 class _HeaderButton extends StatelessWidget {
   const _HeaderButton({required this.label, required this.onPressed});
@@ -178,4 +176,3 @@ class _HeaderButton extends StatelessWidget {
     );
   }
 }
->>>>>>> main

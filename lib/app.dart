@@ -6,16 +6,16 @@ import 'package:pawly_mobile/apps/home/page/home_screen.dart';
 import 'package:pawly_mobile/apps/home/page/notifications_screen.dart';
 import 'package:pawly_mobile/apps/product/page/product_list_screen.dart';
 import 'package:pawly_mobile/apps/profile/page/my_pets_screen.dart';
+import 'package:pawly_mobile/apps/profile/page/orders_screen.dart';
 import 'package:pawly_mobile/apps/profile/page/profile_screen.dart';
 import 'package:pawly_mobile/common/auth/page/login_screen.dart';
 import 'package:pawly_mobile/common/auth/page/register_screen.dart';
+import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
 import 'package:pawly_mobile/common/navigation/main_tab_navigation.dart';
+import 'package:pawly_mobile/common/notification/store/notification_provider.dart';
 import 'package:pawly_mobile/common/store/app_state.dart';
+import 'package:pawly_mobile/features/chat/screens/chat_list_screen.dart';
 import 'package:pawly_mobile/features/chat/screens/pet_ai_selection_screen.dart';
-
-import 'package:petpee_mobile/common/notification/store/notification_provider.dart';
-import 'package:petpee_mobile/apps/profile/page/orders_screen.dart';
-import 'package:petpee_mobile/common/auth/store/auth_provider.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -46,12 +46,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       navigatorKey: MyApp.navigatorKey,
       debugShowCheckedModeBanner: false,
-<<<<<<< feature/notifications-update
-
-      title: 'PetPeese',
-=======
       title: 'Pawly',
->>>>>>> main
       theme: ThemeData(
         pageTransitionsTheme: const PageTransitionsTheme(
           builders: {
@@ -74,6 +69,7 @@ class _MyAppState extends State<MyApp> {
         '/bookings': (context) =>
             const HomeScreen(), // TODO: Create BookingsScreen
         '/orders': (context) => const OrdersScreen(),
+        '/conversations': (context) => const ChatListScreen(),
       },
     );
   }

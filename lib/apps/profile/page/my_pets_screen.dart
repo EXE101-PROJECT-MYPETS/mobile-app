@@ -53,7 +53,7 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
       // Log token info for debugging 401 errors
       final message = e.toString();
       if (message.contains('401') || message.contains('Unauthorized')) {
-        print('[MyPetsScreen] 401 Error - logging token info');
+        debugPrint('[MyPetsScreen] 401 Error - logging token info');
         _authProvider.debugPrintTokenInfo();
 
         try {
@@ -61,8 +61,8 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
           final refreshedDtos = await _petService.getAll();
           return refreshedDtos.map((dto) => PetModel.fromDTO(dto)).toList();
         } catch (refreshError) {
-          print('[MyPetsScreen] refreshSession failed: $refreshError');
-          throw refreshError;
+          debugPrint('[MyPetsScreen] refreshSession failed: $refreshError');
+          rethrow;
         }
       }
 
@@ -298,13 +298,12 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
                       await _petService.delete(pet.id!);
                       _onDeletePetSuccess();
                     } catch (e) {
-                      if (mounted) {
-                        showAppToast(
-                          context,
-                          message: 'Lỗi xóa thú cưng: $e',
-                          type: AppToastType.error,
-                        );
-                      }
+                      if (!context.mounted) return;
+                      showAppToast(
+                        context,
+                        message: 'Lỗi xóa thú cưng: $e',
+                        type: AppToastType.error,
+                      );
                     }
                   }
                 },
@@ -424,7 +423,7 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: bgColor.withOpacity(0.4),
+          color: bgColor.withValues(alpha: 0.4),
           borderRadius: BorderRadius.circular(4),
         ),
         child: Row(

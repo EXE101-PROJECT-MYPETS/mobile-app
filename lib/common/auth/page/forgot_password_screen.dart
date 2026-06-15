@@ -378,8 +378,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       isPassword: true,
                       controller: _newPasswordController,
                       validator: (val) {
-                        if (val == null || val.isEmpty)
+                        if (val == null || val.isEmpty) {
                           return 'Vui lòng nhập mật khẩu';
+                        }
                         if (val.length < 6) return 'Tối thiểu 6 ký tự';
                         return null;
                       },
@@ -392,8 +393,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       isPassword: true,
                       controller: _confirmPasswordController,
                       validator: (val) {
-                        if (val == null || val.isEmpty)
+                        if (val == null || val.isEmpty) {
                           return 'Vui lòng xác nhận mật khẩu';
+                        }
                         if (val != _newPasswordController.text) {
                           return 'Mật khẩu không khớp';
                         }

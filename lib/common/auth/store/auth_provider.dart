@@ -3,18 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-<<<<<<< feature/notifications-update
-import 'package:petpee_mobile/common/auth/api/auth_service.dart';
-import 'package:petpee_mobile/common/auth/model/auth_dto.dart';
-import 'package:petpee_mobile/common/config/api_client.dart';
-import 'package:petpee_mobile/common/config/firebase_notification_service.dart';
-import 'package:petpee_mobile/common/user/model/user_model.dart';
-=======
 import 'package:pawly_mobile/common/auth/api/auth_service.dart';
 import 'package:pawly_mobile/common/auth/model/auth_dto.dart';
 import 'package:pawly_mobile/common/config/api_client.dart';
+import 'package:pawly_mobile/common/config/firebase_notification_service.dart';
 import 'package:pawly_mobile/common/user/model/user_model.dart';
->>>>>>> main
 
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
@@ -301,12 +294,12 @@ class AuthProvider extends ChangeNotifier {
 
   /// Debug helper to inspect JWT token content.
   void debugPrintTokenInfo() {
-    print('\n=== AUTH TOKEN DEBUG INFO ===');
-    print('Token exists: ${_token != null}');
-    print('Refresh token exists: ${_refreshToken != null}');
-    print('Current Shop ID: $_currentShopId');
-    print('Current User ID: ${_currentUser?.id}');
-    print('Role: $_role');
+    debugPrint('\n=== AUTH TOKEN DEBUG INFO ===');
+    debugPrint('Token exists: ${_token != null}');
+    debugPrint('Refresh token exists: ${_refreshToken != null}');
+    debugPrint('Current Shop ID: $_currentShopId');
+    debugPrint('Current User ID: ${_currentUser?.id}');
+    debugPrint('Role: $_role');
 
     if (_token != null) {
       try {
@@ -320,17 +313,17 @@ class AuthProvider extends ChangeNotifier {
           final decoded = utf8.decode(base64Url.decode(normalized));
           final claims = jsonDecode(decoded) as Map<String, dynamic>;
 
-          print('JWT Claims:');
+          debugPrint('JWT Claims:');
           claims.forEach((key, value) {
-            print('  $key: $value');
+            debugPrint('  $key: $value');
           });
         }
       } catch (e) {
-        print('Error decoding token: $e');
+        debugPrint('Error decoding token: $e');
       }
     }
 
-    print('==============================\n');
+    debugPrint('==============================\n');
   }
 
   Future<void> googleLogin(String idToken) async {

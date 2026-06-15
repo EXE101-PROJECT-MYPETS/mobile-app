@@ -275,7 +275,7 @@ class ChatSocketService {
     _conversationSubscriptionId = 'sub-${++_subscriptionCounter}';
     final destination = '/topic/conversations/$conversationId/messages';
     debugPrint(
-      '[ChatSocket] SUBSCRIBE to $destination (id=${_conversationSubscriptionId})',
+      '[ChatSocket] SUBSCRIBE to $destination (id=$_conversationSubscriptionId)',
     );
     _sendFrame('SUBSCRIBE', {
       'id': _conversationSubscriptionId!,
@@ -300,7 +300,7 @@ class ChatSocketService {
     _shopSubscriptionId = 'sub-shop-${++_subscriptionCounter}';
     final destination = '/topic/shops/$shopId/messages';
     debugPrint(
-      '[ChatSocket] SUBSCRIBE to $destination (id=${_shopSubscriptionId})',
+      '[ChatSocket] SUBSCRIBE to $destination (id=$_shopSubscriptionId)',
     );
     _sendFrame('SUBSCRIBE', {
       'id': _shopSubscriptionId!,
