@@ -8,8 +8,9 @@ class ApiConfig {
   static const String _androidEmulatorBaseUrl = 'http://10.0.2.2:8080/api';
   static const String _iosSimulatorBaseUrl = 'http://localhost:8080/api';
   static const List<String> _physicalDeviceBaseUrls = [
-    'http://192.168.16.103:8080/api',
-    'http://192.168.16.102:8080/api',
+    'http://192.168.1.11:8080/api',
+    'http://192.168.165.224:8080/api',
+    'http://192.168.165.224:8080/api',
   ];
 
   static String _baseUrl = const String.fromEnvironment(
@@ -106,7 +107,10 @@ class ApiConfig {
   static String get productPublicUrl => '$baseUrl/public/products';
   static String get productMobileUrl => '$productPublicUrl/mobile';
   static String get shopPublicUrl => '$baseUrl/public/shops';
+  static String get nearbyShopsUrl => '$shopPublicUrl/nearby';
   static String get shopMarkersUrl => '$shopPublicUrl/markers';
+  static String shopServicesUrl(int shopId) =>
+      '$shopPublicUrl/$shopId/services';
   static String serviceDetailUrl(int id) => '$baseUrl/services/$id';
   static String shopBookingsUrl(int shopId) =>
       '$baseUrl/shops/$shopId/bookings';
