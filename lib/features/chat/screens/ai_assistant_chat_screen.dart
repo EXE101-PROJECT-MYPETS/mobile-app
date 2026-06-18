@@ -324,9 +324,8 @@ class _ChatMessageBubble extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
-        mainAxisAlignment: message.isUser
-            ? MainAxisAlignment.end
-            : MainAxisAlignment.start,
+        mainAxisAlignment:
+            message.isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!message.isUser) ...[
@@ -346,9 +345,8 @@ class _ChatMessageBubble extends StatelessWidget {
                     vertical: 13,
                   ),
                   decoration: BoxDecoration(
-                    color: message.isUser
-                        ? const Color(0xFF0866D8)
-                        : Colors.white,
+                    color:
+                        message.isUser ? const Color(0xFF0866D8) : Colors.white,
                     borderRadius: BorderRadius.circular(18).copyWith(
                       bottomLeft: Radius.circular(message.isUser ? 18 : 6),
                       bottomRight: Radius.circular(message.isUser ? 6 : 18),
@@ -431,8 +429,7 @@ class _ChatMessageBubble extends StatelessWidget {
     final action = message.action;
     if (action?.type == 'OPEN_BOOKING_FLOW') {
       return _BookingActionConfig(
-        keyword:
-            _stringArg(action!.arguments, 'keyword') ??
+        keyword: _stringArg(action!.arguments, 'keyword') ??
             _stringArg(action.arguments, 'prefillKeyword'),
         serviceType: _stringArg(action.arguments, 'serviceType'),
         preferredDateText: _stringArg(action.arguments, 'preferredDateText'),
@@ -491,9 +488,8 @@ class AiBookingActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = isVetRecommendation
-        ? 'Nên liên hệ thú y sớm'
-        : 'Đặt lịch cho $petName';
+    final title =
+        isVetRecommendation ? 'Nên liên hệ thú y sớm' : 'Đặt lịch cho $petName';
     final serviceLabel = _serviceLabel(serviceType, keyword);
 
     return Container(
@@ -548,9 +544,8 @@ class AiBookingActionCard extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (_) => SpaServiceScreen(
                       petId: petId,
-                      prefillKeyword: isVetRecommendation
-                          ? 'khám thú y'
-                          : keyword,
+                      prefillKeyword:
+                          isVetRecommendation ? 'khám thú y' : keyword,
                       serviceType: isVetRecommendation ? 'VET' : serviceType,
                       preferredDateText: preferredDateText,
                     ),

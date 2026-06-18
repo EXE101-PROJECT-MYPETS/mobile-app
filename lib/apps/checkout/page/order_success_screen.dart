@@ -108,8 +108,8 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                               Container(
                                 width: 72,
                                 height: 72,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFE9F7EE),
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFFE9F7EE),
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(
@@ -223,8 +223,8 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
             ),
           ),
           if (_isLoading)
-            SliverFillRemaining(
-              child: const Center(child: CircularProgressIndicator()),
+            const SliverFillRemaining(
+              child: Center(child: CircularProgressIndicator()),
             )
           else if (_products.isEmpty)
             SliverFillRemaining(
@@ -264,8 +264,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
               sliver: SliverGrid(
                 delegate: SliverChildBuilderDelegate((context, index) {
                   final product = _products[index];
-                  final imageUrl =
-                      (product.imageUrls != null &&
+                  final imageUrl = (product.imageUrls != null &&
                           product.imageUrls!.isNotEmpty)
                       ? product.imageUrls!.first
                       : 'https://via.placeholder.com/150';

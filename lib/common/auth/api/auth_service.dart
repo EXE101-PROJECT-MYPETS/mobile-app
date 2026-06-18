@@ -90,9 +90,8 @@ class AuthService {
     if (avatarUrlPreview != null) {
       final mimeType = avatarUrlPreview.mimeType ?? 'image/jpeg';
       final type = mimeType.split('/')[0];
-      final subtype = mimeType.split('/').length > 1
-          ? mimeType.split('/')[1]
-          : 'jpeg';
+      final subtype =
+          mimeType.split('/').length > 1 ? mimeType.split('/')[1] : 'jpeg';
 
       request.files.add(
         await http.MultipartFile.fromPath(
@@ -151,9 +150,8 @@ class AuthService {
     if (avatarUrlPreview != null) {
       final mimeType = avatarUrlPreview.mimeType ?? 'image/jpeg';
       final type = mimeType.split('/')[0];
-      final subtype = mimeType.split('/').length > 1
-          ? mimeType.split('/')[1]
-          : 'jpeg';
+      final subtype =
+          mimeType.split('/').length > 1 ? mimeType.split('/')[1] : 'jpeg';
 
       request.files.add(
         await http.MultipartFile.fromPath(

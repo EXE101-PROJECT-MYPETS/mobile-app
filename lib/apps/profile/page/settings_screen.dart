@@ -98,7 +98,6 @@ class SettingsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
-
               _buildSectionHeader('Tài khoản của tôi'),
               _buildMenuCard([
                 _buildMenuItem(
@@ -136,7 +135,6 @@ class SettingsScreen extends StatelessWidget {
                   LucideIcons.credit_card,
                 ),
               ]),
-
               const SizedBox(height: 16),
               _buildSectionHeader('Cài đặt'),
               _buildMenuCard([
@@ -154,7 +152,6 @@ class SettingsScreen extends StatelessWidget {
                   subtitle: 'Tiếng Việt',
                 ),
               ]),
-
               const SizedBox(height: 16),
               _buildSectionHeader('Hỗ trợ'),
               _buildMenuCard([
@@ -175,7 +172,6 @@ class SettingsScreen extends StatelessWidget {
                   isDestructive: true,
                 ),
               ]),
-
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,

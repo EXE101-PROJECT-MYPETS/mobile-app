@@ -118,19 +118,15 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
                     _buildAiPrefillCard(),
                     const SizedBox(height: 4),
                   ],
-
                   const _SectionTitle(title: 'Chọn Gói Dịch Vụ'),
                   _buildServicePackages(),
                   const SizedBox(height: 20),
-
                   const _SectionTitle(title: 'Chọn Ngày'),
                   _buildCalendar(),
                   const SizedBox(height: 20),
-
                   const _SectionTitle(title: 'Chọn Khung Giờ'),
                   _buildTimeSlots(),
                   const SizedBox(height: 20),
-
                   const _SectionTitle(title: 'Chọn Thú Cưng Của Bạn'),
                   _buildPetSelection(),
                   const SizedBox(height: 20),
@@ -573,13 +569,11 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
                 dayNumber,
               );
 
-              bool isSelected =
-                  _selectedDate.year == date.year &&
+              bool isSelected = _selectedDate.year == date.year &&
                   _selectedDate.month == date.month &&
                   _selectedDate.day == date.day;
 
-              bool isToday =
-                  DateTime.now().year == date.year &&
+              bool isToday = DateTime.now().year == date.year &&
                   DateTime.now().month == date.month &&
                   DateTime.now().day == date.day;
 
@@ -887,24 +881,24 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
             ),
           ),
           const SizedBox(width: 12),
-          Expanded(
+          const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Sunny Spa - CS1',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       LucideIcons.map_pin,
                       size: 12,
                       color: Colors.grey,
                     ),
-                    const SizedBox(width: 4),
-                    const Expanded(
+                    SizedBox(width: 4),
+                    Expanded(
                       child: Text(
                         '123 Đường Cầu Giấy, Q. Cầu Giấy, Hà Nội',
                         style: TextStyle(color: Colors.grey, fontSize: 11),
@@ -914,16 +908,16 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       LucideIcons.navigation,
                       size: 12,
                       color: Colors.pink,
                     ),
-                    const SizedBox(width: 4),
-                    const Text(
+                    SizedBox(width: 4),
+                    Text(
                       'Cách bạn 1.2 km',
                       style: TextStyle(
                         color: Colors.pink,

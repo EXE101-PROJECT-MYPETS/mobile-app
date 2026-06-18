@@ -149,9 +149,8 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
       }).toList();
 
       setState(() {
-        _relatedServices = reset
-            ? nextServices
-            : [..._relatedServices, ...nextServices];
+        _relatedServices =
+            reset ? nextServices : [..._relatedServices, ...nextServices];
         _relatedCursor = response.nextCursor;
         _hasMoreRelated = response.hasNext && response.nextCursor != null;
         _isLoadingRelated = false;
@@ -191,8 +190,8 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
         _selectedPetId = currentPetStillExists
             ? _selectedPetId
             : selectablePets.isNotEmpty
-            ? selectablePets.first.id
-            : null;
+                ? selectablePets.first.id
+                : null;
         _isLoadingPets = false;
       });
     } catch (error) {
@@ -282,7 +281,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
     final selectablePets = _pets.where((pet) => pet.id != null).toList();
     final petId = requiresPet
         ? (_selectedPetId ??
-              (selectablePets.isNotEmpty ? selectablePets.first.id : null))
+            (selectablePets.isNotEmpty ? selectablePets.first.id : null))
         : null;
 
     if (shopId == null) {
@@ -754,7 +753,7 @@ class _QuickInfoPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _PanelTitle(icon: LucideIcons.file_text, text: 'Thông tin dịch vụ'),
+          const _PanelTitle(icon: LucideIcons.file_text, text: 'Thông tin dịch vụ'),
           const SizedBox(height: 12),
           ...rows.expand((row) sync* {
             yield row;
@@ -793,7 +792,7 @@ class _ShopPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _PanelTitle(icon: LucideIcons.store, text: 'Cửa hàng cung cấp'),
+          const _PanelTitle(icon: LucideIcons.store, text: 'Cửa hàng cung cấp'),
           const SizedBox(height: 14),
           InkWell(
             onTap: canOpenShop ? openShop : null,
@@ -905,14 +904,14 @@ class _SchedulePanel extends StatelessWidget {
     final selectedValue = petItems.any((pet) => pet.id == selectedPetId)
         ? selectedPetId
         : petItems.isNotEmpty
-        ? petItems.first.id
-        : null;
+            ? petItems.first.id
+            : null;
 
     return _Panel(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _PanelTitle(icon: LucideIcons.calendar_check, text: 'Chọn lịch hẹn'),
+          const _PanelTitle(icon: LucideIcons.calendar_check, text: 'Chọn lịch hẹn'),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -1455,9 +1454,8 @@ class _PetChoiceTile extends StatelessWidget {
           color: isSelected ? const Color(0xFFFFF1F2) : const Color(0xFFF8FAFC),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected
-                ? const Color(0xFFE11D48)
-                : const Color(0xFFE5E7EB),
+            color:
+                isSelected ? const Color(0xFFE11D48) : const Color(0xFFE5E7EB),
             width: isSelected ? 1.4 : 1,
           ),
         ),
@@ -1635,7 +1633,7 @@ class _ReviewsPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _PanelTitle(icon: LucideIcons.star, text: 'Đánh giá khách hàng'),
+          const _PanelTitle(icon: LucideIcons.star, text: 'Đánh giá khách hàng'),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -1789,9 +1787,8 @@ class _ServiceReviewCard extends StatelessWidget {
               CircleAvatar(
                 radius: 14,
                 backgroundColor: const Color(0xFFE5E7EB),
-                backgroundImage: avatarUrl != null
-                    ? NetworkImage(avatarUrl)
-                    : null,
+                backgroundImage:
+                    avatarUrl != null ? NetworkImage(avatarUrl) : null,
                 child: avatarUrl == null
                     ? Text(
                         _reviewInitial(reviewerName),
@@ -1923,8 +1920,8 @@ class _BookingBar extends StatelessWidget {
                 onPressed: detail.active == false
                     ? null
                     : isBooking
-                    ? null
-                    : onSubmit,
+                        ? null
+                        : onSubmit,
                 icon: isBooking
                     ? const SizedBox(
                         width: 18,

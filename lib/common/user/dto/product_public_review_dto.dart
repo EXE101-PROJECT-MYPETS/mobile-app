@@ -29,19 +29,16 @@ class ProductPublicReviewDTO {
     return ProductPublicReviewDTO(
       id: json['id'] as int?,
       productId: json['productId'] as int?,
-      authorName:
-          json['authorName'] as String? ??
+      authorName: json['authorName'] as String? ??
           json['customerName'] as String? ??
           (user is Map<String, dynamic> ? user['name'] as String? : null),
-      rating:
-          (json['rating'] as num?)?.toDouble() ??
+      rating: (json['rating'] as num?)?.toDouble() ??
           (json['star'] as num?)?.toDouble(),
       comment: json['comment'] as String? ?? json['content'] as String?,
       images: images is List ? images.whereType<String>().toList() : <String>[],
       variant: json['variant'] as String?,
       createdAt: json['createdAt'] as String? ?? json['date'] as String?,
-      likeCount:
-          json['likeCount'] as int? ??
+      likeCount: json['likeCount'] as int? ??
           json['helpfulCount'] as int? ??
           json['usefulCount'] as int?,
       verifiedPurchase:

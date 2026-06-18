@@ -311,7 +311,7 @@ class _StickySearchHeader extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushNamed(context, '/login');
                   },
-                  icon: Icon(LucideIcons.log_in, size: 16),
+                  icon: const Icon(LucideIcons.log_in, size: 16),
                   label: const Text(
                     'Đăng nhập',
                     style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
@@ -553,9 +553,8 @@ class _HeroActionButton extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(9),
-              border: borderColor == null
-                  ? null
-                  : Border.all(color: borderColor!),
+              border:
+                  borderColor == null ? null : Border.all(color: borderColor!),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Row(
@@ -612,7 +611,7 @@ class _QuickUtilitySection extends StatelessWidget {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => MapScreen()),
+            MaterialPageRoute(builder: (context) => const MapScreen()),
           );
         },
       ),
@@ -686,8 +685,7 @@ class _QuickUtilityTile extends StatelessWidget {
     Color color,
     Color background,
     VoidCallback onTap,
-  })
-  item;
+  }) item;
 
   @override
   Widget build(BuildContext context) {
@@ -1251,7 +1249,7 @@ class _VeterinarySection extends StatelessWidget {
             onViewAll: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => MapScreen()),
+                MaterialPageRoute(builder: (context) => const MapScreen()),
               );
             },
           ),
@@ -1288,8 +1286,7 @@ class _VeterinarySection extends StatelessWidget {
                   builder: (context, constraints) {
                     const horizontalPadding = 12.0;
                     const itemGap = 12.0;
-                    final availableWidth =
-                        constraints.maxWidth -
+                    final availableWidth = constraints.maxWidth -
                         (horizontalPadding * 2) -
                         itemGap;
                     final itemWidth = (availableWidth / 2).clamp(194.0, 204.0);

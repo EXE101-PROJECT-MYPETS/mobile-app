@@ -195,8 +195,7 @@ class AuthProvider extends ChangeNotifier {
       );
       await _saveCurrentUser(updatedUser);
 
-      final emailChanged =
-          previousEmail != null &&
+      final emailChanged = previousEmail != null &&
           previousEmail.toLowerCase() != updatedUser.email.toLowerCase();
       if (emailChanged && _refreshToken != null && _refreshToken!.isNotEmpty) {
         await refreshSession();

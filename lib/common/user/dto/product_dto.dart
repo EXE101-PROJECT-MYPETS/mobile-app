@@ -71,8 +71,7 @@ class ProductDTO {
       imageUrls: ImageUrlUtil.buildPublicUrls(
         (json['imageUrls'] as List<dynamic>?)?.whereType<String>(),
       ),
-      shopProvince:
-          readString(shopData?['province']) ??
+      shopProvince: readString(shopData?['province']) ??
           readString(json['province']) ??
           readString(json['shopProvince']),
     );

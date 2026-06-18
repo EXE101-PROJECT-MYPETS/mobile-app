@@ -731,9 +731,8 @@ class _MarketplaceProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = product.imageUrls?.isNotEmpty == true
-        ? product.imageUrls!.first
-        : null;
+    final imageUrl =
+        product.imageUrls?.isNotEmpty == true ? product.imageUrls!.first : null;
 
     final displayName = product.name?.trim().isNotEmpty == true
         ? product.name!.trim()
@@ -743,9 +742,8 @@ class _MarketplaceProductCard extends StatelessWidget {
         ? product.categoryName!.trim()
         : null;
 
-    final unitLabel = product.unit?.trim().isNotEmpty == true
-        ? product.unit!.trim()
-        : null;
+    final unitLabel =
+        product.unit?.trim().isNotEmpty == true ? product.unit!.trim() : null;
 
     final ratingValue = product.rating ?? product.reviewAvg ?? 0;
     final reviewLabel =

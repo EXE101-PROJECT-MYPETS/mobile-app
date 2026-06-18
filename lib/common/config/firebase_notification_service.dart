@@ -30,11 +30,11 @@ class FirebaseNotificationService {
 
   static const AndroidNotificationChannel _androidChannel =
       AndroidNotificationChannel(
-        'pawly_channel_id',
-        'Pawly Thông báo',
-        description: 'Kênh thông báo của Pawly',
-        importance: Importance.max,
-      );
+    'pawly_channel_id',
+    'Pawly Thông báo',
+    description: 'Kênh thông báo của Pawly',
+    importance: Importance.max,
+  );
 
   void _handleNotificationPayload(String? payload) {
     if (payload == null || payload.isEmpty) return;
@@ -68,24 +68,33 @@ class FirebaseNotificationService {
       const AndroidInitializationSettings initializationSettingsAndroid =
           AndroidInitializationSettings('@mipmap/launcher_icon');
 
+      const DarwinInitializationSettings initializationSettingsDarwin =
+          DarwinInitializationSettings(
+        requestAlertPermission: false,
+        requestBadgePermission: false,
+        requestSoundPermission: false,
+      );
+
       const InitializationSettings initializationSettings =
-          InitializationSettings(android: initializationSettingsAndroid);
+          InitializationSettings(
+        android: initializationSettingsAndroid,
+        iOS: initializationSettingsDarwin,
+      );
 
       await flutterLocalNotificationsPlugin.initialize(
         initializationSettings,
         onDidReceiveNotificationResponse:
             (NotificationResponse notificationResponse) {
-              debugPrint(
-                'Notification clicked with payload: ${notificationResponse.payload}',
-              );
-              _handleNotificationPayload(notificationResponse.payload);
-            },
+          debugPrint(
+            'Notification clicked with payload: ${notificationResponse.payload}',
+          );
+          _handleNotificationPayload(notificationResponse.payload);
+        },
       );
 
-      final androidPlugin = flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin
-          >();
+      final androidPlugin =
+          flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>();
       await androidPlugin?.requestNotificationsPermission();
 
       await androidPlugin?.createNotificationChannel(_androidChannel);
@@ -111,8 +120,8 @@ class FirebaseNotificationService {
       );
 
       // Check if the app was opened from a terminated state via a notification
-      RemoteMessage? initialMessage = await FirebaseMessaging.instance
-          .getInitialMessage();
+      RemoteMessage? initialMessage =
+          await FirebaseMessaging.instance.getInitialMessage();
       if (initialMessage != null) {
         debugPrint(
           'App opened from terminated state via notification: ${initialMessage.messageId}',
@@ -154,14 +163,14 @@ class FirebaseNotificationService {
   Future<void> _showLocalNotification(RemoteMessage message) async {
     const AndroidNotificationDetails androidNotificationDetails =
         AndroidNotificationDetails(
-          'pawly_channel_id',
-          'Pawly Thông báo',
-          channelDescription: 'Kênh thông báo của Pawly',
-          importance: Importance.max,
-          priority: Priority.high,
-          icon: '@mipmap/launcher_icon',
-          ticker: 'ticker',
-        );
+      'pawly_channel_id',
+      'Pawly Thông báo',
+      channelDescription: 'Kênh thông báo của Pawly',
+      importance: Importance.max,
+      priority: Priority.high,
+      icon: '@mipmap/launcher_icon',
+      ticker: 'ticker',
+    );
     const NotificationDetails notificationDetails = NotificationDetails(
       android: androidNotificationDetails,
     );
