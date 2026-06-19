@@ -129,13 +129,14 @@ class _AddPetScreenState extends State<AddPetScreen> {
                                     File(_avatarFile!.path),
                                     fit: BoxFit.cover,
                                   )
-                                : (widget.pet?.avatarUrl != null &&
-                                        widget.pet!.avatarUrl!.isNotEmpty)
+                                : (currentAvatarUrl != null &&
+                                        currentAvatarUrl.isNotEmpty)
                                     ? Image.network(
-                                        widget.pet!.avatarUrl!,
+                                        currentAvatarUrl,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (_, __, ___) =>
-                                            const Icon(
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                const Icon(
                                           LucideIcons.camera,
                                           color: Colors.grey,
                                           size: 40,

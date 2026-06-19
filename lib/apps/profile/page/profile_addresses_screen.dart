@@ -196,7 +196,7 @@ class _ProfileAddressesScreenState extends State<ProfileAddressesScreen> {
                       )
                     : ListView.separated(
                         itemCount: addresses.length,
-                        separatorBuilder: (_, __) =>
+                        separatorBuilder: (context, index) =>
                             const Divider(height: 1, color: Color(0xFFE5E7EB)),
                         itemBuilder: (context, index) {
                           final address = addresses[index];
