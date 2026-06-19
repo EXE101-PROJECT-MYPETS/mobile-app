@@ -709,7 +709,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
               itemCount: products.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              separatorBuilder: (context, index) => const SizedBox(width: 12),
               itemBuilder: (context, index) {
                 final product = products[index];
                 return GestureDetector(
@@ -769,7 +769,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ? Image.network(
                             product.image,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) =>
+                            errorBuilder: (context, error, stackTrace) =>
                                 _buildShopProductImageFallback(),
                           )
                         : _buildShopProductImageFallback(),
@@ -1089,7 +1089,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: review.images.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 12),
+                separatorBuilder: (context, index) => const SizedBox(width: 12),
                 itemBuilder: (context, index) {
                   return ClipRRect(
                     borderRadius: BorderRadius.circular(14),

@@ -785,7 +785,7 @@ class _AddressRegionScreenState extends State<_AddressRegionScreen> {
 
                   return ListView.separated(
                     itemCount: units.length,
-                    separatorBuilder: (_, __) =>
+                    separatorBuilder: (context, index) =>
                         const Divider(height: 1, indent: 52),
                     itemBuilder: (context, index) {
                       final unit = units[index];

@@ -128,7 +128,8 @@ class _ChatDetailScreenState extends State<ChatDetailScreen>
                         width: 36,
                         height: 36,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Icon(
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(
                           Icons.store,
                           color: Colors.grey,
                           size: 20,
@@ -219,7 +220,8 @@ class _ChatDetailScreenState extends State<ChatDetailScreen>
                         width: 24,
                         height: 24,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Icon(
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(
                           Icons.store,
                           size: 12,
                           color: Colors.grey,
