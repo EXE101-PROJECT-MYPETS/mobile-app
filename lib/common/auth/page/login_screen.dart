@@ -299,8 +299,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   isPassword: true,
                                   textInputAction: TextInputAction.done,
                                   onFieldSubmitted: (_) {
-                                    final authProvider = context
-                                        .read<AuthProvider>();
+                                    final authProvider =
+                                        context.read<AuthProvider>();
                                     if (!authProvider.isLoading) {
                                       _submitLogin(authProvider);
                                     }
@@ -415,9 +415,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 height: 18,
                                                 child:
                                                     CircularProgressIndicator(
-                                                      color: Colors.white,
-                                                      strokeWidth: 2,
-                                                    ),
+                                                  color: Colors.white,
+                                                  strokeWidth: 2,
+                                                ),
                                               )
                                             : Text(
                                                 'Đăng nhập',
@@ -437,7 +437,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   builder: (context, authProvider, child) {
                                     final socialEnabled =
                                         !authProvider.isLoading &&
-                                        _socialLoginProvider == null;
+                                            _socialLoginProvider == null;
                                     final googleLoading =
                                         _socialLoginProvider == 'google';
                                     final facebookLoading =
@@ -466,8 +466,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                           isLoading: facebookLoading,
                                           onPressed: () =>
                                               _handleFacebookSignIn(
-                                                authProvider,
-                                              ),
+                                            authProvider,
+                                          ),
                                         ),
                                         const SizedBox(height: 8),
                                         _SocialButton(
@@ -551,7 +551,7 @@ class _LoginHero extends StatelessWidget {
             child: IconButton(
               onPressed: () => Navigator.maybePop(context),
               icon: const Icon(Icons.arrow_back_rounded),
-              color: Color(0xFFFF4F8B),
+              color: const Color(0xFFFF4F8B),
               iconSize: 32,
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints.tightFor(width: 48, height: 48),
@@ -821,13 +821,13 @@ class _SocialButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: enabled && !isLoading
             ? onPressed ??
-                  () {
-                    showAppToast(
-                      context,
-                      message: '$providerName chưa được cấu hình',
-                      type: AppToastType.info,
-                    );
-                  }
+                () {
+                  showAppToast(
+                    context,
+                    message: '$providerName chưa được cấu hình',
+                    type: AppToastType.info,
+                  );
+                }
             : null,
         style: OutlinedButton.styleFrom(
           foregroundColor: const Color(0xFF2F3744),

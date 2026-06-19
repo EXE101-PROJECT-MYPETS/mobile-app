@@ -18,9 +18,8 @@ class CommonBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cartItemCount = context.watch<AppState>().cartItems.length;
-    final unreadNotificationCount = context
-        .watch<NotificationProvider>()
-        .unreadCount;
+    final unreadNotificationCount =
+        context.watch<NotificationProvider>().unreadCount;
 
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,

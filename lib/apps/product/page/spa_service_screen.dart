@@ -981,6 +981,59 @@ class _MetricBadge extends StatelessWidget {
               fontWeight: FontWeight.w800,
               height: 1,
             ),
+            itemCount: daysInMonth + emptySlots,
+            itemBuilder: (context, index) {
+              if (index < emptySlots) {
+                return const SizedBox.shrink(); // Ô trống
+              }
+              int dayNumber = index - emptySlots + 1;
+              DateTime date = DateTime(
+                _currentMonth.year,
+                _currentMonth.month,
+                dayNumber,
+              );
+
+              bool isSelected = _selectedDate.year == date.year &&
+                  _selectedDate.month == date.month &&
+                  _selectedDate.day == date.day;
+
+              bool isToday = DateTime.now().year == date.year &&
+                  DateTime.now().month == date.month &&
+                  DateTime.now().day == date.day;
+
+              return Center(
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedDate = date;
+                    });
+                  },
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? const Color(0xFFE91E63)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(8),
+                      border: isToday && !isSelected
+                          ? Border.all(color: const Color(0xFFE91E63), width: 1)
+                          : null,
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      dayNumber.toString(),
+                      style: TextStyle(
+                        color: isSelected ? Colors.white : Colors.black87,
+                        fontWeight: isSelected || isToday
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -1110,14 +1163,54 @@ class _QuickBookingStateView extends StatelessWidget {
               color: const Color(0xFF111827),
             ),
           ),
-          const SizedBox(height: 6),
-          Text(
-            subtitle,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              color: const Color(0xFF64748B),
-              height: 1.35,
+          const SizedBox(width: 12),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Sunny Spa - CS1',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(
+                      LucideIcons.map_pin,
+                      size: 12,
+                      color: Colors.grey,
+                    ),
+                    SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        '123 Đường Cầu Giấy, Q. Cầu Giấy, Hà Nội',
+                        style: TextStyle(color: Colors.grey, fontSize: 11),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(
+                      LucideIcons.navigation,
+                      size: 12,
+                      color: Colors.pink,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      'Cách bạn 1.2 km',
+                      style: TextStyle(
+                        color: Colors.pink,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
           if (actionLabel != null && onAction != null) ...[

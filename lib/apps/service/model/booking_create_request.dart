@@ -27,9 +27,9 @@ class BookingCreateRequest {
     final absoluteOffset = offset.abs();
     final offsetHours = absoluteOffset.inHours.toString().padLeft(2, '0');
     final offsetMinutes = (absoluteOffset.inMinutes % 60).toString().padLeft(
-      2,
-      '0',
-    );
+          2,
+          '0',
+        );
 
     String twoDigits(int number) => number.toString().padLeft(2, '0');
 

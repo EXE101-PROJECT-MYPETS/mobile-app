@@ -206,9 +206,8 @@ class ServiceCard extends StatelessWidget {
   }
 
   String _buildLocationText(String? shopProvince) {
-    final province = shopProvince?.isNotEmpty == true
-        ? shopProvince!
-        : 'Thành phố Hà Nội';
+    final province =
+        shopProvince?.isNotEmpty == true ? shopProvince! : 'Thành phố Hà Nội';
     return province;
   }
 

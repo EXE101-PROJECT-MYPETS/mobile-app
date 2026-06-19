@@ -317,9 +317,8 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
             children: [
               CircleAvatar(
                 radius: 30,
-                backgroundImage: avatarUrl != null
-                    ? NetworkImage(avatarUrl)
-                    : null,
+                backgroundImage:
+                    avatarUrl != null ? NetworkImage(avatarUrl) : null,
                 child: avatarUrl == null
                     ? const Icon(LucideIcons.dog, size: 30)
                     : null,

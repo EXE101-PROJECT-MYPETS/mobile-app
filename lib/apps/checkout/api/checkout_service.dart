@@ -39,9 +39,8 @@ class CheckoutService {
           )
           .toList(),
       if (request.serviceBookings.isNotEmpty)
-        'serviceBookings': request.serviceBookings
-            .map((item) => item.toJson())
-            .toList(),
+        'serviceBookings':
+            request.serviceBookings.map((item) => item.toJson()).toList(),
     };
 
     final response = await _client.post(uri, body: jsonEncode(payload));

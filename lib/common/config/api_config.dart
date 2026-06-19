@@ -10,9 +10,10 @@ class ApiConfig {
   static const String _androidEmulatorBaseUrl = 'http://10.0.2.2:8080/api';
   static const String _iosSimulatorBaseUrl = 'http://localhost:8080/api';
   static const List<String> _physicalDeviceBaseUrls = [
-    'http://192.168.1.11:8080/api',
-    'http://192.168.165.224:8080/api',
-    'http://192.168.165.224:8080/api',
+    'https://ygveh-123-16-54-27.free.pinggy.net/api',
+    'http://192.168.16.113:8080/api',
+    'http://192.168.16.103:8080/api',
+    'http://192.168.16.102:8080/api',
   ];
 
   static String _baseUrl = const String.fromEnvironment(
@@ -21,7 +22,7 @@ class ApiConfig {
   );
 
   static Future<void> initialize() async {
-    final configuredBaseUrl = const String.fromEnvironment(
+    const configuredBaseUrl = String.fromEnvironment(
       'API_BASE_URL',
       defaultValue: _deployedBaseUrl,
     );
@@ -59,9 +60,15 @@ class ApiConfig {
   static String get baseUrl => _baseUrl;
 
   static Future<String> _resolvePhysicalDeviceBaseUrl() async {
-    for (final candidateBaseUrl in _physicalDeviceBaseUrls) {
-      if (await _isReachable(candidateBaseUrl)) {
-        return candidateBaseUrl;
+    final results = await Future.wait(
+      _physicalDeviceBaseUrls.map((url) async {
+        final reachable = await _isReachable(url);
+        return MapEntry(url, reachable);
+      }),
+    );
+    for (final entry in results) {
+      if (entry.value) {
+        return entry.key;
       }
     }
 
@@ -72,9 +79,8 @@ class ApiConfig {
     final uri = Uri.parse('$baseUrl/public/products/mobile?size=1');
     final client = http.Client();
     try {
-      final response = await client
-          .get(uri)
-          .timeout(const Duration(seconds: 3));
+      final response =
+          await client.get(uri).timeout(const Duration(seconds: 3));
       return response.statusCode >= 200 && response.statusCode < 500;
     } catch (_) {
       return false;

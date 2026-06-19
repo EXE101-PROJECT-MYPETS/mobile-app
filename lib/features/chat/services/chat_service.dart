@@ -33,13 +33,13 @@ class ChatService {
     int guard = 0;
 
     while (hasNext && guard < 100) {
-      final uri = Uri.parse('${ApiConfig.chatUrl}/$conversationId/messages')
-          .replace(
-            queryParameters: {
-              'size': '50',
-              if (cursor != null) 'cursor': cursor.toString(),
-            },
-          );
+      final uri =
+          Uri.parse('${ApiConfig.chatUrl}/$conversationId/messages').replace(
+        queryParameters: {
+          'size': '50',
+          if (cursor != null) 'cursor': cursor.toString(),
+        },
+      );
       final response = await _client.get(uri);
 
       if (response.statusCode != 200) {

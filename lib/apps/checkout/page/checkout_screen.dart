@@ -321,21 +321,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
 
     final address = _selectedAddress ?? appState.defaultAddress;
-    final userAddressId = hasProducts && address != null
-        ? int.tryParse(address.id)
-        : null;
+    final userAddressId =
+        hasProducts && address != null ? int.tryParse(address.id) : null;
     if (hasProducts && (userAddressId == null || userAddressId <= 0)) {
       _showMessage('Địa chỉ giao hàng chưa hợp lệ. Vui lòng chọn lại địa chỉ.');
       return;
     }
 
-    final shippingAddressText = address != null
-        ? _buildShippingAddressText(address, user)
-        : '';
+    final shippingAddressText =
+        address != null ? _buildShippingAddressText(address, user) : '';
     final shippingFeeValue = hasProducts ? (_shippingFee ?? 0).round() : 0;
-    final pickupFeeValue = hasServices && _transportOption == 1
-        ? _pickupFeeValue
-        : 0;
+    final pickupFeeValue =
+        hasServices && _transportOption == 1 ? _pickupFeeValue : 0;
 
     final selectedShopId = items.first.shopId;
     if (selectedShopId <= 0) {
@@ -372,19 +369,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     final serviceBookings = hasServices
         ? items
-              .where((item) => item.isService)
-              .map(
-                (item) => CheckoutServiceBookingRequest(
-                  serviceId: item.serviceId ?? int.tryParse(item.id) ?? 0,
-                  petId: _selectedPetId!,
-                  bookingDate: bookingDateTime!,
-                  bookingTime: bookingDateTime,
-                  note: _noteController.text.trim().isEmpty
-                      ? null
-                      : _noteController.text.trim(),
-                ),
-              )
-              .toList()
+            .where((item) => item.isService)
+            .map(
+              (item) => CheckoutServiceBookingRequest(
+                serviceId: item.serviceId ?? int.tryParse(item.id) ?? 0,
+                petId: _selectedPetId!,
+                bookingDate: bookingDateTime!,
+                bookingTime: bookingDateTime,
+                note: _noteController.text.trim().isEmpty
+                    ? null
+                    : _noteController.text.trim(),
+              ),
+            )
+            .toList()
         : <CheckoutServiceBookingRequest>[];
 
     if (hasServices &&
@@ -451,9 +448,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final hasServices = items.any((item) => item.isService);
     final address = _selectedAddress ?? state.defaultAddress;
     final shippingFee = (_shippingFee ?? 0).round();
-    final pickupFee = hasServices && _transportOption == 1
-        ? _pickupFeeValue
-        : 0;
+    final pickupFee =
+        hasServices && _transportOption == 1 ? _pickupFeeValue : 0;
     final subtotalAmount = _subtotalAmount(state);
     final totalAmount = subtotalAmount + shippingFee + pickupFee - 0;
 
@@ -560,8 +556,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                     width: double.infinity,
                                     child: OutlinedButton.icon(
                                       onPressed: () async {
-                                        final appState = context
-                                            .read<AppState>();
+                                        final appState =
+                                            context.read<AppState>();
                                         final result = await Navigator.push(
                                           context,
                                           MaterialPageRoute(
@@ -803,9 +799,9 @@ class _AddressCheckoutBlock extends StatelessWidget {
                     Text(
                       hasAddress
                           ? [addressName?.trim(), phone?.trim()]
-                                .whereType<String>()
-                                .where((v) => v.isNotEmpty)
-                                .join('  ')
+                              .whereType<String>()
+                              .where((v) => v.isNotEmpty)
+                              .join('  ')
                           : 'Chọn địa chỉ nhận hàng',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -1053,8 +1049,8 @@ class _ShippingMethodBlock extends StatelessWidget {
                         isLoading
                             ? 'Đang tính...'
                             : error != null
-                            ? 'Chưa có phí'
-                            : PriceFormatter.formatVnd(fee),
+                                ? 'Chưa có phí'
+                                : PriceFormatter.formatVnd(fee),
                         style: GoogleFonts.inter(
                           color: error != null
                               ? const Color(0xFFDC2626)
@@ -1536,8 +1532,7 @@ class _SummaryRow extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style:
-                  labelStyle ??
+              style: labelStyle ??
                   GoogleFonts.inter(
                     fontSize: 13,
                     color: const Color(0xFF64748B),
@@ -1548,8 +1543,7 @@ class _SummaryRow extends StatelessWidget {
           Text(
             value,
             textAlign: TextAlign.right,
-            style:
-                valueStyle ??
+            style: valueStyle ??
                 GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,

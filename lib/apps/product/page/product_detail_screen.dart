@@ -61,9 +61,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ? await _productService.getShopDetail(detail.shopId!)
         : null;
 
-    final relatedProducts = related
-        .map((dto) => ProductModel.fromDTO(dto))
-        .toList();
+    final relatedProducts =
+        related.map((dto) => ProductModel.fromDTO(dto)).toList();
 
     return ProductDetailPageData(
       detail: detail,
@@ -428,8 +427,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Widget _buildPriceSection(ProductPublicDetailDTO detail) {
-    final hasDiscount =
-        detail.originalPrice != null &&
+    final hasDiscount = detail.originalPrice != null &&
         (detail.originalPrice ?? 0) > (detail.price ?? 0);
     return Row(
       children: [
@@ -711,7 +709,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
               itemCount: products.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 12),
+              separatorBuilder: (_, __) => const SizedBox(width: 12),
               itemBuilder: (context, index) {
                 final product = products[index];
                 return GestureDetector(
@@ -771,7 +769,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ? Image.network(
                             product.image,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) =>
+                            errorBuilder: (_, __, ___) =>
                                 _buildShopProductImageFallback(),
                           )
                         : _buildShopProductImageFallback(),
@@ -1091,7 +1089,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: review.images.length,
-                separatorBuilder: (_, _) => const SizedBox(width: 12),
+                separatorBuilder: (_, __) => const SizedBox(width: 12),
                 itemBuilder: (context, index) {
                   return ClipRRect(
                     borderRadius: BorderRadius.circular(14),

@@ -243,9 +243,8 @@ class AppState extends ChangeNotifier {
       );
 
       // Convert DTOs to ProductModels
-      _allProducts = response.content
-          .map((dto) => ProductModel.fromDTO(dto))
-          .toList();
+      _allProducts =
+          response.content.map((dto) => ProductModel.fromDTO(dto)).toList();
       _productCursor = response.nextCursor;
       _hasMoreProducts = response.hasNext;
       _productsError = null;
@@ -278,9 +277,8 @@ class AppState extends ChangeNotifier {
         size: size,
       );
 
-      final newProducts = response.content
-          .map((dto) => ProductModel.fromDTO(dto))
-          .toList();
+      final newProducts =
+          response.content.map((dto) => ProductModel.fromDTO(dto)).toList();
 
       if (newProducts.isNotEmpty) {
         _allProducts.addAll(newProducts);

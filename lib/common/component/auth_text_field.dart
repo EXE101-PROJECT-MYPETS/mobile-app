@@ -104,12 +104,12 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     ),
                   )
                 : widget.suffixIcon != null
-                ? Icon(
-                    widget.suffixIcon,
-                    color: const Color(0xFF929AA5),
-                    size: 18,
-                  )
-                : null,
+                    ? Icon(
+                        widget.suffixIcon,
+                        color: const Color(0xFF929AA5),
+                        size: 18,
+                      )
+                    : null,
             filled: true,
             fillColor: Colors.white,
             contentPadding: const EdgeInsets.symmetric(

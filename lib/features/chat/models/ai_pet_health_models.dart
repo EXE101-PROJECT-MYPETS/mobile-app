@@ -133,8 +133,8 @@ class AiAction {
       arguments: argumentsRaw is Map<String, dynamic> ? argumentsRaw : const {},
       missingFields: missingFieldsRaw is List
           ? missingFieldsRaw
-                .map((item) => item.toString())
-                .toList(growable: false)
+              .map((item) => item.toString())
+              .toList(growable: false)
           : const [],
     );
   }

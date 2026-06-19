@@ -164,9 +164,9 @@ class _ProfileAddressesScreenState extends State<ProfileAddressesScreen> {
               icon: LucideIcons.circle_alert,
               title: 'Không thể tải địa chỉ',
               message: snapshot.error.toString().replaceFirst(
-                'Exception: ',
-                '',
-              ),
+                    'Exception: ',
+                    '',
+                  ),
               actionLabel: 'Thử lại',
               onAction: _reloadAddresses,
             );
@@ -196,7 +196,7 @@ class _ProfileAddressesScreenState extends State<ProfileAddressesScreen> {
                       )
                     : ListView.separated(
                         itemCount: addresses.length,
-                        separatorBuilder: (_, _) =>
+                        separatorBuilder: (_, __) =>
                             const Divider(height: 1, color: Color(0xFFE5E7EB)),
                         itemBuilder: (context, index) {
                           final address = addresses[index];

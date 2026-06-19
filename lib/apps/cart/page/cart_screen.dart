@@ -18,12 +18,10 @@ class CartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = context.watch<AppState>();
     final selectedItems = state.selectedCartItems;
-    final productItems = state.cartItems
-        .where((item) => !item.isService)
-        .toList();
-    final serviceItems = state.cartItems
-        .where((item) => item.isService)
-        .toList();
+    final productItems =
+        state.cartItems.where((item) => !item.isService).toList();
+    final serviceItems =
+        state.cartItems.where((item) => item.isService).toList();
     final currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
 
     return Scaffold(
@@ -121,9 +119,8 @@ class CartScreen extends StatelessWidget {
                   return;
                 }
 
-                final shopIds = selectedItems
-                    .map((item) => item.shopId)
-                    .toSet();
+                final shopIds =
+                    selectedItems.map((item) => item.shopId).toSet();
                 if (shopIds.length > 1) {
                   showAppToast(
                     context,

@@ -132,12 +132,12 @@ class _ChatListScreenState extends State<ChatListScreen>
                     style: TextStyle(
                       color:
                           _isShopMessage(conversation.lastMessage?.senderType)
-                          ? Colors.black87
-                          : Colors.black54,
+                              ? Colors.black87
+                              : Colors.black54,
                       fontWeight:
                           _isShopMessage(conversation.lastMessage?.senderType)
-                          ? FontWeight.w500
-                          : FontWeight.normal,
+                              ? FontWeight.w500
+                              : FontWeight.normal,
                     ),
                   ),
                 ),

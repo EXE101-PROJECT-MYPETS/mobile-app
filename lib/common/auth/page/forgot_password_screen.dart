@@ -251,8 +251,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               _step == 1
                   ? 'Nhập email để nhận mã OTP khôi phục mật khẩu.'
                   : _step == 2
-                  ? 'Nhập mã OTP được gửi đến email của bạn'
-                  : 'Tạo mật khẩu mới cho tài khoản của bạn',
+                      ? 'Nhập mã OTP được gửi đến email của bạn'
+                      : 'Tạo mật khẩu mới cho tài khoản của bạn',
               style: const TextStyle(
                 color: Color(0xFF64748B),
                 fontWeight: FontWeight.w500,

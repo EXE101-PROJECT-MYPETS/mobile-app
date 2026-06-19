@@ -26,9 +26,8 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final trimmedCategory = product.category.trim();
     final categoryLabel = trimmedCategory.isNotEmpty ? trimmedCategory : null;
-    final categoryBadgeStyle = categoryLabel != null
-        ? resolveCategoryBadgeStyle(categoryLabel)
-        : null;
+    final categoryBadgeStyle =
+        categoryLabel != null ? resolveCategoryBadgeStyle(categoryLabel) : null;
 
     return GestureDetector(
       onTap: () {

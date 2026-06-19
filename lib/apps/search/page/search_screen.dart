@@ -147,9 +147,8 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Future<void> _loadInitial({bool resetRecommendedSize = true}) async {
     final location = _currentLocation();
-    final requestedSize = resetRecommendedSize
-        ? _recommendedPageStep
-        : _recommendedSize;
+    final requestedSize =
+        resetRecommendedSize ? _recommendedPageStep : _recommendedSize;
     setState(() {
       if (resetRecommendedSize) {
         _recommendedSize = _recommendedPageStep;
@@ -209,7 +208,7 @@ class _SearchScreenState extends State<SearchScreen> {
         _recommendedSize = nextSize;
         _recommendedHasMore =
             response.recommendedItems.length > previousCount &&
-            response.recommendedItems.length >= nextSize;
+                response.recommendedItems.length >= nextSize;
       });
     } catch (_) {
       if (!mounted) return;
@@ -426,8 +425,8 @@ class _SearchScreenState extends State<SearchScreen> {
     final nextValue = value == 'PRICE' && _sort == 'PRICE_ASC'
         ? 'PRICE_DESC'
         : value == 'PRICE'
-        ? 'PRICE_ASC'
-        : value;
+            ? 'PRICE_ASC'
+            : value;
     if (_sort == nextValue) return;
     setState(() => _sort = nextValue);
     if (_activeKeyword.isNotEmpty) {
@@ -439,25 +438,22 @@ class _SearchScreenState extends State<SearchScreen> {
     final token = context.read<AuthProvider>().token;
     if (token == null || token.isEmpty) return;
 
-    _searchService
-        .saveHistory(keyword)
-        .then((_) {
-          if (!mounted) return;
-          final recent = [
-            keyword,
-            ..._initial.recentKeywords.where(
-              (item) => item.toLowerCase() != keyword.toLowerCase(),
-            ),
-          ].take(10).toList(growable: false);
-          setState(() {
-            _initial = SearchInitialResponse(
-              recentKeywords: recent,
-              suggestedKeywords: _initial.suggestedKeywords,
-              recommendedItems: _initial.recommendedItems,
-            );
-          });
-        })
-        .catchError((_) {});
+    _searchService.saveHistory(keyword).then((_) {
+      if (!mounted) return;
+      final recent = [
+        keyword,
+        ..._initial.recentKeywords.where(
+          (item) => item.toLowerCase() != keyword.toLowerCase(),
+        ),
+      ].take(10).toList(growable: false);
+      setState(() {
+        _initial = SearchInitialResponse(
+          recentKeywords: recent,
+          suggestedKeywords: _initial.suggestedKeywords,
+          recommendedItems: _initial.recommendedItems,
+        );
+      });
+    }).catchError((_) {});
   }
 
   Future<void> _deleteHistory({String? keyword}) async {
@@ -466,8 +462,8 @@ class _SearchScreenState extends State<SearchScreen> {
     final nextRecent = keyword == null
         ? <String>[]
         : _initial.recentKeywords
-              .where((item) => item.toLowerCase() != keyword.toLowerCase())
-              .toList(growable: false);
+            .where((item) => item.toLowerCase() != keyword.toLowerCase())
+            .toList(growable: false);
 
     setState(() {
       _initial = SearchInitialResponse(
@@ -869,8 +865,8 @@ class _SearchHeader extends StatelessWidget {
                   backgroundColor: _shopeeOrange,
                   foregroundColor: Colors.white,
                   padding: EdgeInsets.zero,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: const BorderRadius.only(
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
                       topRight: Radius.circular(8),
                       bottomRight: Radius.circular(8),
                     ),
@@ -955,7 +951,7 @@ class _SectionTitle extends StatelessWidget {
               ),
             ),
           ),
-          ?trailing,
+          if (trailing != null) trailing!,
         ],
       ),
     );
@@ -1088,8 +1084,8 @@ class _FilterBar extends StatelessWidget {
     final priceLabel = sort == 'PRICE_DESC'
         ? 'Giá ↓'
         : sort == 'PRICE_ASC'
-        ? 'Giá ↑'
-        : 'Giá ↕';
+            ? 'Giá ↑'
+            : 'Giá ↕';
 
     return Column(
       children: [
@@ -1438,8 +1434,8 @@ class _SearchItemRatingMeta extends StatelessWidget {
     final countLabel = count == null
         ? null
         : item.isService
-        ? 'đã dùng $count'
-        : 'đã bán $count';
+            ? 'đã dùng $count'
+            : 'đã bán $count';
 
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 92),

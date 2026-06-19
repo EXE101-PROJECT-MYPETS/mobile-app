@@ -289,7 +289,6 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               ),
             ),
           ),
-
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(
@@ -770,9 +769,9 @@ class _AddressRegionScreenState extends State<_AddressRegionScreen> {
                         padding: const EdgeInsets.all(24),
                         child: Text(
                           snapshot.error.toString().replaceFirst(
-                            'Exception: ',
-                            '',
-                          ),
+                                'Exception: ',
+                                '',
+                              ),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -786,7 +785,7 @@ class _AddressRegionScreenState extends State<_AddressRegionScreen> {
 
                   return ListView.separated(
                     itemCount: units.length,
-                    separatorBuilder: (_, _) =>
+                    separatorBuilder: (_, __) =>
                         const Divider(height: 1, indent: 52),
                     itemBuilder: (context, index) {
                       final unit = units[index];

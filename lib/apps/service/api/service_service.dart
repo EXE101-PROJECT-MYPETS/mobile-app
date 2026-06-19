@@ -18,7 +18,7 @@ class ServicePublicService {
   final http.Client _client;
 
   ServicePublicService({http.Client? client})
-    : _client = client ?? http.Client();
+      : _client = client ?? http.Client();
 
   Future<ServiceDetailDTO> getDetail(int id) async {
     final uri = Uri.parse(ApiConfig.serviceDetailUrl(id));
@@ -256,7 +256,7 @@ class ServicePublicService {
 
 class ServiceBookingService {
   ServiceBookingService({ApiClient? client})
-    : _client = client ?? ApiClient.instance;
+      : _client = client ?? ApiClient.instance;
 
   final ApiClient _client;
 
