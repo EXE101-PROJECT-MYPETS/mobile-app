@@ -1,6 +1,7 @@
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:pawly_mobile/common/utils/image_url_util.dart';
 
 class ApiConfig {
   static const Duration requestTimeout = Duration(seconds: 15);
@@ -140,14 +141,6 @@ class ApiConfig {
   }
 
   static String formatImageUrl(String? url) {
-    if (url == null || url.isEmpty) return '';
-    if (url.startsWith('http://') || url.startsWith('https://')) return url;
-
-    // Remove /api from baseUrl since images are usually hosted at /uploads directly
-    final base = baseUrl.replaceAll('/api', '');
-    if (url.startsWith('/')) {
-      return '$base$url';
-    }
-    return '$base/$url';
+    return ImageUrlUtil.buildPublicUrl(url) ?? '';
   }
 }

@@ -1,3 +1,5 @@
+import 'package:pawly_mobile/common/utils/image_url_util.dart';
+
 class PetDTO {
   final int? id;
   final int? userId;
@@ -36,6 +38,8 @@ class PetDTO {
   });
 
   factory PetDTO.fromJson(Map<String, dynamic> json) {
+    final avatarUrl = json['avatarUrl'];
+
     return PetDTO(
       id: json['id'] as int?,
       userId: json['userId'] as int?,
@@ -45,7 +49,7 @@ class PetDTO {
       speciesName: _parseSpeciesName(json),
       breedId: json['breedId'] as int?,
       breedText: json['breedText'] as String?,
-      avatarUrl: json['avatarUrl'] as String?,
+      avatarUrl: ImageUrlUtil.buildPublicUrl(avatarUrl?.toString()),
       name: json['name'] as String? ?? 'Unknown',
       gender: json['gender'] as String?,
       dob: json['dob'] != null ? DateTime.parse(json['dob'] as String) : null,

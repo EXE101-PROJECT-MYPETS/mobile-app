@@ -1,3 +1,5 @@
+import 'package:pawly_mobile/common/utils/image_url_util.dart';
+
 class SearchInitialResponse {
   const SearchInitialResponse({
     required this.recentKeywords,
@@ -103,7 +105,7 @@ class SearchItem {
       id: _toInt(json['id']) ?? 0,
       type: (json['type'] as String? ?? '').toUpperCase(),
       name: (json['name'] as String? ?? '').trim(),
-      image: (json['image'] as String?)?.trim(),
+      image: ImageUrlUtil.buildPublicUrl((json['image'] as String?)?.trim()),
       price: json['price'] as num?,
       originalPrice: json['originalPrice'] as num?,
       shopId: _toInt(json['shopId']),

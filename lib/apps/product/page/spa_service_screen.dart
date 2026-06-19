@@ -96,9 +96,9 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
         child: _buildQuickBookingBody(),
       ),
       bottomNavigationBar: CommonBottomNavBar(
-        currentIndex: 2,
+        currentIndex: 0,
         onTap: (index) =>
-            MainTabNavigation.open(context, index, currentIndex: 2),
+            MainTabNavigation.open(context, index, currentIndex: -1),
       ),
     );
   }
@@ -310,8 +310,6 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
           isLoadingServices: _isLoadingServices,
           onSelect: _loadServicesForShop,
         ),
-        const SizedBox(height: 18),
-        if (_selectedShop != null) _SelectedShopSummary(shop: _selectedShop!),
         const SizedBox(height: 18),
         if (_isLoadingServices && _shopServices.isEmpty)
           const _ServiceLoadingPanel()
@@ -557,7 +555,7 @@ class _NearbyShopStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 146,
+      height: 164,
       child: ScrollConfiguration(
         behavior: ScrollConfiguration.of(context).copyWith(
           dragDevices: {
@@ -602,6 +600,12 @@ class _NearbyShopCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final openingHours = shop.openingHours?.trim();
+    final closingHours = shop.closingHours?.trim();
+    final hasHours =
+        (openingHours?.isNotEmpty ?? false) ||
+        (closingHours?.isNotEmpty ?? false);
+
     return SizedBox(
       width: 286,
       child: Material(
@@ -689,6 +693,39 @@ class _NearbyShopCard extends StatelessWidget {
                     ),
                   ],
                 ),
+                const SizedBox(height: 9),
+                SizedBox(
+                  height: 17,
+                  child: Visibility(
+                    visible: isSelected && hasHours,
+                    maintainSize: true,
+                    maintainAnimation: true,
+                    maintainState: true,
+                    child: Row(
+                      children: [
+                        const Icon(
+                          LucideIcons.clock,
+                          size: 13,
+                          color: Color(0xFF475569),
+                        ),
+                        const SizedBox(width: 5),
+                        Expanded(
+                          child: Text(
+                            'Giờ mở cửa: ${openingHours ?? '--:--'} - ${closingHours ?? '--:--'}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.inter(
+                              color: const Color(0xFF475569),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              height: 1.1,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 const Spacer(),
                 Wrap(
                   spacing: 8,
@@ -720,78 +757,6 @@ class _NearbyShopCard extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _SelectedShopSummary extends StatelessWidget {
-  const _SelectedShopSummary({required this.shop});
-
-  final NearbyShopDTO shop;
-
-  @override
-  Widget build(BuildContext context) {
-    final openingHours = shop.openingHours?.trim();
-    final closingHours = shop.closingHours?.trim();
-    final hasHours =
-        (openingHours?.isNotEmpty ?? false) ||
-        (closingHours?.isNotEmpty ?? false);
-
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Icon(LucideIcons.store, color: Color(0xFFFF4F8B), size: 20),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  shop.name ?? 'Shop đã chọn',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                    color: const Color(0xFF111827),
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  shop.address ?? 'Địa chỉ đang cập nhật',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    height: 1.3,
-                    color: const Color(0xFF64748B),
-                  ),
-                ),
-                if (hasHours) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    'Giờ mở cửa: ${openingHours ?? '--:--'} - ${closingHours ?? '--:--'}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      color: const Color(0xFF475569),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

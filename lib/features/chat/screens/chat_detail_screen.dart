@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pawly_mobile/common/utils/image_url_util.dart';
 import 'package:provider/provider.dart';
 import '../providers/chat_provider.dart';
 import '../models/message_model.dart';
@@ -30,15 +31,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen>
   int _lastRenderedMessageCount = 0;
 
   String? get _safeShopAvatarUrl {
-    final raw = widget.shopAvatarUrl?.trim();
-    if (raw == null || raw.isEmpty) return null;
-    final lower = raw.toLowerCase();
-    if (lower.startsWith('/uploads/') ||
-        lower.startsWith('uploads/') ||
-        lower.contains(':8080/uploads/')) {
-      return null;
-    }
-    return raw;
+    return ImageUrlUtil.buildPublicUrl(widget.shopAvatarUrl);
   }
 
   bool _isCurrentUserMessage(String senderType) {

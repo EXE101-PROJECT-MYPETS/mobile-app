@@ -10,6 +10,7 @@ import 'package:pawly_mobile/common/component/service_card.dart';
 import 'package:pawly_mobile/common/user/dto/product_dto.dart';
 import 'package:pawly_mobile/common/user/dto/service_public_dto.dart';
 import 'package:pawly_mobile/common/utils/category_badge_style.dart';
+import 'package:pawly_mobile/common/utils/image_url_util.dart';
 import 'package:pawly_mobile/common/utils/price_formatter.dart';
 import 'package:pawly_mobile/features/chat/screens/chat_detail_screen.dart';
 
@@ -47,7 +48,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
   }
 
   String get _effectiveShopAvatarUrl {
-    final value = widget.shopAvatarUrl?.trim();
+    final value = ImageUrlUtil.buildPublicUrl(widget.shopAvatarUrl);
     if (value != null && value.isNotEmpty) {
       return value;
     }

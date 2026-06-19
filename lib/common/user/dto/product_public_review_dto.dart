@@ -1,3 +1,5 @@
+import 'package:pawly_mobile/common/utils/image_url_util.dart';
+
 class ProductPublicReviewDTO {
   final int? id;
   final int? productId;
@@ -37,7 +39,9 @@ class ProductPublicReviewDTO {
           (json['rating'] as num?)?.toDouble() ??
           (json['star'] as num?)?.toDouble(),
       comment: json['comment'] as String? ?? json['content'] as String?,
-      images: images is List ? images.whereType<String>().toList() : <String>[],
+      images: images is List
+          ? ImageUrlUtil.buildPublicUrls(images.whereType<String>())
+          : <String>[],
       variant: json['variant'] as String?,
       createdAt: json['createdAt'] as String? ?? json['date'] as String?,
       likeCount:

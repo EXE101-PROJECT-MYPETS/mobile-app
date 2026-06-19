@@ -1,3 +1,5 @@
+import 'package:pawly_mobile/common/utils/image_url_util.dart';
+
 import 'message_model.dart';
 
 class ConversationModel {
@@ -25,7 +27,9 @@ class ConversationModel {
       shopId: json['shopId'].toString(),
       customerId: json['customerId'].toString(),
       shopName: json['shopName'] ?? 'Shop ${json['shopId']}',
-      shopAvatarUrl: json['shopAvatarUrl'],
+      shopAvatarUrl: ImageUrlUtil.buildPublicUrl(
+        json['shopAvatarUrl']?.toString(),
+      ),
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
           : DateTime.now(),
