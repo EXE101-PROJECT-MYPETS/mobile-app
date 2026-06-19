@@ -62,15 +62,15 @@ class _ProductListScreenState extends State<ProductListScreen> {
     var products = _selectedCategoryIndex == 0
         ? allProducts
         : allProducts
-              .where(
-                (p) =>
-                    p.category == _categories[_selectedCategoryIndex] ||
-                    (p.type == 'spa' &&
-                        _categories[_selectedCategoryIndex] == 'Spa') ||
-                    (p.type == 'thu_y' &&
-                        _categories[_selectedCategoryIndex] == 'Thú y'),
-              )
-              .toList();
+            .where(
+              (p) =>
+                  p.category == _categories[_selectedCategoryIndex] ||
+                  (p.type == 'spa' &&
+                      _categories[_selectedCategoryIndex] == 'Spa') ||
+                  (p.type == 'thu_y' &&
+                      _categories[_selectedCategoryIndex] == 'Thú y'),
+            )
+            .toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF5F7), // Nền hồng nhạt rất nhẹ

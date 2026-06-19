@@ -14,7 +14,8 @@ void main() async {
   await Hive.initFlutter();
   await Hive.openBox('auth_box');
   await ApiConfig.initialize();
-  await FirebaseNotificationService().init();
+  // Khởi chạy dịch vụ thông báo ở chế độ chạy ngầm (asynchronous) để tránh chặn luồng khởi động của app gây lỗi màn hình trắng
+  FirebaseNotificationService().init();
 
   runApp(
     MultiProvider(
@@ -29,6 +30,13 @@ void main() async {
             final currentUserId = auth.currentUser?.id;
             if (appState.currentUserId != currentUserId) {
               appState.loadUserCart(currentUserId);
+              appState.loadProducts();
+              appState.loadServices();
+              appState.loadVeterinaryServices();
+              appState.loadCurrentUserAddresses(auth.token);
+              if (currentUserId != null) {
+                appState.loadMyPets();
+              }
             }
             return appState;
           },

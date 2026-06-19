@@ -204,8 +204,7 @@ class ServiceDetailReviewUserDTO {
   factory ServiceDetailReviewUserDTO.fromJson(Map<String, dynamic> json) {
     return ServiceDetailReviewUserDTO(
       id: ServiceDetailDTO._asInt(json['id']),
-      fullName:
-          ServiceDetailDTO._asString(json['fullName']) ??
+      fullName: ServiceDetailDTO._asString(json['fullName']) ??
           ServiceDetailDTO._asString(json['name']),
       email: ServiceDetailDTO._asString(json['email']),
       avatarUrl: ImageUrlUtil.buildPublicUrl(

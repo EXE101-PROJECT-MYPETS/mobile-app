@@ -11,7 +11,7 @@ class ProductModel {
   final String image;
   final String type; // 'spa', 'thu_y', 'product'
   final String
-  category; // 'Chó', 'Mèo', 'Spa', 'Thú y', 'Cát vệ sinh', 'Sữa tắm', v.v.
+      category; // 'Chó', 'Mèo', 'Spa', 'Thú y', 'Cát vệ sinh', 'Sữa tắm', v.v.
   final String description;
   final double? weightKg;
   final String shopProvince;

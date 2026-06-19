@@ -997,11 +997,10 @@ class _AddressSelectionSheetState extends State<_AddressSelectionSheet> {
                   final visibleUnits = _query.isEmpty
                       ? units
                       : units
-                            .where(
-                              (unit) =>
-                                  unit.name.toLowerCase().contains(_query),
-                            )
-                            .toList();
+                          .where(
+                            (unit) => unit.name.toLowerCase().contains(_query),
+                          )
+                          .toList();
 
                   if (visibleUnits.isEmpty) {
                     return const _AddressSheetMessage(
@@ -1013,7 +1012,7 @@ class _AddressSelectionSheetState extends State<_AddressSelectionSheet> {
                   return ListView.separated(
                     padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
                     itemCount: visibleUnits.length,
-                    separatorBuilder: (_, _) =>
+                    separatorBuilder: (_, __) =>
                         const Divider(height: 1, color: Color(0xFFF1F4F8)),
                     itemBuilder: (context, index) {
                       final unit = visibleUnits[index];

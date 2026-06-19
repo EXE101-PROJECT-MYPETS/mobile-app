@@ -6,7 +6,7 @@ import 'package:pawly_mobile/features/chat/models/ai_pet_health_models.dart';
 
 class AiPetHealthService {
   AiPetHealthService({ApiClient? client})
-    : _client = client ?? ApiClient.instance;
+      : _client = client ?? ApiClient.instance;
 
   final ApiClient _client;
 

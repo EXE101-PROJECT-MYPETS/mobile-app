@@ -135,7 +135,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen>
                         width: 36,
                         height: 36,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) => const Icon(
+                        errorBuilder: (_, __, ___) => const Icon(
                           Icons.store,
                           color: Colors.grey,
                           size: 20,
@@ -210,9 +210,8 @@ class _ChatDetailScreenState extends State<ChatDetailScreen>
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
-        mainAxisAlignment: isMe
-            ? MainAxisAlignment.end
-            : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isMe) ...[
@@ -227,7 +226,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen>
                         width: 24,
                         height: 24,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) => const Icon(
+                        errorBuilder: (_, __, ___) => const Icon(
                           Icons.store,
                           size: 12,
                           color: Colors.grey,

@@ -132,7 +132,7 @@ class AddressSelectionScreen extends StatelessWidget {
 
           // Add button
           Container(
-            padding: EdgeInsets.all(
+            padding: const EdgeInsets.all(
               16,
             ).copyWith(bottom: MediaQuery.of(context).padding.bottom + 16),
             color: Colors.white,

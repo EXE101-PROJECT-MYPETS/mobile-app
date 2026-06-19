@@ -127,21 +127,22 @@ class _AddPetScreenState extends State<AddPetScreen> {
                                     fit: BoxFit.cover,
                                   )
                                 : (widget.pet?.avatarUrl != null &&
-                                      widget.pet!.avatarUrl!.isNotEmpty)
-                                ? Image.network(
-                                    widget.pet!.avatarUrl!,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, _, _) => const Icon(
-                                      LucideIcons.camera,
-                                      color: Colors.grey,
-                                      size: 40,
-                                    ),
-                                  )
-                                : const Icon(
-                                    LucideIcons.camera,
-                                    color: Colors.grey,
-                                    size: 40,
-                                  ),
+                                        widget.pet!.avatarUrl!.isNotEmpty)
+                                    ? Image.network(
+                                        widget.pet!.avatarUrl!,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) =>
+                                            const Icon(
+                                          LucideIcons.camera,
+                                          color: Colors.grey,
+                                          size: 40,
+                                        ),
+                                      )
+                                    : const Icon(
+                                        LucideIcons.camera,
+                                        color: Colors.grey,
+                                        size: 40,
+                                      ),
                           ),
                         ),
                         Positioned(
@@ -183,16 +184,16 @@ class _AddPetScreenState extends State<AddPetScreen> {
                               'Loại',
                               _speciesList.map((e) => e.name).toList(),
                               _speciesList.any(
-                                    (e) => e.id.toString() == _speciesId,
-                                  )
+                                (e) => e.id.toString() == _speciesId,
+                              )
                                   ? _speciesList
-                                        .firstWhere(
-                                          (e) => e.id.toString() == _speciesId,
-                                        )
-                                        .name
+                                      .firstWhere(
+                                        (e) => e.id.toString() == _speciesId,
+                                      )
+                                      .name
                                   : (_speciesList.isNotEmpty
-                                        ? _speciesList.first.name
-                                        : ''),
+                                      ? _speciesList.first.name
+                                      : ''),
                               (v) {
                                 if (v != null) {
                                   setState(() {

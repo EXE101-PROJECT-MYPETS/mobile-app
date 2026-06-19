@@ -164,15 +164,15 @@ class _PetAiSelectionScreenState extends State<PetAiSelectionScreen> {
                 ),
                 const SizedBox(height: 18),
                 ...pets.asMap().entries.map(
-                  (entry) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: _PetChatCard(
-                      pet: entry.value,
-                      isOpening: _openingPetId == entry.value.id,
-                      onTap: () => _openChat(entry.value),
+                      (entry) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: _PetChatCard(
+                          pet: entry.value,
+                          isOpening: _openingPetId == entry.value.id,
+                          onTap: () => _openChat(entry.value),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
                 const SizedBox(height: 12),
                 const _SuggestionSection(),
               ],
@@ -432,9 +432,8 @@ class _SuggestionSection extends StatelessWidget {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: suggestions
-              .map((label) => _QuestionChip(label: label))
-              .toList(),
+          children:
+              suggestions.map((label) => _QuestionChip(label: label)).toList(),
         ),
       ],
     );

@@ -109,8 +109,7 @@ class ProductPublicDetailDTO {
       ),
       shopVerified:
           json['shopVerified'] as bool? ?? shopData?['verified'] as bool?,
-      shopRating:
-          (json['shopRating'] as num?)?.toDouble() ??
+      shopRating: (json['shopRating'] as num?)?.toDouble() ??
           (shopData?['rating'] as num?)?.toDouble(),
       shopProductCount:
           json['shopProductCount'] as int? ?? shopData?['productCount'] as int?,
@@ -118,11 +117,9 @@ class ProductPublicDetailDTO {
           getString(json['shopAddress']) ?? getString(shopData?['address']),
       shopContactName:
           getString(json['shopContactName']) ?? getString(shopContact?['name']),
-      shopContactPhone:
-          getString(json['shopContactPhone']) ??
+      shopContactPhone: getString(json['shopContactPhone']) ??
           getString(shopContact?['phone']),
-      shopContactEmail:
-          getString(json['shopContactEmail']) ??
+      shopContactEmail: getString(json['shopContactEmail']) ??
           getString(shopContact?['email']),
       name: getString(json['name']),
       sku: getString(json['sku']),

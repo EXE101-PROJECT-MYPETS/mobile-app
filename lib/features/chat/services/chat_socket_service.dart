@@ -167,9 +167,8 @@ class ChatSocketService {
   }
 
   void _processFrame(String frame) {
-    final normalizedFrame = frame
-        .replaceAll('\r\n', '\n')
-        .replaceAll('\r', '\n');
+    final normalizedFrame =
+        frame.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
     final lines = normalizedFrame.split('\n');
     if (lines.isEmpty) {
       return;
@@ -230,15 +229,12 @@ class ChatSocketService {
     final expectedConvDestination = activeConversationId != null
         ? '/topic/conversations/$activeConversationId/messages'
         : '';
-    final expectedShopDestination = activeShopId != null
-        ? '/topic/shops/$activeShopId/messages'
-        : '';
+    final expectedShopDestination =
+        activeShopId != null ? '/topic/shops/$activeShopId/messages' : '';
 
-    final matchesConv =
-        expectedConvDestination.isNotEmpty &&
+    final matchesConv = expectedConvDestination.isNotEmpty &&
         destination == expectedConvDestination;
-    final matchesShop =
-        expectedShopDestination.isNotEmpty &&
+    final matchesShop = expectedShopDestination.isNotEmpty &&
         destination == expectedShopDestination;
 
     if (!matchesConv && !matchesShop) {
