@@ -103,16 +103,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Consumer<AuthProvider>(
               builder: (context, authProvider, child) {
                 final user = authProvider.currentUser;
-                String avatarUrl = 'https://picsum.photos/seed/user/200';
-                if (user?.avatarUrlPreview != null &&
-                    user!.avatarUrlPreview!.isNotEmpty) {
-                  if (user.avatarUrlPreview!.startsWith('http')) {
-                    avatarUrl = user.avatarUrlPreview!;
-                  } else {
-                    avatarUrl =
-                        '${ApiConfig.baseUrl.replaceAll('/api', '')}/${user.avatarUrlPreview!}';
-                  }
-                }
+                final avatarUrl = ApiConfig.formatImageUrl(
+                  user?.avatarUrlPreview,
+                );
+                final hasAvatar = avatarUrl.isNotEmpty;
 
                 return GestureDetector(
                   onTap: () {
@@ -140,10 +134,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         CircleAvatar(
                           radius: 30,
                           backgroundColor: Colors.grey.shade200,
-                          backgroundImage: user?.avatarUrlPreview != null
+                          backgroundImage: hasAvatar
                               ? NetworkImage(avatarUrl)
                               : null,
-                          child: user?.avatarUrlPreview == null
+                          child: !hasAvatar
                               ? const Icon(
                                   LucideIcons.user,
                                   size: 30,

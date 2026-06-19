@@ -6,6 +6,7 @@ import 'package:pawly_mobile/apps/profile/model/pet_dto.dart';
 import 'package:pawly_mobile/apps/profile/model/pet_model.dart';
 import 'package:pawly_mobile/apps/profile/api/pet_service.dart';
 import 'package:pawly_mobile/common/toast/app_toast.dart';
+import 'package:pawly_mobile/common/utils/image_url_util.dart';
 import 'package:pawly_mobile/apps/profile/model/pet_species_dto.dart';
 import 'dart:io';
 
@@ -79,6 +80,8 @@ class _AddPetScreenState extends State<AddPetScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final currentAvatarUrl = ImageUrlUtil.buildPublicUrl(widget.pet?.avatarUrl);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(

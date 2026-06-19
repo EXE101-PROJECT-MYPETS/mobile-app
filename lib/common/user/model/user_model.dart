@@ -1,3 +1,5 @@
+import 'package:pawly_mobile/common/utils/image_url_util.dart';
+
 class UserModel {
   final int id;
   final String email;
@@ -28,6 +30,8 @@ class UserModel {
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
+    final avatarUrlPreview = json['avatarUrlPreview'];
+
     return UserModel(
       id: (json['id'] as num?)?.toInt() ?? 0,
       email: json['email'] ?? '',
@@ -36,7 +40,9 @@ class UserModel {
       status: json['status'],
       address: json['address'],
       age: (json['age'] as num?)?.toInt(),
-      avatarUrlPreview: json['avatarUrlPreview'],
+      avatarUrlPreview: ImageUrlUtil.buildPublicUrl(
+        avatarUrlPreview?.toString(),
+      ),
       role: json['role'] ?? 'CUSTOMER',
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],

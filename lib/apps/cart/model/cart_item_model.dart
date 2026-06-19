@@ -1,3 +1,5 @@
+import 'package:pawly_mobile/common/utils/image_url_util.dart';
+
 class CartItem {
   final String id;
   final bool isService;
@@ -52,7 +54,7 @@ class CartItem {
       productId: productId,
       serviceId: null,
       name: name,
-      imageUrl: imageUrl,
+      imageUrl: ImageUrlUtil.buildPublicUrl(imageUrl) ?? '',
       unitPrice: unitPrice,
       weightKg: weightKg,
       quantity: quantity,
@@ -82,7 +84,7 @@ class CartItem {
       productId: null,
       serviceId: serviceId,
       name: name,
-      imageUrl: imageUrl,
+      imageUrl: ImageUrlUtil.buildPublicUrl(imageUrl) ?? '',
       unitPrice: unitPrice,
       weightKg: null,
       quantity: quantity,
@@ -103,7 +105,7 @@ class CartItem {
       productId: productId,
       serviceId: serviceId,
       name: name,
-      imageUrl: imageUrl,
+      imageUrl: ImageUrlUtil.buildPublicUrl(imageUrl) ?? '',
       unitPrice: unitPrice,
       weightKg: weightKg ?? this.weightKg,
       quantity: quantity ?? this.quantity,
@@ -141,7 +143,7 @@ class CartItem {
       productId: map['productId'],
       serviceId: map['serviceId'],
       name: map['name'] ?? '',
-      imageUrl: map['imageUrl'] ?? '',
+      imageUrl: ImageUrlUtil.buildPublicUrl(map['imageUrl']?.toString()) ?? '',
       unitPrice: map['unitPrice'] ?? 0,
       weightKg: _parseDouble(map['weightKg']),
       quantity: map['quantity'] ?? 1,

@@ -1,10 +1,12 @@
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:pawly_mobile/common/utils/image_url_util.dart';
 
 class ApiConfig {
   static const Duration requestTimeout = Duration(seconds: 15);
 
+  static const String _deployedBaseUrl = 'https://api.pawly.website/api';
   static const String _androidEmulatorBaseUrl = 'http://10.0.2.2:8080/api';
   static const String _iosSimulatorBaseUrl = 'http://localhost:8080/api';
   static const List<String> _physicalDeviceBaseUrls = [
@@ -16,13 +18,13 @@ class ApiConfig {
 
   static String _baseUrl = const String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: '',
+    defaultValue: _deployedBaseUrl,
   );
 
   static Future<void> initialize() async {
     const configuredBaseUrl = String.fromEnvironment(
       'API_BASE_URL',
-      defaultValue: '',
+      defaultValue: _deployedBaseUrl,
     );
     if (configuredBaseUrl.isNotEmpty) {
       _baseUrl = configuredBaseUrl;
@@ -113,7 +115,10 @@ class ApiConfig {
   static String get productPublicUrl => '$baseUrl/public/products';
   static String get productMobileUrl => '$productPublicUrl/mobile';
   static String get shopPublicUrl => '$baseUrl/public/shops';
+  static String get nearbyShopsUrl => '$shopPublicUrl/nearby';
   static String get shopMarkersUrl => '$shopPublicUrl/markers';
+  static String shopServicesUrl(int shopId) =>
+      '$shopPublicUrl/$shopId/services';
   static String serviceDetailUrl(int id) => '$baseUrl/services/$id';
   static String shopBookingsUrl(int shopId) =>
       '$baseUrl/shops/$shopId/bookings';
@@ -143,14 +148,6 @@ class ApiConfig {
   }
 
   static String formatImageUrl(String? url) {
-    if (url == null || url.isEmpty) return '';
-    if (url.startsWith('http://') || url.startsWith('https://')) return url;
-
-    // Remove /api from baseUrl since images are usually hosted at /uploads directly
-    final base = baseUrl.replaceAll('/api', '');
-    if (url.startsWith('/')) {
-      return '$base$url';
-    }
-    return '$base/$url';
+    return ImageUrlUtil.buildPublicUrl(url) ?? '';
   }
 }

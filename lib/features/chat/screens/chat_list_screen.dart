@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pawly_mobile/common/utils/image_url_util.dart';
 import 'package:provider/provider.dart';
 import '../providers/chat_provider.dart';
 import 'chat_detail_screen.dart';
@@ -20,15 +21,7 @@ class _ChatListScreenState extends State<ChatListScreen>
   }
 
   String? _safeAvatarUrl(String? url) {
-    final normalized = url?.trim();
-    if (normalized == null || normalized.isEmpty) return null;
-    final lower = normalized.toLowerCase();
-    if (lower.startsWith('/uploads/') ||
-        lower.startsWith('uploads/') ||
-        lower.contains(':8080/uploads/')) {
-      return null;
-    }
-    return normalized;
+    return ImageUrlUtil.buildPublicUrl(url);
   }
 
   @override

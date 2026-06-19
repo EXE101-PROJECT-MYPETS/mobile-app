@@ -109,6 +109,44 @@ class ServicePublicService {
     }
   }
 
+  Future<ScrollResponse<ServicePublicDTO>> getByShopForScroll({
+    required int shopId,
+    bool active = true,
+    int? cursor,
+    int size = 20,
+  }) async {
+    final queryParams = <String, String>{
+      'active': active.toString(),
+      'size': size.clamp(1, 50).toString(),
+    };
+
+    if (cursor != null) {
+      queryParams['cursor'] = cursor.toString();
+    }
+
+    final uri = Uri.parse(
+      ApiConfig.shopServicesUrl(shopId),
+    ).replace(queryParameters: queryParams);
+
+    final response = await _client.get(
+      uri,
+      headers: const {'ngrok-skip-browser-warning': 'true'},
+    );
+
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(utf8.decode(response.bodyBytes));
+      if (decoded is Map<String, dynamic>) {
+        return ScrollResponse<ServicePublicDTO>.fromJson(
+          decoded,
+          (item) => ServicePublicDTO.fromJson(item),
+        );
+      }
+      throw Exception('Dữ liệu dịch vụ của shop không hợp lệ');
+    }
+
+    throw Exception('Không thể tải dịch vụ của shop (${response.statusCode})');
+  }
+
   Future<ScrollResponse<ServicePublicDTO>> getVeterinaryForScroll({
     int? shopId,
     String? search,

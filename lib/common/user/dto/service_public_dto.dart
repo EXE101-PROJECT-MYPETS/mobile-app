@@ -150,15 +150,15 @@ class ShopInfoDTO {
 
   factory ShopInfoDTO.fromJson(Map<String, dynamic> json) {
     return ShopInfoDTO(
-      shopId: json['shopId'] as int?,
+      shopId: _asInt(json['shopId']),
       shopName: json['shopName'] as String?,
       shopImageUrl: ImageUrlUtil.buildPublicUrl(
         json['shopImageUrl'] as String?,
       ),
       shopAddress: json['shopAddress'] as String?,
       shopProvince: json['shopProvince'] as String?,
-      shopLat: (json['shopLat'] as num?)?.toDouble(),
-      shopLng: (json['shopLng'] as num?)?.toDouble(),
+      shopLat: _asDouble(json['shopLat']),
+      shopLng: _asDouble(json['shopLng']),
     );
   }
 
