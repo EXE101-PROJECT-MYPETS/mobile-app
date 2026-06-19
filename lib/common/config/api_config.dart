@@ -6,6 +6,7 @@ import 'package:pawly_mobile/common/utils/image_url_util.dart';
 class ApiConfig {
   static const Duration requestTimeout = Duration(seconds: 15);
 
+  static const String _deployedBaseUrl = 'https://api.pawly.website/api';
   static const String _androidEmulatorBaseUrl = 'http://10.0.2.2:8080/api';
   static const String _iosSimulatorBaseUrl = 'http://localhost:8080/api';
   static const List<String> _physicalDeviceBaseUrls = [
@@ -16,13 +17,13 @@ class ApiConfig {
 
   static String _baseUrl = const String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: '',
+    defaultValue: _deployedBaseUrl,
   );
 
   static Future<void> initialize() async {
     final configuredBaseUrl = const String.fromEnvironment(
       'API_BASE_URL',
-      defaultValue: '',
+      defaultValue: _deployedBaseUrl,
     );
     if (configuredBaseUrl.isNotEmpty) {
       _baseUrl = configuredBaseUrl;
