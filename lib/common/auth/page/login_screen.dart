@@ -469,14 +469,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                             authProvider,
                                           ),
                                         ),
-                                        const SizedBox(height: 8),
-                                        _SocialButton(
-                                          providerName: 'Apple',
-                                          label: 'Đăng nhập với Apple',
-                                          icon: Icons.apple,
-                                          iconColor: Colors.black,
-                                          enabled: socialEnabled,
-                                        ),
                                       ],
                                     );
                                   },
