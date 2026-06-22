@@ -280,9 +280,8 @@ class _SpaServiceScreenState extends State<SpaServiceScreen> {
     }
 
     final veterinaryServices = _shopServices.where(_isVeterinary).toList();
-    final spaServices = _shopServices
-        .where((service) => !_isVeterinary(service))
-        .toList();
+    final spaServices =
+        _shopServices.where((service) => !_isVeterinary(service)).toList();
 
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
@@ -602,8 +601,7 @@ class _NearbyShopCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final openingHours = shop.openingHours?.trim();
     final closingHours = shop.closingHours?.trim();
-    final hasHours =
-        (openingHours?.isNotEmpty ?? false) ||
+    final hasHours = (openingHours?.isNotEmpty ?? false) ||
         (closingHours?.isNotEmpty ?? false);
 
     return SizedBox(

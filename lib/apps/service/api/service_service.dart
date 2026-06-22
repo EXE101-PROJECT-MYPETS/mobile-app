@@ -4,6 +4,7 @@ import 'package:pawly_mobile/apps/service/model/booking_create_request.dart';
 import 'package:pawly_mobile/apps/service/model/service_detail_dto.dart';
 import 'package:pawly_mobile/common/config/api_client.dart';
 import 'package:pawly_mobile/common/config/api_config.dart';
+import 'package:pawly_mobile/apps/service/model/booking_list_item_dto.dart';
 import 'package:pawly_mobile/common/user/dto/service_public_dto.dart';
 import 'package:pawly_mobile/common/user/dto/scroll_response.dart';
 
@@ -286,5 +287,42 @@ class ServiceBookingService {
     }
 
     throw Exception('Không thể tạo lịch hẹn (${response.statusCode})');
+  }
+
+  Future<ScrollResponse<BookingListItemDTO>> getCustomerBookings({
+    String? status,
+    int? cursor,
+    int size = 10,
+    String? token,
+  }) async {
+    final queryParams = <String, String>{'size': size.toString()};
+    if (status != null) {
+      queryParams['status'] = status;
+    }
+    if (cursor != null) {
+      queryParams['cursor'] = cursor.toString();
+    }
+
+    final uri = Uri.parse(ApiConfig.customerBookingsUrl)
+        .replace(queryParameters: queryParams);
+
+    final headers = <String, String>{};
+    if (token != null) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+
+    final response = await _client.get(uri, headers: headers);
+    final body = utf8.decode(response.bodyBytes);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      final decoded = jsonDecode(body) as Map<String, dynamic>;
+      return ScrollResponse<BookingListItemDTO>.fromJson(
+        decoded,
+        (item) => BookingListItemDTO.fromJson(item),
+      );
+    }
+
+    throw Exception(
+        'Không thể tải lịch sử đặt lịch (${response.statusCode}): $body');
   }
 }

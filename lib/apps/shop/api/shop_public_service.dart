@@ -6,7 +6,7 @@ import 'package:pawly_mobile/common/config/public_api_client.dart';
 
 class ShopPublicService {
   ShopPublicService({PublicApiClient? client})
-    : _client = client ?? PublicApiClient.instance;
+      : _client = client ?? PublicApiClient.instance;
 
   final PublicApiClient _client;
 

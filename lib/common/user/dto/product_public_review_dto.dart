@@ -10,6 +10,9 @@ class ProductPublicReviewDTO {
   final String? variant;
   final String? createdAt;
   final int? likeCount;
+  final int? dislikeCount;
+  final String? userReaction;
+  final String? reply;
   final bool? verifiedPurchase;
 
   ProductPublicReviewDTO({
@@ -22,6 +25,9 @@ class ProductPublicReviewDTO {
     this.variant,
     this.createdAt,
     this.likeCount,
+    this.dislikeCount,
+    this.userReaction,
+    this.reply,
     this.verifiedPurchase,
   });
 
@@ -45,6 +51,9 @@ class ProductPublicReviewDTO {
       likeCount: json['likeCount'] as int? ??
           json['helpfulCount'] as int? ??
           json['usefulCount'] as int?,
+      dislikeCount: json['dislikeCount'] as int?,
+      userReaction: json['userReaction'] as String?,
+      reply: json['reply'] as String?,
       verifiedPurchase:
           json['verifiedPurchase'] as bool? ?? json['isVerified'] as bool?,
     );

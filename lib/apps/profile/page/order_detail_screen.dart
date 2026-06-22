@@ -9,6 +9,7 @@ import 'package:pawly_mobile/apps/shop/page/shop_detail_screen.dart';
 import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
 import 'package:pawly_mobile/common/config/api_config.dart';
 import 'package:pawly_mobile/common/toast/app_toast.dart';
+import 'package:pawly_mobile/common/component/write_review_sheet.dart';
 import 'package:pawly_mobile/features/chat/providers/chat_provider.dart';
 import 'package:pawly_mobile/features/chat/screens/chat_detail_screen.dart';
 
@@ -196,6 +197,146 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             ProductDetailScreen(productId: productId.toString()),
       ),
     );
+  }
+
+  Future<void> _completeOrder(Map<String, dynamic> order) async {
+    final orderId = _asInt(order['id']);
+    if (orderId == null) return;
+
+    final token = context.read<AuthProvider>().token;
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Xác nhận đã nhận hàng'),
+        content:
+            const Text('Bạn có chắc chắn đã nhận được đơn hàng này không?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Hủy'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Xác nhận'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      await _orderService.completeCustomerOrder(id: orderId, token: token);
+      if (!mounted) return;
+      showAppToast(
+        context,
+        message: 'Xác nhận đã nhận hàng thành công!',
+        type: AppToastType.success,
+      );
+      _refresh();
+    } catch (e) {
+      if (!mounted) return;
+      showAppToast(
+        context,
+        message: 'Có lỗi xảy ra: ${e.toString()}',
+        type: AppToastType.error,
+      );
+    }
+  }
+
+  void _onReviewTap(Map<String, dynamic> order) {
+    final items = _itemsOf(order);
+    if (items.isEmpty) {
+      showAppToast(
+        context,
+        message: 'Không tìm thấy thông tin sản phẩm để đánh giá',
+        type: AppToastType.error,
+      );
+      return;
+    }
+
+    if (items.length == 1) {
+      final item = items.first;
+      final productId = _asInt(item['productId']);
+      if (productId == null) return;
+      showWriteReviewSheet(
+        context: context,
+        productId: productId,
+        name: _asString(item['productName'], 'Sản phẩm'),
+        imageUrl: _imageUrl(item),
+        onReviewSubmitted: _refresh,
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(
+            'Chọn sản phẩm đánh giá',
+            style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.separated(
+              shrinkWrap: true,
+              itemCount: items.length,
+              separatorBuilder: (_, __) => const Divider(),
+              itemBuilder: (context, index) {
+                final item = items[index];
+                return ListTile(
+                  leading: SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: Image.network(
+                        _imageUrl(item),
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) =>
+                            Container(color: Colors.grey.shade200),
+                      ),
+                    ),
+                  ),
+                  title: Text(
+                    _asString(item['productName'], 'Sản phẩm'),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                        fontSize: 13, fontWeight: FontWeight.w600),
+                  ),
+                  trailing: const Icon(Icons.arrow_forward_ios,
+                      size: 14, color: Color(0xFFFB7185)),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    final productId = _asInt(item['productId']);
+                    if (productId == null) return;
+                    showWriteReviewSheet(
+                      context: context,
+                      productId: productId,
+                      name: _asString(item['productName'], 'Sản phẩm'),
+                      imageUrl: _imageUrl(item),
+                      onReviewSubmitted: _refresh,
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(
+                'Đóng',
+                style: GoogleFonts.inter(
+                    color: Colors.grey, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   void _copyOrderCode(Map<String, dynamic> order) {
@@ -444,6 +585,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           onChat: () => _openChat(order),
           isCancelling: _isCancelling,
           canCancel: _canCancelOrder(order),
+          status: _asString(order['status']),
+          onComplete: () => _completeOrder(order),
+          onReview: () => _onReviewTap(order),
         ),
       ],
     );
@@ -875,6 +1019,9 @@ class _OrderDetailBottomBar extends StatelessWidget {
     required this.onChat,
     required this.isCancelling,
     required this.canCancel,
+    required this.status,
+    required this.onComplete,
+    required this.onReview,
   });
 
   final String orderCode;
@@ -883,6 +1030,9 @@ class _OrderDetailBottomBar extends StatelessWidget {
   final VoidCallback onChat;
   final bool isCancelling;
   final bool canCancel;
+  final String status;
+  final VoidCallback onComplete;
+  final VoidCallback onReview;
 
   @override
   Widget build(BuildContext context) {
@@ -957,6 +1107,38 @@ class _OrderDetailBottomBar extends StatelessWidget {
                     child: const Text('Liên hệ Shop'),
                   ),
                 ),
+                if (status == 'SHIPPING' || status == 'GHTK_PICKED_UP') ...[
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: onComplete,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFB7185),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      child: const Text('Đã nhận hàng'),
+                    ),
+                  ),
+                ],
+                if (status == 'COMPLETED') ...[
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: onReview,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFB7185),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      child: const Text('Đánh giá'),
+                    ),
+                  ),
+                ],
               ],
             ),
           ],

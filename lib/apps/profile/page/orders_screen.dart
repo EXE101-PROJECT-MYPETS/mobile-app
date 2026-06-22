@@ -8,6 +8,7 @@ import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
 import 'package:pawly_mobile/common/config/api_config.dart';
 import 'package:pawly_mobile/common/toast/app_toast.dart';
 import 'package:pawly_mobile/apps/profile/page/order_detail_screen.dart';
+import 'package:pawly_mobile/common/component/write_review_sheet.dart';
 import 'package:pawly_mobile/features/chat/providers/chat_provider.dart';
 import 'package:pawly_mobile/features/chat/screens/chat_detail_screen.dart';
 
@@ -384,6 +385,146 @@ class _OrdersListState extends State<_OrdersList> {
     );
   }
 
+  Future<void> _completeOrder(Map<String, dynamic> order) async {
+    final orderId = _asInt(order['id']);
+    if (orderId == null) return;
+
+    final token = context.read<AuthProvider>().token;
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Xác nhận đã nhận hàng'),
+        content:
+            const Text('Bạn có chắc chắn đã nhận được đơn hàng này không?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Hủy'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Xác nhận'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      await _orderService.completeCustomerOrder(id: orderId, token: token);
+      if (!mounted) return;
+      showAppToast(
+        context,
+        message: 'Xác nhận đã nhận hàng thành công!',
+        type: AppToastType.success,
+      );
+      _loadInitialData();
+    } catch (e) {
+      if (!mounted) return;
+      showAppToast(
+        context,
+        message: 'Có lỗi xảy ra: ${e.toString()}',
+        type: AppToastType.error,
+      );
+    }
+  }
+
+  void _onReviewTap(Map<String, dynamic> order) {
+    final items = _getOrderItems(order['items']);
+    if (items.isEmpty) {
+      showAppToast(
+        context,
+        message: 'Không tìm thấy thông tin sản phẩm để đánh giá',
+        type: AppToastType.error,
+      );
+      return;
+    }
+
+    if (items.length == 1) {
+      final item = items.first;
+      final productId = _asInt(item['productId']);
+      if (productId == null) return;
+      showWriteReviewSheet(
+        context: context,
+        productId: productId,
+        name: _asString(item['productName'], 'Sản phẩm'),
+        imageUrl: _resolveImageUrl(item),
+        onReviewSubmitted: _loadInitialData,
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(
+            'Chọn sản phẩm đánh giá',
+            style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.separated(
+              shrinkWrap: true,
+              itemCount: items.length,
+              separatorBuilder: (_, __) => const Divider(),
+              itemBuilder: (context, index) {
+                final item = items[index];
+                return ListTile(
+                  leading: SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: Image.network(
+                        _resolveImageUrl(item),
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) =>
+                            Container(color: Colors.grey.shade200),
+                      ),
+                    ),
+                  ),
+                  title: Text(
+                    _asString(item['productName'], 'Sản phẩm'),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                        fontSize: 13, fontWeight: FontWeight.w600),
+                  ),
+                  trailing: const Icon(Icons.arrow_forward_ios,
+                      size: 14, color: Color(0xFFFB7185)),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    final productId = _asInt(item['productId']);
+                    if (productId == null) return;
+                    showWriteReviewSheet(
+                      context: context,
+                      productId: productId,
+                      name: _asString(item['productName'], 'Sản phẩm'),
+                      imageUrl: _resolveImageUrl(item),
+                      onReviewSubmitted: _loadInitialData,
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(
+                'Đóng',
+                style: GoogleFonts.inter(
+                    color: Colors.grey, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   Widget _buildOrderCard(
     Map<String, dynamic> order,
     NumberFormat currencyFormat,
@@ -540,25 +681,74 @@ class _OrdersListState extends State<_OrdersList> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
-                  OutlinedButton(
-                    onPressed: () => _openChatForOrder(order),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF111827),
-                      side: const BorderSide(color: Color(0xFFD1D5DB)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      OutlinedButton(
+                        onPressed: () => _openChatForOrder(order),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF111827),
+                          side: const BorderSide(color: Color(0xFFD1D5DB)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 18,
+                            vertical: 10,
+                          ),
+                          textStyle: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        child: const Text('Liên hệ Shop'),
                       ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 10,
-                      ),
-                      textStyle: GoogleFonts.inter(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    child: const Text('Liên hệ Shop'),
+                      if (statusString == 'SHIPPING' ||
+                          statusString == 'GHTK_PICKED_UP') ...[
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () => _completeOrder(order),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFFB7185),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 18,
+                              vertical: 10,
+                            ),
+                            textStyle: GoogleFonts.inter(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          child: const Text('Đã nhận hàng'),
+                        ),
+                      ],
+                      if (statusString == 'COMPLETED') ...[
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () => _onReviewTap(order),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFFB7185),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 18,
+                              vertical: 10,
+                            ),
+                            textStyle: GoogleFonts.inter(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          child: const Text('Đánh giá'),
+                        ),
+                      ],
+                    ],
                   ),
                 ],
               ),
