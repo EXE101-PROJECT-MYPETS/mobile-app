@@ -155,6 +155,10 @@ class ServiceDetailReviewDTO {
     this.content,
     this.user,
     this.date,
+    this.reply,
+    this.likeCount,
+    this.dislikeCount,
+    this.userReaction,
   });
 
   final int? id;
@@ -162,6 +166,10 @@ class ServiceDetailReviewDTO {
   final String? content;
   final ServiceDetailReviewUserDTO? user;
   final String? date;
+  final String? reply;
+  final int? likeCount;
+  final int? dislikeCount;
+  final String? userReaction;
 
   factory ServiceDetailReviewDTO.fromJson(Map<String, dynamic> json) {
     return ServiceDetailReviewDTO(
@@ -174,6 +182,10 @@ class ServiceDetailReviewDTO {
             )
           : null,
       date: ServiceDetailDTO._asString(json['date']),
+      reply: ServiceDetailDTO._asString(json['reply']),
+      likeCount: ServiceDetailDTO._asInt(json['likeCount']),
+      dislikeCount: ServiceDetailDTO._asInt(json['dislikeCount']),
+      userReaction: ServiceDetailDTO._asString(json['userReaction']),
     );
   }
 
@@ -184,6 +196,10 @@ class ServiceDetailReviewDTO {
       'content': content,
       'user': user?.toJson(),
       'date': date,
+      'reply': reply,
+      'likeCount': likeCount,
+      'dislikeCount': dislikeCount,
+      'userReaction': userReaction,
     };
   }
 }

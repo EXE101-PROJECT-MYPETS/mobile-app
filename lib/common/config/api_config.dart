@@ -129,6 +129,23 @@ class ApiConfig {
   // Order endpoints
   static String get ordersUrl => '$baseUrl/orders';
   static String get checkoutUrl => '$baseUrl/v1/checkout';
+  static String orderCustomerCompleteUrl(int id) =>
+      '$baseUrl/orders/customer/$id/complete';
+
+  // Review endpoints
+  static String get productReviewsCustomerUrl => '$baseUrl/reviews/customer';
+  static String get serviceReviewsCustomerUrl =>
+      '$baseUrl/service-reviews/customer';
+  static String productReviewLikeUrl(int id) => '$baseUrl/reviews/$id/like';
+  static String productReviewDislikeUrl(int id) =>
+      '$baseUrl/reviews/$id/dislike';
+  static String serviceReviewLikeUrl(int id) =>
+      '$baseUrl/service-reviews/$id/like';
+  static String serviceReviewDislikeUrl(int id) =>
+      '$baseUrl/service-reviews/$id/dislike';
+
+  // Booking customer endpoints
+  static String get customerBookingsUrl => '$baseUrl/bookings/customer';
 
   // Chat endpoints
   static String get chatUrl => '$baseUrl/customer/conversations';

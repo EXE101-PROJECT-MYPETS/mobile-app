@@ -14,6 +14,7 @@ import 'package:pawly_mobile/common/toast/app_toast.dart';
 import 'package:pawly_mobile/features/chat/providers/chat_provider.dart';
 import 'package:pawly_mobile/features/chat/screens/chat_detail_screen.dart';
 import 'package:pawly_mobile/apps/product/api/product_service.dart';
+import 'package:pawly_mobile/common/user/api/review_service.dart';
 import 'package:pawly_mobile/common/user/dto/product_public_detail_dto.dart';
 import 'package:pawly_mobile/common/user/dto/product_public_review_dto.dart';
 import 'package:pawly_mobile/common/user/dto/shop_public_dto.dart';
@@ -70,6 +71,35 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       relatedProducts: relatedProducts,
       topReviews: reviews,
     );
+  }
+
+  Future<void> _toggleReviewReaction(
+      ProductPublicReviewDTO review, bool isLike) async {
+    final token = context.read<AuthProvider>().token;
+    if (token == null) {
+      showLoginRequiredSheet(context);
+      return;
+    }
+
+    final reviewService = ReviewService();
+    try {
+      if (isLike) {
+        await reviewService.likeProductReview(review.id!, token: token);
+      } else {
+        await reviewService.dislikeProductReview(review.id!, token: token);
+      }
+
+      setState(() {
+        _pageDataFuture = _loadPageData();
+      });
+    } catch (e) {
+      if (!mounted) return;
+      showAppToast(
+        context,
+        message: 'Có lỗi xảy ra: ${e.toString()}',
+        type: AppToastType.error,
+      );
+    }
   }
 
   @override
@@ -1054,13 +1084,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ],
                 ),
               ),
-              Text(
-                '${review.likeCount ?? 0} hữu ích',
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  color: const Color(0xFF6B7280),
-                ),
-              ),
+              const SizedBox.shrink(),
             ],
           ),
           const SizedBox(height: 8),
@@ -1101,6 +1125,110 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ),
                   );
                 },
+              ),
+            ),
+          ],
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () => _toggleReviewReaction(review, true),
+                child: Row(
+                  children: [
+                    Icon(
+                      review.userReaction == 'LIKE'
+                          ? Icons.thumb_up_rounded
+                          : Icons.thumb_up_outlined,
+                      size: 16,
+                      color: review.userReaction == 'LIKE'
+                          ? const Color(0xFFFB7185)
+                          : const Color(0xFF6B7280),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${review.likeCount ?? 0}',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: review.userReaction == 'LIKE'
+                            ? const Color(0xFFFB7185)
+                            : const Color(0xFF6B7280),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              GestureDetector(
+                onTap: () => _toggleReviewReaction(review, false),
+                child: Row(
+                  children: [
+                    Icon(
+                      review.userReaction == 'DISLIKE'
+                          ? Icons.thumb_down_rounded
+                          : Icons.thumb_down_outlined,
+                      size: 16,
+                      color: review.userReaction == 'DISLIKE'
+                          ? Colors.blue
+                          : const Color(0xFF6B7280),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${review.dislikeCount ?? 0}',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: review.userReaction == 'DISLIKE'
+                            ? Colors.blue
+                            : const Color(0xFF6B7280),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (review.reply != null && review.reply!.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFF1F5F9)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        LucideIcons.message_square,
+                        size: 14,
+                        color: Color(0xFFFB7185),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Phản hồi từ Cửa hàng',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF1E293B),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    review.reply!,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: const Color(0xFF475569),
+                      height: 1.4,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

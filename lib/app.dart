@@ -5,6 +5,7 @@ import 'package:pawly_mobile/apps/cart/page/cart_screen.dart';
 import 'package:pawly_mobile/apps/home/page/home_screen.dart';
 import 'package:pawly_mobile/apps/home/page/notifications_screen.dart';
 import 'package:pawly_mobile/apps/product/page/product_list_screen.dart';
+import 'package:pawly_mobile/apps/profile/page/bookings_screen.dart';
 import 'package:pawly_mobile/apps/profile/page/my_pets_screen.dart';
 import 'package:pawly_mobile/apps/profile/page/orders_screen.dart';
 import 'package:pawly_mobile/apps/profile/page/profile_screen.dart';
@@ -66,8 +67,7 @@ class _MyAppState extends State<MyApp> {
         MainTabRoutes.notifications: (context) => const NotificationsScreen(),
         MainTabRoutes.profile: (context) => const ProfileScreen(),
         '/pets': (context) => const MyPetsScreen(),
-        '/bookings': (context) =>
-            const HomeScreen(), // TODO: Create BookingsScreen
+        '/bookings': (context) => const BookingsScreen(),
         '/orders': (context) => const OrdersScreen(),
         '/conversations': (context) => const ChatListScreen(),
       },

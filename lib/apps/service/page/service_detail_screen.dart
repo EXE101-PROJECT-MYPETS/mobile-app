@@ -10,10 +10,12 @@ import 'package:pawly_mobile/apps/service/model/service_detail_dto.dart';
 import 'package:pawly_mobile/apps/shop/page/shop_detail_screen.dart';
 import 'package:pawly_mobile/common/auth/store/auth_provider.dart';
 import 'package:pawly_mobile/common/component/login_required_sheet.dart';
+import 'package:pawly_mobile/common/user/api/review_service.dart';
 import 'package:pawly_mobile/common/component/service_card.dart';
 import 'package:pawly_mobile/common/user/dto/service_public_dto.dart';
 import 'package:pawly_mobile/common/utils/image_url_util.dart';
 import 'package:pawly_mobile/common/utils/price_formatter.dart';
+import 'package:pawly_mobile/common/toast/app_toast.dart';
 
 class ServiceDetailScreen extends StatefulWidget {
   const ServiceDetailScreen({
@@ -421,6 +423,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
         onManagePets: _openPets,
         onRetryPets: _loadPets,
         onRetryRelated: () => _loadRelatedServices(reset: true),
+        onRefresh: _loadDetail,
       ),
       bottomNavigationBar: _BookingBar(
         detail: detail,
@@ -454,6 +457,7 @@ class _ServiceDetailContent extends StatelessWidget {
     required this.onManagePets,
     required this.onRetryPets,
     required this.onRetryRelated,
+    required this.onRefresh,
   });
 
   final ScrollController scrollController;
@@ -477,6 +481,7 @@ class _ServiceDetailContent extends StatelessWidget {
   final VoidCallback onManagePets;
   final VoidCallback onRetryPets;
   final VoidCallback onRetryRelated;
+  final VoidCallback onRefresh;
 
   @override
   Widget build(BuildContext context) {
@@ -523,7 +528,10 @@ class _ServiceDetailContent extends StatelessWidget {
                 const SizedBox(height: 12),
                 _ShopPanel(detail: detail),
                 const SizedBox(height: 12),
-                _ReviewsPanel(detail: detail),
+                _ReviewsPanel(
+                  detail: detail,
+                  onReactionToggled: onRefresh,
+                ),
                 const SizedBox(height: 12),
                 _SchedulePanel(
                   pets: pets,
@@ -753,7 +761,8 @@ class _QuickInfoPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _PanelTitle(icon: LucideIcons.file_text, text: 'Thông tin dịch vụ'),
+          const _PanelTitle(
+              icon: LucideIcons.file_text, text: 'Thông tin dịch vụ'),
           const SizedBox(height: 12),
           ...rows.expand((row) sync* {
             yield row;
@@ -911,7 +920,8 @@ class _SchedulePanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _PanelTitle(icon: LucideIcons.calendar_check, text: 'Chọn lịch hẹn'),
+          const _PanelTitle(
+              icon: LucideIcons.calendar_check, text: 'Chọn lịch hẹn'),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -1616,11 +1626,15 @@ class _PanelPrompt extends StatelessWidget {
 }
 
 class _ReviewsPanel extends StatelessWidget {
-  const _ReviewsPanel({required this.detail});
+  const _ReviewsPanel({
+    required this.detail,
+    required this.onReactionToggled,
+  });
 
   static const int _previewLimit = 5;
 
   final ServiceDetailDTO detail;
+  final VoidCallback onReactionToggled;
 
   @override
   Widget build(BuildContext context) {
@@ -1633,7 +1647,8 @@ class _ReviewsPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _PanelTitle(icon: LucideIcons.star, text: 'Đánh giá khách hàng'),
+          const _PanelTitle(
+              icon: LucideIcons.star, text: 'Đánh giá khách hàng'),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -1691,7 +1706,10 @@ class _ReviewsPanel extends StatelessWidget {
             )
           else ...[
             ...previewReviews.map(
-              (review) => _ServiceReviewCard(review: review),
+              (review) => _ServiceReviewCard(
+                review: review,
+                onReactionToggled: onReactionToggled,
+              ),
             ),
             if (reviews.length > _previewLimit)
               TextButton(
@@ -1746,7 +1764,10 @@ class _ReviewsPanel extends StatelessWidget {
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
                     itemCount: reviews.length,
                     itemBuilder: (context, index) {
-                      return _ServiceReviewCard(review: reviews[index]);
+                      return _ServiceReviewCard(
+                        review: reviews[index],
+                        onReactionToggled: onReactionToggled,
+                      );
                     },
                   ),
                 ),
@@ -1760,9 +1781,37 @@ class _ReviewsPanel extends StatelessWidget {
 }
 
 class _ServiceReviewCard extends StatelessWidget {
-  const _ServiceReviewCard({required this.review});
+  const _ServiceReviewCard({
+    required this.review,
+    required this.onReactionToggled,
+  });
 
   final ServiceDetailReviewDTO review;
+  final VoidCallback onReactionToggled;
+
+  Future<void> _toggleReaction(BuildContext context, bool isLike) async {
+    final token = context.read<AuthProvider>().token;
+    if (token == null) {
+      showLoginRequiredSheet(context);
+      return;
+    }
+
+    try {
+      if (isLike) {
+        await ReviewService().likeServiceReview(review.id!, token: token);
+      } else {
+        await ReviewService().dislikeServiceReview(review.id!, token: token);
+      }
+      onReactionToggled();
+    } catch (e) {
+      if (!context.mounted) return;
+      showAppToast(
+        context,
+        message: 'Có lỗi xảy ra: ${e.toString()}',
+        type: AppToastType.error,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1852,6 +1901,110 @@ class _ServiceReviewCard extends StatelessWidget {
               height: 1.45,
             ),
           ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () => _toggleReaction(context, true),
+                child: Row(
+                  children: [
+                    Icon(
+                      review.userReaction == 'LIKE'
+                          ? Icons.thumb_up_rounded
+                          : Icons.thumb_up_outlined,
+                      size: 16,
+                      color: review.userReaction == 'LIKE'
+                          ? const Color(0xFFFB7185)
+                          : const Color(0xFF6B7280),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${review.likeCount ?? 0}',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: review.userReaction == 'LIKE'
+                            ? const Color(0xFFFB7185)
+                            : const Color(0xFF6B7280),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              GestureDetector(
+                onTap: () => _toggleReaction(context, false),
+                child: Row(
+                  children: [
+                    Icon(
+                      review.userReaction == 'DISLIKE'
+                          ? Icons.thumb_down_rounded
+                          : Icons.thumb_down_outlined,
+                      size: 16,
+                      color: review.userReaction == 'DISLIKE'
+                          ? Colors.blue
+                          : const Color(0xFF6B7280),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${review.dislikeCount ?? 0}',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: review.userReaction == 'DISLIKE'
+                            ? Colors.blue
+                            : const Color(0xFF6B7280),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (review.reply != null && review.reply!.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFF1F5F9)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        LucideIcons.message_square,
+                        size: 14,
+                        color: Color(0xFFFB7185),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Phản hồi từ Cửa hàng',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF1E293B),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    review.reply!,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: const Color(0xFF475569),
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );

@@ -134,9 +134,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         CircleAvatar(
                           radius: 30,
                           backgroundColor: Colors.grey.shade200,
-                          backgroundImage: hasAvatar
-                              ? NetworkImage(avatarUrl)
-                              : null,
+                          backgroundImage:
+                              hasAvatar ? NetworkImage(avatarUrl) : null,
                           child: !hasAvatar
                               ? const Icon(
                                   LucideIcons.user,
